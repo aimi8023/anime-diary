@@ -6,8 +6,8 @@ const ANIME_KEY = "anime:all";
 
 function getRedis(): Redis {
   return new Redis({
-    url: process.env.STORAGE_REDIS_REST_URL!,
-    token: process.env.STORAGE_REDIS_REST_TOKEN!,
+    url: process.env.KV_REST_API_URL!,
+    token: process.env.KV_REST_API_TOKEN!,
   });
 }
 
