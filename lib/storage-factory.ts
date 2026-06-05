@@ -3,7 +3,7 @@ import { jsonStorage } from "./storage-json";
 import { kvStorage } from "./storage-kv";
 
 function getStorage(): Storage {
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
     return kvStorage;
   }
   return jsonStorage;
