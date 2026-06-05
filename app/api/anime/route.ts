@@ -8,8 +8,9 @@ export async function GET() {
     const list = await storage.getAll();
     return NextResponse.json(list);
   } catch (error) {
+    const message = error instanceof Error ? error.message : "获取数据失败";
     console.error("GET /api/anime error:", error);
-    return NextResponse.json({ error: "获取数据失败" }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -41,7 +42,8 @@ export async function POST(request: Request) {
     await storage.add(anime);
     return NextResponse.json(anime, { status: 201 });
   } catch (error) {
+    const message = error instanceof Error ? error.message : "添加失败";
     console.error("POST /api/anime error:", error);
-    return NextResponse.json({ error: "添加失败" }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
