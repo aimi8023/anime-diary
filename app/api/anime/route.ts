@@ -33,7 +33,6 @@ export async function POST(request: Request) {
       season: body.season.trim(),
       cover: body.cover?.trim() || "",
       rating: Math.round(Math.min(10, Math.max(1, Number(body.rating) || 1)) * 2) / 2,
-      status: body.status || "想看",
       comment: body.comment?.trim() || "",
       episodes: Math.max(0, Number(body.episodes) || 0),
       createdAt: new Date().toISOString(),

@@ -20,7 +20,6 @@ export async function PUT(
     if (body.cover !== undefined) updates.cover = body.cover.trim();
     if (body.rating !== undefined)
       updates.rating = Math.round(Math.min(10, Math.max(1, Number(body.rating))) * 2) / 2;
-    if (body.status !== undefined) updates.status = body.status;
     if (body.comment !== undefined) updates.comment = body.comment.trim();
     if (body.episodes !== undefined)
       updates.episodes = Math.max(0, Number(body.episodes));
