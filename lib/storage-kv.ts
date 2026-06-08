@@ -7,11 +7,32 @@ const ANIME_KEY = "anime:all";
 function getRedis(): Redis {
   // Support both naming conventions
   const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN!;
+  
+  if (!redisUrl) {
+    throw new Error('REDIS_URL or UPSTASH_REDIS_REST_URL is not set');
+  }
+  
+  // Try to extract token from URL if it contains ?token=xxx
+  let token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!token && redisUrl.includes('?token=')) {
+    const urlParts = redisUrl.split('?token=');
+    if (urlParts.length > 1) {
+      token = urlParts[1];
+    }
+  }
+  
+  if (!token) {
+    throw new Error('UPSTASH_REDIS_REST_TOKEN is not set. Please add it to environment variables.');
+  }
+  
+  // Use base URL without token parameter if token is extracted
+  const baseUrl = redisUrl.includes('?token=') 
+    ? redisUrl.split('?token=')[0] 
+    : redisUrl;
   
   return new Redis({
-    url: redisUrl!,
-    token: redisToken,
+    url: baseUrl,
+    token: token,
   });
 }
 
