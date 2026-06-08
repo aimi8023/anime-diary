@@ -61,39 +61,91 @@ function getRedis(): Redis {
 export const kvStorage: Storage = {
   async getAll() {
     const redis = getRedis();
-    const data = await redis.get<string>(ANIME_KEY);
+    // Get data - it might be a string or already parsed object
+    const data = await redis.get<Anime[]>(ANIME_KEY);
+    
     if (!data) return [];
-    const list = JSON.parse(data) as Anime[];
-    return list.sort(
+    
+    // If data is already an array, use it directly
+    if (Array.isArray(data)) return data.sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+    
+    // If data is a string, parse it
+    if (typeof data === 'string') {
+      try {
+        const list = JSON.parse(data) as Anime[];
+        return list.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      } catch (e) {
+        console.error('Failed to parse anime data:', e);
+        return [];
+      }
+    }
+    
+    return [];
   },
 
   async add(anime: Anime) {
     const redis = getRedis();
-    const data = await redis.get<string>(ANIME_KEY);
-    const list: Anime[] = data ? JSON.parse(data) : [];
+    // Get existing data
+    const data = await redis.get<Anime[]>(ANIME_KEY);
+    
+    let list: Anime[] = [];
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (typeof data === 'string') {
+      try {
+        list = JSON.parse(data);
+      } catch (e) {
+        console.error('Failed to parse existing data:', e);
+      }
+    }
+    
     list.push(anime);
-    await redis.set(ANIME_KEY, JSON.stringify(list));
+    await redis.set(ANIME_KEY, list); // Pass object directly, not JSON.stringify
   },
 
   async update(id: string, data: Partial<AnimeInput>) {
     const redis = getRedis();
-    const raw = await redis.get<string>(ANIME_KEY);
-    const list: Anime[] = raw ? JSON.parse(raw) : [];
+    const raw = await redis.get<Anime[]>(ANIME_KEY);
+    
+    let list: Anime[] = [];
+    if (Array.isArray(raw)) {
+      list = raw;
+    } else if (typeof raw === 'string') {
+      try {
+        list = JSON.parse(raw);
+      } catch (e) {
+        console.error('Failed to parse existing data:', e);
+      }
+    }
+    
     const index = list.findIndex((a) => a.id === id);
     if (index === -1) throw new Error(`Anime with id ${id} not found`);
     list[index] = { ...list[index], ...data };
-    await redis.set(ANIME_KEY, JSON.stringify(list));
+    await redis.set(ANIME_KEY, list);
   },
 
   async remove(id: string) {
     const redis = getRedis();
-    const raw = await redis.get<string>(ANIME_KEY);
-    const list: Anime[] = raw ? JSON.parse(raw) : [];
+    const raw = await redis.get<Anime[]>(ANIME_KEY);
+    
+    let list: Anime[] = [];
+    if (Array.isArray(raw)) {
+      list = raw;
+    } else if (typeof raw === 'string') {
+      try {
+        list = JSON.parse(raw);
+      } catch (e) {
+        console.error('Failed to parse existing data:', e);
+      }
+    }
+    
     const filtered = list.filter((a) => a.id !== id);
     if (filtered.length === list.length)
       throw new Error(`Anime with id ${id} not found`);
-    await redis.set(ANIME_KEY, JSON.stringify(filtered));
+    await redis.set(ANIME_KEY, filtered);
   },
 };
