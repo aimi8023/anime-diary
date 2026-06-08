@@ -5,9 +5,13 @@ import type { Storage } from "./storage";
 const ANIME_KEY = "anime:all";
 
 function getRedis(): Redis {
+  // Support both naming conventions
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN!;
+  
   return new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    url: redisUrl!,
+    token: redisToken,
   });
 }
 
