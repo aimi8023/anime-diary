@@ -96,6 +96,22 @@ export default function AdminPage() {
     router.push("/");
   };
 
+  const handleExport = () => {
+    // Create JSON blob
+    const dataStr = JSON.stringify(animeList, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `anime-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-8 gap-3 flex-wrap">
@@ -135,6 +151,18 @@ export default function AdminPage() {
               className="bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white text-sm font-medium px-3 sm:px-4 py-2.5 rounded-lg transition-all min-h-[44px] shadow-md hover:shadow-lg whitespace-nowrap"
             >
               + 添加番剧
+            </button>
+          )}
+          {animeList.length > 0 && (
+            <button
+              onClick={handleExport}
+              className="text-gray-700 hover:text-green-600 border border-gray-300 hover:border-green-500 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] flex items-center gap-1.5 text-sm font-medium bg-white/50 hover:bg-white/80"
+              title="导出数据为 JSON 文件"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span className="hidden sm:inline">导出</span>
             </button>
           )}
           <button
