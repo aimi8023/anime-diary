@@ -5,15 +5,21 @@ import type { Storage } from "./storage";
 const ANIME_KEY = "anime:all";
 
 function getRedis(): Redis {
-  // Support both naming conventions
-  const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
+  // Support multiple environment variable naming conventions
+  const redisUrl = 
+    process.env.UPSTASH_REDIS_REST_URL || 
+    process.env.KV_REST_API_URL || 
+    process.env.REDIS_URL;
   
   if (!redisUrl) {
-    throw new Error('REDIS_URL or UPSTASH_REDIS_REST_URL is not set');
+    throw new Error('REDIS_URL, KV_REST_API_URL, or UPSTASH_REDIS_REST_URL is not set');
   }
   
   // Try to extract token from URL if it contains ?token=xxx
-  let token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  let token = 
+    process.env.UPSTASH_REDIS_REST_TOKEN || 
+    process.env.KV_REST_API_TOKEN;
+  
   if (!token && redisUrl.includes('?token=')) {
     const urlParts = redisUrl.split('?token=');
     if (urlParts.length > 1) {
@@ -21,14 +27,30 @@ function getRedis(): Redis {
     }
   }
   
-  if (!token) {
-    throw new Error('UPSTASH_REDIS_REST_TOKEN is not set. Please add it to environment variables.');
+  // For rediss:// protocol URLs, extract token from the URL
+  if (!token && redisUrl.startsWith('rediss://')) {
+    const match = redisUrl.match(/rediss:\/\/[^:]+:([^@]+)@/);
+    if (match && match[1]) {
+      token = match[1];
+    }
   }
   
-  // Use base URL without token parameter if token is extracted
-  const baseUrl = redisUrl.includes('?token=') 
-    ? redisUrl.split('?token=')[0] 
-    : redisUrl;
+  if (!token) {
+    throw new Error('UPSTASH_REDIS_REST_TOKEN, KV_REST_API_TOKEN, or token in REDIS_URL is not set');
+  }
+  
+  // Convert rediss:// URL to https:// REST API URL if needed
+  let baseUrl = redisUrl;
+  if (redisUrl.startsWith('rediss://')) {
+    // Extract host from rediss://default:token@host:6379
+    const hostMatch = redisUrl.match(/rediss:\/\/[^@]+@([^:]+)/);
+    if (hostMatch && hostMatch[1]) {
+      baseUrl = `https://${hostMatch[1]}`;
+    }
+  } else if (redisUrl.includes('?token=')) {
+    // Remove token parameter from URL
+    baseUrl = redisUrl.split('?token=')[0];
+  }
   
   return new Redis({
     url: baseUrl,
