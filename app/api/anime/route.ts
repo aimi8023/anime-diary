@@ -16,10 +16,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    console.log("POST /api/anime - Starting...");
-    
     const body: AnimeInput = await request.json();
-    console.log("Request body:", JSON.stringify(body, null, 2));
 
     // Basic validation
     if (!body.title?.trim()) {
@@ -41,14 +38,11 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("Saving anime:", JSON.stringify(anime, null, 2));
     await storage.add(anime);
-    console.log("Anime saved successfully!");
-    
     return NextResponse.json(anime, { status: 201 });
   } catch (error) {
-    console.error("POST /api/anime error:", error);
     const message = error instanceof Error ? error.message : "添加失败";
-    return NextResponse.json({ error: message, details: String(error) }, { status: 500 });
+    console.error("POST /api/anime error:", error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
