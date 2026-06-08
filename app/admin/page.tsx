@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchList = useCallback(async () => {
     try {
@@ -31,6 +32,13 @@ export default function AdminPage() {
   useEffect(() => {
     fetchList();
   }, [fetchList]);
+
+  // Filter by search query
+  const filteredList = searchQuery.trim()
+    ? animeList.filter((anime) =>
+        anime.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : animeList;
 
   const handleSave = async (data: AnimeInput) => {
     if (editing) {
@@ -90,23 +98,48 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">管理番剧</h1>
-          <p className="text-sm text-white/40 mt-1">添加、编辑或删除你的追番记录</p>
+      <div className="flex items-center justify-between mb-8 gap-3 flex-wrap">
+        <div className="flex-1 min-w-[200px]">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">管理番剧</h1>
+          <p className="text-sm text-gray-600 mt-1">添加、编辑或删除你的追番记录</p>
         </div>
+        
+        {/* Search Bar */}
+        <div className="relative max-w-xs flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜索番剧..."
+            className="w-full px-3 py-2 pr-10 rounded-lg glass-input text-sm focus:outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1"
+            >
+              
+            </button>
+          )}
+          {!searchQuery && (
+            <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          )}
+        </div>
+        
         <div className="flex items-center gap-2">
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-3 sm:px-4 py-2.5 rounded-lg transition-colors min-h-[44px]"
+              className="bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white text-sm font-medium px-3 sm:px-4 py-2.5 rounded-lg transition-all min-h-[44px] shadow-md hover:shadow-lg whitespace-nowrap"
             >
               + 添加番剧
             </button>
           )}
           <button
             onClick={handleLogout}
-            className="text-white/30 hover:text-red-400 px-2 py-2.5 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="text-gray-600 hover:text-red-500 px-2 py-2.5 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             title="退出登录"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -119,7 +152,7 @@ export default function AdminPage() {
       {/* Form — glass */}
       {showForm && (
         <div className="mb-8 glass rounded-xl p-4 sm:p-5">
-          <h2 className="text-sm font-semibold text-white/80 mb-4">
+          <h2 className="text-sm font-semibold text-gray-800 mb-4">
             {editing ? `编辑：${editing.title}` : "添加新番剧"}
           </h2>
           <AnimeForm
@@ -132,10 +165,16 @@ export default function AdminPage() {
 
       {/* List */}
       {loading ? (
-        <div className="text-center py-12 text-white/30 text-sm">加载中...</div>
+        <div className="text-center py-12 text-gray-600 text-sm">加载中...</div>
+      ) : filteredList.length === 0 && searchQuery ? (
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4"></div>
+          <p className="text-gray-700 text-lg font-medium mb-2">未找到相关番剧</p>
+          <p className="text-gray-500 text-sm">试试其他关键词吧</p>
+        </div>
       ) : (
         <AnimeList
-          animeList={animeList}
+          animeList={filteredList}
           onEdit={handleEdit}
           onDelete={handleDelete}
           deleting={deleting}

@@ -1,20 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import type { Anime, AnimeInput, AnimeStatus } from "@/lib/types";
+import type { Anime, AnimeInput } from "@/lib/types";
 
 const SEASONS = [
-  "2026夏", "2026春", "2026冬",
-  "2025秋", "2025夏", "2025春", "2025冬",
-  "2024秋", "2024夏", "2024春", "2024冬",
-  "2023秋", "2023夏", "2023春", "2023冬",
-  "2022秋", "2022夏", "2022春", "2022冬",
+  { value: "春", label: "春季-1月" },
+  { value: "夏", label: "夏季-4月" },
+  { value: "秋", label: "秋季-7月" },
+  { value: "冬", label: "冬季-10月" },
 ];
-
-const STATUSES: AnimeStatus[] = ["想看", "在看", "看完", "弃番"];
-
-// Generate rating options: 1.0, 1.5, 2.0, ... 10.0
-const RATINGS = Array.from({ length: 19 }, (_, i) => (i + 2) / 2);
 
 interface AnimeFormProps {
   initial?: Anime | null;
@@ -24,10 +18,10 @@ interface AnimeFormProps {
 
 export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps) {
   const [title, setTitle] = useState(initial?.title || "");
-  const [season, setSeason] = useState(initial?.season || SEASONS[0]);
+  const [year, setYear] = useState(initial?.season ? parseInt(initial.season.substring(0, 4)) : 2026);
+  const [season, setSeason] = useState(initial?.season ? initial.season.substring(4, 5) : SEASONS[0].value);
   const [cover, setCover] = useState(initial?.cover || "");
   const [rating, setRating] = useState(initial?.rating || 5);
-  const [status, setStatus] = useState<AnimeStatus>(initial?.status || "想看");
   const [comment, setComment] = useState(initial?.comment || "");
   const [episodes, setEpisodes] = useState(initial?.episodes || 0);
   const [saving, setSaving] = useState(false);
@@ -46,10 +40,9 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
     try {
       await onSave({
         title: title.trim(),
-        season,
+        season: `${year}${season}`,
         cover: cover.trim(),
         rating,
-        status,
         comment: comment.trim(),
         episodes,
       });
@@ -60,21 +53,25 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
     }
   };
 
+  const handleYearChange = (delta: number) => {
+    setYear((prev) => Math.min(2100, Math.max(1900, prev + delta)));
+  };
+
   const inputClass =
-    "w-full px-3 py-2.5 min-h-[44px] rounded-lg text-sm transition bg-white/6 border border-white/12 text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/10";
+    "w-full px-3 py-2.5 min-h-[44px] rounded-lg text-sm transition glass-input focus:outline-none";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-400/10 text-red-300 text-sm px-4 py-2.5 rounded-lg border border-red-400/20">
+        <div className="bg-red-500/10 text-red-600 text-sm px-4 py-2.5 rounded-lg border border-red-400/40 font-medium">
           {error}
         </div>
       )}
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-white/70 mb-1.5">
-          标题 <span className="text-red-400">*</span>
+        <label className="block text-sm font-medium text-gray-800 mb-1.5">
+          标题 <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -85,24 +82,51 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
         />
       </div>
 
-      {/* Season + Episodes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Year + Season + Episodes */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label className="block text-sm font-medium text-white/70 mb-1.5">季度</label>
+          <label className="block text-sm font-medium text-gray-800 mb-1.5">年份</label>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleYearChange(-1)}
+              className="w-10 h-11 rounded-lg bg-white/40 hover:bg-white/60 border border-white/60 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              
+            </button>
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(Math.min(2100, Math.max(1900, parseInt(e.target.value) || 2026)))}
+              className={`${inputClass} text-center`}
+              min={1900}
+              max={2100}
+            />
+            <button
+              type="button"
+              onClick={() => handleYearChange(1)}
+              className="w-10 h-11 rounded-lg bg-white/40 hover:bg-white/60 border border-white/60 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-800 mb-1.5">季度</label>
           <select
             value={season}
             onChange={(e) => setSeason(e.target.value)}
             className={`${inputClass} appearance-none`}
           >
             {SEASONS.map((s) => (
-              <option key={s} value={s} className="bg-gray-800 text-white">
-                {s}
+              <option key={s.value} value={s.value} className="bg-white text-gray-900">
+                {s.label}
               </option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-white/70 mb-1.5">话数</label>
+          <label className="block text-sm font-medium text-gray-800 mb-1.5">话数</label>
           <input
             type="number"
             value={episodes}
@@ -115,7 +139,7 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
 
       {/* Cover URL */}
       <div>
-        <label className="block text-sm font-medium text-white/70 mb-1.5">封面图片链接</label>
+        <label className="block text-sm font-medium text-gray-800 mb-1.5">封面图片链接</label>
         <input
           type="url"
           value={cover}
@@ -124,7 +148,7 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
           placeholder="https://..."
         />
         {cover && (
-          <div className="mt-2 w-16 h-22 rounded-lg overflow-hidden bg-white/5 border border-white/10">
+          <div className="mt-2 w-16 h-22 rounded-lg overflow-hidden bg-white/30 border border-white/50">
             <img
               src={cover}
               alt="封面预览"
@@ -137,43 +161,52 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
         )}
       </div>
 
-      {/* Status + Rating */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-sm font-medium text-white/70 mb-1.5">状态</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as AnimeStatus)}
-            className={`${inputClass} appearance-none`}
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s} className="bg-gray-800 text-white">
-                {s}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-white/70 mb-1.5">
-            评分：{rating.toFixed(1)}
-          </label>
-          <select
+      {/* Rating Slider */}
+      <div>
+        <label className="block text-sm font-medium text-gray-800 mb-2">
+          评分：<span className="text-pink-600 font-bold text-base">{rating.toFixed(1)}</span>
+        </label>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min="1"
+            max="10"
+            step="0.5"
             value={rating}
             onChange={(e) => setRating(parseFloat(e.target.value))}
-            className={`${inputClass} appearance-none`}
-          >
-            {RATINGS.map((r) => (
-              <option key={r} value={r} className="bg-gray-800 text-white">
-                {r.toFixed(1)}
-              </option>
-            ))}
-          </select>
+            className="flex-1 h-2 bg-gradient-to-r from-pink-400 to-blue-400 rounded-lg appearance-none cursor-pointer accent-pink-500"
+          />
+          <div className="flex items-center gap-1 text-xs text-gray-600">
+            <span>1</span>
+            <span>-</span>
+            <span>10</span>
+          </div>
+        </div>
+        {/* Visual stars for rating */}
+        <div className="mt-2 flex items-center gap-0.5">
+          {Array.from({ length: 5 }, (_, i) => {
+            const threshold = (i + 1) * 2;
+            const full = rating >= threshold;
+            const half = !full && rating >= threshold - 1;
+            
+            return (
+              <svg
+                key={i}
+                viewBox="0 0 24 24"
+                className={`w-5 h-5 ${full ? 'text-yellow-500' : half ? 'text-yellow-500' : 'text-gray-300'}`}
+                fill="currentColor"
+                style={half ? { clipPath: 'inset(0 50% 0 0)' } : undefined}
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            );
+          })}
         </div>
       </div>
 
       {/* Comment */}
       <div>
-        <label className="block text-sm font-medium text-white/70 mb-1.5">短评</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">短评</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -188,14 +221,14 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 min-h-[44px] bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
+          className="flex-1 min-h-[44px] bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg"
         >
           {saving ? "保存中..." : initial ? "更新" : "添加"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 min-h-[44px] text-sm text-white/50 hover:text-white border border-white/15 rounded-lg hover:bg-white/10 transition-colors"
+          className="px-4 min-h-[44px] text-sm text-gray-700 hover:text-gray-900 border border-white/60 rounded-lg hover:bg-white/40 transition-colors"
         >
           取消
         </button>

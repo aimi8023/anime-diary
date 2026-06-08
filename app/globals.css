@@ -1,24 +1,31 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0f0c29;
-  --color-foreground: #ffffff;
+  --color-background: #fff5f7;
+  --color-foreground: #2d1f3d;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-/* ── Background ── */
+/* ── Background with Custom Image ── */
 body {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0c29 0%, #1a1744 30%, #24243e 60%, #1a1040 100%);
+  background: 
+    /* Very light overlay to let background image show through clearly */
+    linear-gradient(135deg, rgba(255, 245, 247, 0.15) 0%, rgba(255, 240, 245, 0.10) 50%, rgba(250, 235, 245, 0.15) 100%),
+    url('/bg.png');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
-  color: #ffffff;
+  background-repeat: no-repeat;
+  color: #2d1f3d;
   font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* ── Stars overlay ── */
+/* ─ Sparkle Overlay (very subtle) ── */
 body::before {
   content: "";
   position: fixed;
@@ -26,78 +33,110 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,0.7), transparent),
-    radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 15% 65%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 75% 85%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 5% 90%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(2px 2px at 20% 50%, rgba(255,255,255,0.8), transparent),
-    radial-gradient(2px 2px at 50% 5%, rgba(255,255,255,0.7), transparent),
-    radial-gradient(2px 2px at 80% 40%, rgba(255,255,255,0.8), transparent);
-  animation: twinkle 4s ease-in-out infinite alternate;
+    radial-gradient(2px 2px at 20% 30%, rgba(255, 182, 193, 0.3), transparent),
+    radial-gradient(2px 2px at 40% 70%, rgba(255, 182, 193, 0.25), transparent),
+    radial-gradient(2px 2px at 60% 20%, rgba(255, 182, 193, 0.3), transparent),
+    radial-gradient(2px 2px at 80% 50%, rgba(255, 182, 193, 0.25), transparent),
+    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 90% 10%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.3), transparent);
+  animation: sparkleFloat 8s ease-in-out infinite alternate;
 }
 
-@keyframes twinkle {
-  0% { opacity: 0.7; }
-  100% { opacity: 1; }
+@keyframes sparkleFloat {
+  0%, 100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 0.35; transform: translateY(-5px); }
 }
 
-/* ── Glass base ── */
+/* ── Light & Airy Glass Card - zi0.cc Style ─ */
 .glass {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.3);  /* 15% 透明度，让背景更清晰 */
+  backdrop-filter: blur(12px);              /* 降低模糊，背景更清楚 */
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.3);  /* 边框也更淡 */
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);   /* 阴影减弱 */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shimmer on hover */
+.glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.glass:hover::before {
+  left: 100%;
 }
 
 .glass-hover {
   transition: all 0.3s ease;
 }
+
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  background: rgba(255, 255, 255, 0.3);    /* 悬停时稍微实一点 */
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
-/* ── Glass input ── */
+/* ── Subtle Accent Borders ── */
+.glass-neon-purple {
+  border-color: rgba(236, 72, 153, 0.4);
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.1);
+}
+
+.glass-neon-blue {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+}
+
+.glass-neon-pink {
+  border-color: rgba(244, 63, 94, 0.4);
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.1);
+}
+
+/* ── Glass Input - Light Theme ── */
 .glass-input {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.25);  /* 输入框也更透明 */
+  backdrop-filter: blur(6px);              /* 降低模糊 */
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.4);  /* 边框更淡 */
+  border-radius: 12px;
+  color: #1a1a1a;
   transition: all 0.2s ease;
 }
 .glass-input:focus {
   outline: none;
-  border-color: rgba(251, 191, 36, 0.5);
-  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+  background: rgba(255, 255, 255, 0.35);   /* 聚焦时稍微实一点 */
 }
 .glass-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(0, 0, 0, 0.35);
 }
 
 /* ── Custom scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.3);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  background: rgba(255, 182, 193, 0.5);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 182, 193, 0.7);
 }
 
 /* ── Line clamp ── */
