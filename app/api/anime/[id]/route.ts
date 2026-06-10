@@ -23,6 +23,8 @@ export async function PUT(
     if (body.comment !== undefined) updates.comment = body.comment.trim();
     if (body.episodes !== undefined)
       updates.episodes = Math.max(0, Number(body.episodes));
+    if (body.tags !== undefined)
+      updates.tags = Array.isArray(body.tags) ? body.tags : [];
 
     await storage.update(id, updates);
     return NextResponse.json({ success: true });

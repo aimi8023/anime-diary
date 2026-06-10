@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       rating: Math.round(Math.min(10, Math.max(1, Number(body.rating) || 1)) * 2) / 2,
       comment: body.comment?.trim() || "",
       episodes: Math.max(0, Number(body.episodes) || 0),
+      tags: Array.isArray(body.tags) ? body.tags : [],
       createdAt: new Date().toISOString(),
     };
 

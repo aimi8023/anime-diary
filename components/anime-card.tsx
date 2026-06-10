@@ -70,23 +70,42 @@ export default function AnimeCard({ anime, index }: AnimeCardProps) {
             {anime.title}
           </h3>
           <div className="h-0.5 w-0 group-hover:w-full bg-gradient-to-r from-pink-500 to-blue-500 transition-all duration-300" />
-          
+
+          {/* Tags */}
+          {anime.tags && anime.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {anime.tags.slice(0, 3).map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-0.5 rounded-full bg-gradient-to-r from-pink-500/10 to-blue-500/10 border border-pink-400/20 text-xs text-gray-700 font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+              {anime.tags.length > 3 && (
+                <span className="px-2 py-0.5 rounded-full bg-white/20 border border-white/10 text-xs text-gray-600">
+                  +{anime.tags.length - 3}
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Star Rating */}
           <div className="mt-2">
             <StarRating rating={anime.rating} />
           </div>
-          
+
           {/* Comment with better styling - fixed height for 2 lines */}
           <div className="mt-3 flex-grow">
             {anime.comment ? (
               <p className="text-xs text-gray-700 line-clamp-2 leading-relaxed italic border-l-2 border-blue-300 pl-3 h-10 overflow-hidden">
-                "{anime.comment}"
+&ldquo;{anime.comment}&rdquo;
               </p>
             ) : (
               <div className="h-10" />
             )}
           </div>
-          
+
           {/* Meta info - always at bottom */}
           <div className="mt-auto pt-3 flex items-center justify-between text-xs">
             <span className="px-2 py-1 rounded-lg bg-white/20 text-gray-700 border border-white/10 font-medium">

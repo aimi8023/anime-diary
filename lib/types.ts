@@ -6,6 +6,7 @@ export interface Anime {
   rating: number;
   comment: string;
   episodes: number;
+  tags: string[];
   createdAt: string;
 }
 
@@ -16,4 +17,5 @@ export interface AnimeInput {
   rating: number;
   comment: string;
   episodes: number;
+  tags: string[];
 }

@@ -19,7 +19,13 @@ function formatSeason(season: string): string {
     秋: "秋",
     冬: "冬",
   };
-  return `${match[1]}年${seasonName[match[2]]}季`;
+  const seasonMonth: Record<string, string> = {
+    春: "1月",
+    夏: "4月",
+    秋: "7月",
+    冬: "10月",
+  };
+  return `${match[1]}年${seasonName[match[2]]}季 - ${seasonMonth[match[2]]}`;
 }
 
 export default function SeasonSection({ season, animeList }: SeasonSectionProps) {

@@ -1,17 +1,14 @@
 "use client";
 
-import { storage } from "@/lib/storage-factory";
 import SeasonSection from "@/components/season-section";
 import Timer from "@/components/timer";
+import { useSearch } from "@/components/search-context";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import type { Anime } from "@/lib/types";
 
 export default function HomePage() {
-  const [animeList, setAnimeList] = useState<Anime[]>([]);
+  const { animeList, setAnimeList, filteredList, setFilteredList, hasActiveSearch } = useSearch();
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -19,6 +16,10 @@ export default function HomePage() {
         const res = await fetch("/api/anime");
         const data = await res.json();
         setAnimeList(data);
+        // Only reset filtered list if no active search
+        if (!hasActiveSearch) {
+          setFilteredList(data);
+        }
       } catch (error) {
         console.error("Failed to fetch anime:", error);
       } finally {
@@ -26,14 +27,7 @@ export default function HomePage() {
       }
     }
     fetchData();
-  }, []);
-
-  // Filter by search query
-  const filteredList = searchQuery.trim()
-    ? animeList.filter((anime) =>
-        anime.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : animeList;
+  }, [setAnimeList, setFilteredList, hasActiveSearch]);
 
   // Group by season
   const grouped = filteredList.reduce<Record<string, typeof filteredList>>((acc, anime) => {
@@ -42,13 +36,15 @@ export default function HomePage() {
     return acc;
   }, {});
 
-  // Sort seasons descending
+  // Sort seasons descending by year and month
   const sortedSeasons = Object.keys(grouped).sort((a, b) => {
     const extract = (s: string) => {
       const match = s.match(/^(\d{4})(春|夏|秋|冬)$/);
       if (!match) return 0;
-      const seasonOrder: Record<string, number> = { 冬: 0, 春: 1, 夏: 2, 秋: 3 };
-      return parseInt(match[1]) * 10 + seasonOrder[match[2]];
+      const year = parseInt(match[1]);
+      const seasonMonth: Record<string, number> = { 春: 1, 夏: 4, 秋: 7, 冬: 10 };
+      const month = seasonMonth[match[2]] || 0;
+      return year * 100 + month;
     };
     return extract(b) - extract(a);
   });
@@ -78,30 +74,6 @@ export default function HomePage() {
           <Timer />
         </div>
         
-        {/* Search Bar */}
-        <motion.div 
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: showSearch ? 1 : 0, height: showSearch ? "auto" : 0 }}
-          transition={{ duration: 0.3 }}
-          className="relative max-w-md mx-auto mb-6 overflow-hidden"
-        >
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="搜索番剧名称..."
-            className="w-full px-4 py-2.5 rounded-full glass-input text-sm focus:outline-none"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-              
-            </button>
-          )}
-        </motion.div>
-        
         {/* Stats */}
         {animeList.length > 0 && (
           <motion.div 
@@ -110,19 +82,6 @@ export default function HomePage() {
             transition={{ delay: 0.3, duration: 0.4 }}
             className="relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass"
           >
-            {/* Search Toggle Button */}
-            <button
-              onClick={() => setShowSearch(!showSearch)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/50 hover:bg-white/70 transition-colors text-sm text-gray-700 font-medium"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              搜索
-            </button>
-            
-            <div className="w-px h-5 bg-gray-300" />
-            
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
               <span className="text-sm text-gray-700">共</span>
@@ -135,6 +94,17 @@ export default function HomePage() {
               <span className="text-sm text-gray-700">{sortedSeasons.length}</span>
               <span className="text-sm text-gray-700">个季度</span>
             </div>
+            {filteredList.length !== animeList.length && (
+              <>
+                <div className="w-px h-5 bg-gray-300" />
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-sm text-gray-700">筛选出</span>
+                  <span className="text-lg font-bold text-green-600">{filteredList.length}</span>
+                  <span className="text-sm text-gray-700">部</span>
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </motion.div>
@@ -156,7 +126,7 @@ export default function HomePage() {
       )}
 
       {/* No search results */}
-      {searchQuery && filteredList.length === 0 && (
+      {filteredList.length === 0 && animeList.length > 0 && (
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -164,7 +134,7 @@ export default function HomePage() {
         >
           <div className="text-6xl mb-4"></div>
           <p className="text-gray-700 text-lg font-medium mb-2">未找到相关番剧</p>
-          <p className="text-gray-500 text-sm">试试其他关键词吧</p>
+          <p className="text-gray-500 text-sm">试试调整筛选条件吧</p>
         </motion.div>
       )}
 

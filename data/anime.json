@@ -5,9 +5,9 @@
     "season": "2023秋",
     "cover": "https://lain.bgm.tv/r/400/pic/cover/l/13/c5/400602_ZI8Y9.jpg",
     "rating": 9.5,
-    "status": "看完",
     "comment": "无可挑剔的神作。时间、生命、羁绊，娓娓道来。",
     "episodes": 28,
+    "tags": ["奇幻", "治愈", "神作"],
     "createdAt": "2024-03-22T00:00:00.000Z"
   },
   {
@@ -16,9 +16,9 @@
     "season": "2024冬",
     "cover": "https://lain.bgm.tv/r/400/pic/cover/l/c5/88/395378_jztpO.jpg",
     "rating": 9,
-    "status": "看完",
     "comment": "美食 + 奇幻 + 生态学的完美融合，设定严谨又好笑。",
     "episodes": 24,
+    "tags": ["美食", "奇幻", "生态学"],
     "createdAt": "2024-06-13T00:00:00.000Z"
   },
   {
@@ -27,9 +27,9 @@
     "season": "2024秋",
     "cover": "https://lain.bgm.tv/r/400/pic/cover/l/44/7d/467461_HHw4K.jpg",
     "rating": 8.5,
-    "status": "在看",
     "comment": "作画炸裂，剧情脑洞大开，十月最强战斗番。",
     "episodes": 12,
+    "tags": ["战斗", "科幻"],
     "createdAt": "2024-10-10T00:00:00.000Z"
   },
   {
@@ -38,9 +38,9 @@
     "season": "2026夏",
     "cover": "https://lain.bgm.tv/r/400/pic/cover/l/d1/1c/443428_FIhFu.jpg",
     "rating": 8.5,
-    "status": "看完",
     "comment": "舞台剧篇比第一季更有深度，制作依旧精良。",
     "episodes": 13,
+    "tags": ["偶像", "悬疑"],
     "createdAt": "2024-10-06T00:00:00.000Z"
   },
   {
@@ -49,9 +49,9 @@
     "season": "2023秋",
     "cover": "https://lain.bgm.tv/r/400/pic/cover/l/fe/31/420628_2ZEz0.jpg",
     "rating": 9,
-    "status": "看完",
     "comment": "猫猫太可爱了！宫廷推理+中药知识，节奏极佳。",
     "episodes": 24,
+    "tags": ["推理", "历史", "医药"],
     "createdAt": "2024-03-24T00:00:00.000Z"
   },
   {
@@ -60,9 +60,9 @@
     "season": "2024夏",
     "cover": "https://lain.bgm.tv/r/400/pic/cover/l/e4/dc/464376_NsZRw.jpg",
     "rating": 8,
-    "status": "看完",
     "comment": "败犬女主的青春群像剧，轻松有趣又有点感动。",
     "episodes": 12,
+    "tags": ["恋爱", "喜剧", "校园"],
     "createdAt": "2024-09-28T00:00:00.000Z"
   },
   {
@@ -71,9 +71,9 @@
     "season": "2023秋",
     "cover": "https://lain.bgm.tv/pic/cover/l/e7/a7/428735_1v11n.jpg?_gl=1*fi2ukk*_ga*MTcwMTA0ODgxNi4xNzgwNjczNDc1*_ga_1109JLGMHN*czE3ODA2NzM0NzUkbzEkZzEkdDE3ODA2NzM1MDgkajI3JGwwJGgw",
     "rating": 10,
-    "status": "在看",
     "comment": "最爱之一！！！",
     "episodes": 13,
+    "tags": ["音乐", "乐队", "青春"],
     "createdAt": "2026-06-05T15:32:56.081Z"
   }
 ]

@@ -24,6 +24,8 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
   const [rating, setRating] = useState(initial?.rating || 5);
   const [comment, setComment] = useState(initial?.comment || "");
   const [episodes, setEpisodes] = useState(initial?.episodes || 0);
+  const [tags, setTags] = useState<string[]>(initial?.tags || []);
+  const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,6 +47,7 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
         rating,
         comment: comment.trim(),
         episodes,
+        tags,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存失败");
@@ -53,8 +56,22 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
     }
   };
 
-  const handleYearChange = (delta: number) => {
-    setYear((prev) => Math.min(2100, Math.max(1900, prev + delta)));
+  const handleAddTag = () => {
+    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+      setTags([...tags, tagInput.trim()]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
   };
 
   const inputClass =
@@ -86,30 +103,15 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-800 mb-1.5">年份</label>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleYearChange(-1)}
-              className="w-10 h-11 rounded-lg bg-white/40 hover:bg-white/60 border border-white/60 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              
-            </button>
-            <input
-              type="number"
-              value={year}
-              onChange={(e) => setYear(Math.min(2100, Math.max(1900, parseInt(e.target.value) || 2026)))}
-              className={`${inputClass} text-center`}
-              min={1900}
-              max={2100}
-            />
-            <button
-              type="button"
-              onClick={() => handleYearChange(1)}
-              className="w-10 h-11 rounded-lg bg-white/40 hover:bg-white/60 border border-white/60 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              
-            </button>
-          </div>
+          <input
+            type="number"
+            value={year}
+            onChange={(e) => setYear(Math.min(9999, Math.max(0, parseInt(e.target.value) || 2026)))}
+            className={inputClass}
+            placeholder="例如：2024"
+            min={0}
+            max={9999}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-800 mb-1.5">季度</label>
@@ -202,6 +204,50 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
             );
           })}
         </div>
+      </div>
+
+      {/* Tags */}
+      <div>
+        <label className="block text-sm font-medium text-gray-800 mb-1.5">标签</label>
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagInputKeyDown}
+            className={`${inputClass} flex-1`}
+            placeholder="输入标签后按回车或点击添加"
+          />
+          <button
+            type="button"
+            onClick={handleAddTag}
+            className="px-4 min-h-[44px] bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+          >
+            添加
+          </button>
+        </div>
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-500/10 to-blue-500/10 border border-pink-400/30 text-sm text-gray-700 group hover:border-red-400/50 transition-colors"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="ml-0.5 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors rounded-full hover:bg-red-500/10"
+                  title="删除标签"
+                >
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Comment */}
