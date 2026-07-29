@@ -87,6 +87,24 @@ export const kvStorage: Storage = {
     return [];
   },
 
+  async findByBangumiId(bangumiId: number) {
+    const redis = getRedis();
+    const raw = await redis.get<Anime[]>(ANIME_KEY);
+
+    let list: Anime[] = [];
+    if (Array.isArray(raw)) {
+      list = raw;
+    } else if (typeof raw === "string") {
+      try {
+        list = JSON.parse(raw);
+      } catch (error) {
+        console.error("Failed to parse existing data:", error);
+      }
+    }
+
+    return list.find((anime) => anime.bangumiId === bangumiId) ?? null;
+  },
+
   async add(anime: Anime) {
     const redis = getRedis();
     // Get existing data

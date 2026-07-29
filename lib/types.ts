@@ -7,6 +7,10 @@ export interface Anime {
   comment: string;
   episodes: number;
   tags: string[];
+  bangumiId?: number;
+  bangumiUrl?: string;
+  originalTitle?: string;
+  airDate?: string;
   createdAt: string;
 }
 
@@ -18,4 +22,8 @@ export interface AnimeInput {
   comment: string;
   episodes: number;
   tags: string[];
+  bangumiId?: number;
+  bangumiUrl?: string;
+  originalTitle?: string;
+  airDate?: string;
 }

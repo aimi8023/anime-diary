@@ -34,6 +34,11 @@ export const jsonStorage: Storage = {
     );
   },
 
+  async findByBangumiId(bangumiId: number) {
+    const list = await readAll();
+    return list.find((anime) => anime.bangumiId === bangumiId) ?? null;
+  },
+
   async add(anime: Anime) {
     const list = await readAll();
     list.push(anime);

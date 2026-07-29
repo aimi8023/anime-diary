@@ -14,6 +14,23 @@ export async function PUT(
       return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
     }
 
+    const bangumiId =
+      body.bangumiId !== undefined &&
+      Number.isInteger(Number(body.bangumiId)) &&
+      Number(body.bangumiId) > 0
+        ? Number(body.bangumiId)
+        : undefined;
+
+    if (bangumiId !== undefined) {
+      const existing = await storage.findByBangumiId(bangumiId);
+      if (existing && existing.id !== id) {
+        return NextResponse.json(
+          { error: "该 Bangumi 条目已收录", existingId: existing.id },
+          { status: 409 },
+        );
+      }
+    }
+
     const updates: Partial<AnimeInput> = {};
     if (body.title !== undefined) updates.title = body.title.trim();
     if (body.season !== undefined) updates.season = body.season.trim();
@@ -25,6 +42,12 @@ export async function PUT(
       updates.episodes = Math.max(0, Number(body.episodes));
     if (body.tags !== undefined)
       updates.tags = Array.isArray(body.tags) ? body.tags : [];
+    if (bangumiId !== undefined) updates.bangumiId = bangumiId;
+    if (body.bangumiUrl !== undefined)
+      updates.bangumiUrl = body.bangumiUrl.trim();
+    if (body.originalTitle !== undefined)
+      updates.originalTitle = body.originalTitle.trim();
+    if (body.airDate !== undefined) updates.airDate = body.airDate.trim();
 
     await storage.update(id, updates);
     return NextResponse.json({ success: true });
