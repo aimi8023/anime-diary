@@ -759,7 +759,7 @@ git add README.md CLAUDE.md docs/superpowers/plans/2026-07-29-public-archive-dat
 git commit -m "docs: document server-first public archive"
 ```
 
-- [ ] **Step 7: Review and finish the branch**
+- [x] **Step 7: Review and finish the branch**
 
 Perform an inline requirements and diff review because this session does not permit reviewer subagent dispatch. Address all verified critical or important findings, rerun full verification, then use `superpowers:finishing-a-development-branch` with the already chosen workflow:
 
