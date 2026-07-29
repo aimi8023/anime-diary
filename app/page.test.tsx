@@ -12,6 +12,11 @@ vi.mock("@/lib/storage-factory", () => ({
   storage: { getAll },
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 import HomePage from "./page";
 
 const anime: Anime = {
