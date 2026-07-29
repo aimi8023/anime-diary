@@ -9,6 +9,7 @@
 - **全局搜索**：Header 中弹出式搜索面板，支持按名称、年份、标签、评分多条件筛选
 - **标签系统**：番剧支持自定义标签，首页卡片展示标签，管理页可增删
 - **管理后台**：密码保护的管理页面，可添加、编辑、删除番剧，支持数据导出
+- **Bangumi 辅助录入**：按需搜索动画条目，选择后预填资料和候选标签
 - **优雅交互**：平滑动画效果、悬浮光效、响应式设计
 - **数据存储**：本地 JSON 文件（开发）/ Upstash Redis（生产）
 
@@ -38,6 +39,21 @@ npm run dev
 
 打开 http://localhost:3000 即可访问。
 
+### 环境变量
+
+复制 `.env.local.example` 为 `.env.local`，并填写：
+
+```dotenv
+ADMIN_PASSWORD=你的管理密码
+BANGUMI_USER_AGENT=你的Bangumi用户ID/anime-diary
+BANGUMI_ACCESS_TOKEN=可选的Bangumi访问令牌
+```
+
+- `BANGUMI_USER_AGENT` 应能识别项目所有者，遵循 [Bangumi User-Agent 规范](https://github.com/bangumi/api/blob/master/docs-raw/user%20agent.md)。
+- 可在 [Bangumi Access Token 页面](https://next.bgm.tv/demo/access-token)生成令牌。
+- Token 只由服务端读取，不会发送到浏览器；生产部署建议配置。
+- `.env.local` 包含私密信息，已经被 Git 忽略，不要提交。
+
 ### 页面路由
 
 - **首页 `/`** — 按季度浏览番剧，全局搜索，实时计时
@@ -53,6 +69,11 @@ npm run dev
 - **季度折叠**：点击季度标题展开/收起，格式为"2023年秋季 - 7月"
 
 #### 管理页功能
+- **Bangumi 辅助录入**：输入中日文标题搜索，选择正确条目后预填标题、封面、季度和话数
+- **候选标签**：Bangumi 标签不会自动加入，点击需要的标签后才保存
+- **手动兜底**：Bangumi 不可用时可以随时切换到手动填写
+- **本地快照**：保存后公开页面只读取本站数据，不实时依赖 Bangumi
+- **重复保护**：相同 Bangumi 条目会提示并打开已有记录
 - **搜索栏**：在标题栏中集成搜索框，快速查找番剧
 - **标签管理**：输入框添加标签，支持回车快捷添加，点击删除标签
 - **年份输入**：数字输入框
@@ -96,6 +117,16 @@ npm run dev
 - **更透明**：background: rgba(255, 255, 255, 0.25), blur(8px)
 - **平衡（当前）**：background: rgba(255, 255, 255, 0.35), blur(10px)
 - **更实**：background: rgba(255, 255, 255, 0.55), blur(15px)
+
+## ✅ 测试与检查
+
+```bash
+npm test             # 运行全部自动化测试
+npm run test:watch   # 开发时监听测试
+npm run lint         # ESLint
+npx tsc --noEmit     # TypeScript 类型检查
+npm run build        # 生产构建
+```
 
 ## 📄 许可证
 
