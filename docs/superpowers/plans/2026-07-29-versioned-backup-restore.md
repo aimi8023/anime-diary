@@ -43,7 +43,7 @@
   - `diffAnimeData(current: Anime[], target: Anime[]): DatasetDiff`
   - `createBackupFile(data: Anime[], options): AnimeBackupFile`
 
-- [ ] **Step 1: Write failing validation tests**
+- [x] **Step 1: Write failing validation tests**
 
 Cover the legacy array format, the versioned wrapper, malformed JSON, unsupported versions, duplicate IDs, duplicate positive `bangumiId` values, invalid rating/date/tags, and empty arrays:
 
@@ -66,13 +66,13 @@ it("rejects duplicate Bangumi ids without returning importable data", () => {
 });
 ```
 
-- [ ] **Step 2: Run validation tests and verify RED**
+- [x] **Step 2: Run validation tests and verify RED**
 
 Run: `npm test -- lib/backups/validation.test.ts`
 
 Expected: FAIL because `parseBackupJson` and backup types do not exist.
 
-- [ ] **Step 3: Implement backup types and strict parser**
+- [x] **Step 3: Implement backup types and strict parser**
 
 Use discriminated results so invalid input cannot expose `data`:
 
@@ -91,13 +91,13 @@ export function parseBackupJson(raw: string): BackupParseResult {
 
 Do not silently clamp imported ratings or episodes. Imported data must already satisfy the same persisted invariants as application-created records.
 
-- [ ] **Step 4: Run validation tests and verify GREEN**
+- [x] **Step 4: Run validation tests and verify GREEN**
 
 Run: `npm test -- lib/backups/validation.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 5: Write failing diff and export-format tests**
+- [x] **Step 5: Write failing diff and export-format tests**
 
 ```ts
 it("counts added, removed, changed and unchanged records by id", () => {
@@ -118,17 +118,17 @@ it("creates a versioned file without secret configuration", () => {
 });
 ```
 
-- [ ] **Step 6: Run diff tests and verify RED**
+- [x] **Step 6: Run diff tests and verify RED**
 
 Run: `npm test -- lib/backups/diff.test.ts`
 
 Expected: FAIL because diff and export helpers do not exist.
 
-- [ ] **Step 7: Implement canonical comparison and export helper**
+- [x] **Step 7: Implement canonical comparison and export helper**
 
 Compare all persisted `Anime` fields after sorting object keys and tags consistently, but do not mutate caller arrays. Return up to five representative titles for each changed category.
 
-- [ ] **Step 8: Run task tests and commit**
+- [x] **Step 8: Run task tests and commit**
 
 Run: `npm test -- lib/backups/validation.test.ts lib/backups/diff.test.ts`
 
@@ -166,7 +166,7 @@ git commit -m "feat: add backup validation and diff helpers"
   - `DuplicateBangumiError`
   - `RevisionConflictError`
 
-- [ ] **Step 1: Write failing core behavior tests using an in-memory adapter**
+- [x] **Step 1: Write failing core behavior tests using an in-memory adapter**
 
 The fake adapter must emulate revision conflicts and record commit inputs. Test:
 
@@ -198,13 +198,13 @@ it("throws after three revision conflicts", async () => {
 
 Also verify that duplicate Bangumi detection occurs inside the latest-state mutation for add and update, not only in route prechecks.
 
-- [ ] **Step 2: Run the core tests and verify RED**
+- [x] **Step 2: Run the core tests and verify RED**
 
 Run: `npm test -- lib/storage-core.test.ts`
 
 Expected: FAIL because the versioned adapter and core do not exist.
 
-- [ ] **Step 3: Define the adapter and expanded storage contracts**
+- [x] **Step 3: Define the adapter and expanded storage contracts**
 
 ```ts
 export interface VersionedStorageAdapter {
@@ -231,7 +231,7 @@ export interface Storage {
 
 `CommitInput` contains the expected revision, next dataset, reason, server-generated snapshot ID, and timestamp. `commit` returns `{ committed: false }` for revision mismatch and `{ committed: true, state }` for success.
 
-- [ ] **Step 4: Implement the retrying versioned core**
+- [x] **Step 4: Implement the retrying versioned core**
 
 Use a single internal helper:
 
@@ -255,13 +255,13 @@ async function mutate(
 
 Generate a fresh snapshot ID and timestamp for each commit attempt. Only call pruning after a successful commit; log cleanup failure without converting the successful mutation into an error.
 
-- [ ] **Step 5: Run core tests and verify GREEN**
+- [x] **Step 5: Run core tests and verify GREEN**
 
 Run: `npm test -- lib/storage-core.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/storage.ts lib/storage-core.ts lib/storage-core.test.ts lib/types.ts
@@ -282,7 +282,7 @@ git commit -m "feat: add versioned storage mutation core"
   - `createJsonStorage(options?: { dataFile?: string; backupDir?: string; revisionFile?: string }): Storage`
   - existing singleton `jsonStorage`
 
-- [ ] **Step 1: Write failing filesystem adapter tests**
+- [x] **Step 1: Write failing filesystem adapter tests**
 
 Create a unique temporary directory per test and clean it with Node test hooks. Verify:
 
@@ -303,13 +303,13 @@ it("throws on malformed current JSON instead of returning an empty list", async 
 
 Also test update, delete, import, restore reversibility, 30-version pruning, parallel `Promise.all` writes, missing legacy revision metadata, and failed temp-file replacement preserving the previous current file.
 
-- [ ] **Step 2: Run JSON tests and verify RED**
+- [x] **Step 2: Run JSON tests and verify RED**
 
 Run: `npm test -- lib/storage-json.test.ts`
 
 Expected: FAIL because the factory and versioned semantics do not exist.
 
-- [ ] **Step 3: Implement the JSON adapter**
+- [x] **Step 3: Implement the JSON adapter**
 
 Use:
 
@@ -321,19 +321,19 @@ Use:
 
 Resolve and verify every generated path remains inside the configured data/backup directory. Never derive a path directly from a request parameter.
 
-- [ ] **Step 4: Run JSON tests and verify GREEN**
+- [x] **Step 4: Run JSON tests and verify GREEN**
 
 Run: `npm test -- lib/storage-json.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 5: Run existing API tests for compatibility**
+- [x] **Step 5: Run existing API tests for compatibility**
 
 Run: `npm test -- app/api/anime/route.test.ts app/api/anime/[id]/route.test.ts`
 
 Expected: Existing route tests may fail only where mocks need the new storage behavior; do not change route expectations until Task 5.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/storage-json.ts lib/storage-json.test.ts
@@ -355,7 +355,7 @@ git commit -m "feat: add local versioned backup storage"
   - existing singleton `kvStorage`
   - exported Redis key constants only when required by tests
 
-- [ ] **Step 1: Write failing Redis adapter tests with a command-level fake**
+- [x] **Step 1: Write failing Redis adapter tests with a command-level fake**
 
 Test the observable contract rather than private helpers:
 
@@ -381,13 +381,13 @@ it("maps a script revision mismatch to a retry", async () => {
 
 Also verify legacy `anime:all` fallback, malformed state rejection, metadata-only listing, snapshot download, and orphan-safe idempotent pruning.
 
-- [ ] **Step 2: Run Redis tests and verify RED**
+- [x] **Step 2: Run Redis tests and verify RED**
 
 Run: `npm test -- lib/storage-kv.test.ts`
 
 Expected: FAIL because the injectable factory and atomic implementation do not exist.
 
-- [ ] **Step 3: Implement Redis state reads and Lua commit**
+- [x] **Step 3: Implement Redis state reads and Lua commit**
 
 The script must:
 
@@ -401,17 +401,17 @@ The script must:
 
 All JSON payloads are prepared and validated in TypeScript before `EVAL`; the script must never interpolate record content into Lua source.
 
-- [ ] **Step 4: Implement best-effort pruning**
+- [x] **Step 4: Implement best-effort pruning**
 
 Read IDs beyond the newest 30, then delete snapshot bodies, metadata fields, and sorted-set entries in an idempotent transaction. A cleanup error is logged and retried by a later successful mutation.
 
-- [ ] **Step 5: Run Redis and core tests**
+- [x] **Step 5: Run Redis and core tests**
 
 Run: `npm test -- lib/storage-kv.test.ts lib/storage-core.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/storage-kv.ts lib/storage-kv.test.ts
@@ -446,7 +446,7 @@ git commit -m "feat: add atomic Redis snapshot storage"
   - `createBackupService(storage)`
   - admin-only HTTP endpoints described by the approved design
 
-- [ ] **Step 1: Write failing service tests**
+- [x] **Step 1: Write failing service tests**
 
 ```ts
 it("previews an import without mutating storage", async () => {
@@ -465,19 +465,19 @@ it("revalidates and snapshots when applying an import", async () => {
 
 Verify empty imports require `confirmEmpty: true`, restore returns target metadata plus new state, and current export reads a fresh server state.
 
-- [ ] **Step 2: Run service tests and verify RED**
+- [x] **Step 2: Run service tests and verify RED**
 
 Run: `npm test -- lib/backups/service.test.ts`
 
 Expected: FAIL because the service does not exist.
 
-- [ ] **Step 3: Implement the service and verify GREEN**
+- [x] **Step 3: Implement the service and verify GREEN**
 
 Run: `npm test -- lib/backups/service.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 4: Write failing API and proxy tests**
+- [x] **Step 4: Write failing API and proxy tests**
 
 Test status codes and response shapes:
 
@@ -491,7 +491,7 @@ Test status codes and response shapes:
 - `proxy.config.matcher` contains `/api/backups/:path*`;
 - unauthenticated backup access returns `401`.
 
-- [ ] **Step 5: Run API tests and verify RED**
+- [x] **Step 5: Run API tests and verify RED**
 
 Run:
 
@@ -501,7 +501,7 @@ npm test -- app/api/backups proxy.test.ts
 
 Expected: FAIL because routes and proxy protection do not exist.
 
-- [ ] **Step 6: Implement thin route handlers and same-origin helper**
+- [x] **Step 6: Implement thin route handlers and same-origin helper**
 
 Keep parsing, validation, and storage rules in the service. Route handlers map:
 
@@ -514,7 +514,7 @@ Keep parsing, validation, and storage rules in the service. Route handlers map:
 
 For modifying routes, compare the parsed request `Origin` to `new URL(request.url).origin`.
 
-- [ ] **Step 7: Run API tests and commit**
+- [x] **Step 7: Run API tests and commit**
 
 Run:
 
@@ -545,7 +545,7 @@ git commit -m "feat: add protected backup and restore APIs"
 - Consumes: `DuplicateBangumiError`, `RevisionConflictError`, and snapshotting `Storage` methods.
 - Produces: unchanged public anime API response shapes, now backed by pre-write snapshots.
 
-- [ ] **Step 1: Extend route tests before changing production routes**
+- [x] **Step 1: Extend route tests before changing production routes**
 
 Add expectations that:
 
@@ -555,7 +555,7 @@ Add expectations that:
 - routes no longer rely on a separate `findByBangumiId` result to guarantee uniqueness;
 - successful add, update, and delete call exactly one high-level storage mutation.
 
-- [ ] **Step 2: Run route tests and verify RED**
+- [x] **Step 2: Run route tests and verify RED**
 
 Run:
 
@@ -565,11 +565,11 @@ npm test -- app/api/anime/route.test.ts app/api/anime/[id]/route.test.ts
 
 Expected: FAIL because routes do not map the new domain errors.
 
-- [ ] **Step 3: Refactor routes**
+- [x] **Step 3: Refactor routes**
 
 Keep request normalization in route code. Move race-sensitive existence and duplicate checks into the versioned storage core. Preserve current `201`, `200`, `400`, and duplicate `409` response formats so the existing admin page remains compatible.
 
-- [ ] **Step 4: Run all anime and storage tests**
+- [x] **Step 4: Run all anime and storage tests**
 
 Run:
 
@@ -579,7 +579,7 @@ npm test -- app/api/anime lib/storage-core.test.ts lib/storage-json.test.ts lib/
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/api/anime
@@ -601,7 +601,7 @@ git commit -m "refactor: snapshot all anime mutations"
 - Produces:
   - `<BackupManager currentCount onDataChanged />`
 
-- [ ] **Step 1: Write failing component tests**
+- [x] **Step 1: Write failing component tests**
 
 Use Testing Library to cover:
 
@@ -626,27 +626,27 @@ it("previews differences before restoring", async () => {
 
 Also test successful restore refresh, failed restore error text, JSON file preview, invalid import, extra empty import confirmation, apply-import double-submit protection, current export link, and snapshot download.
 
-- [ ] **Step 2: Run component tests and verify RED**
+- [x] **Step 2: Run component tests and verify RED**
 
 Run: `npm test -- components/backup-manager.test.tsx`
 
 Expected: FAIL because the component does not exist.
 
-- [ ] **Step 3: Implement focused backup manager UI**
+- [x] **Step 3: Implement focused backup manager UI**
 
 The component owns backup loading, preview dialogs, file selection, pending states, and errors. It does not own the anime list. Use the existing glass styling, 44 px minimum touch targets, Chinese copy, and responsive layout.
 
-- [ ] **Step 4: Run component tests and verify GREEN**
+- [x] **Step 4: Run component tests and verify GREEN**
 
 Run: `npm test -- components/backup-manager.test.tsx`
 
 Expected: PASS.
 
-- [ ] **Step 5: Write failing admin integration test**
+- [x] **Step 5: Write failing admin integration test**
 
 Verify that the manager receives the current count and that successful import/restore calls the existing `fetchList` callback.
 
-- [ ] **Step 6: Integrate into the admin page**
+- [x] **Step 6: Integrate into the admin page**
 
 Render the manager outside the add/edit form:
 
@@ -659,7 +659,7 @@ Render the manager outside the add/edit form:
 
 Replace the old client-memory export button with the service-backed download entry in `BackupManager`.
 
-- [ ] **Step 7: Run admin UI tests and commit**
+- [x] **Step 7: Run admin UI tests and commit**
 
 Run:
 
@@ -689,11 +689,11 @@ git commit -m "feat: add backup and restore admin interface"
 - Consumes: all prior tasks.
 - Produces: deployable, documented feature with verified backward compatibility.
 
-- [ ] **Step 1: Add a failing legacy-data regression test if not already covered**
+- [x] **Step 1: Add a failing legacy-data regression test if not already covered**
 
 Use the exact current `data/anime.json` shape and a Redis `anime:all` legacy array fixture. Verify both load as revision 0 and the first mutation creates a restorable snapshot.
 
-- [ ] **Step 2: Run the regression test and verify RED**
+- [x] **Step 2: Run the regression test and verify RED**
 
 Run:
 
@@ -703,11 +703,11 @@ npm test -- lib/storage-json.test.ts lib/storage-kv.test.ts
 
 Expected: the newly added legacy migration case fails before any required compatibility fix.
 
-- [ ] **Step 3: Implement the minimal compatibility fix and verify GREEN**
+- [x] **Step 3: Implement the minimal compatibility fix and verify GREEN**
 
 Run the same command and expect PASS.
 
-- [ ] **Step 4: Update README**
+- [x] **Step 4: Update README**
 
 Document:
 
@@ -718,7 +718,7 @@ Document:
 - recommendation to download a baseline after deployment;
 - no new required environment variables.
 
-- [ ] **Step 5: Run focused and full automated verification**
+- [x] **Step 5: Run focused and full automated verification**
 
 Run:
 
@@ -736,7 +736,7 @@ Expected:
 - ESLint has 0 errors (existing unrelated `<img>` warnings may remain and must be reported);
 - production build exits 0.
 
-- [ ] **Step 6: Inspect the final diff**
+- [x] **Step 6: Inspect the final diff**
 
 Run:
 
@@ -748,13 +748,13 @@ git diff --stat main...
 
 Confirm no credentials, generated build output, temporary imports, or backup data files are staged.
 
-- [ ] **Step 7: Commit final documentation**
+- [x] **Step 7: Commit final documentation**
 
 ```bash
 git add README.md .env.local.example docs/superpowers/plans/2026-07-29-versioned-backup-restore.md
 git commit -m "docs: document backup and restore workflow"
 ```
 
-- [ ] **Step 8: Request code review and finish the branch**
+- [x] **Step 8: Request code review and finish the branch**
 
 Use `superpowers:requesting-code-review`, address verified findings, rerun the full verification, then use `superpowers:finishing-a-development-branch` to integrate according to the user's chosen local-main workflow.
