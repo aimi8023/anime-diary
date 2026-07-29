@@ -49,6 +49,24 @@ function jsonResponse(body: unknown, status = 200): Response {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("AdminPage Bangumi entry", () => {
+  it("shows a safe inline error when the record list cannot load", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response("<h1>Gateway Error</h1>", {
+          status: 502,
+          headers: { "Content-Type": "text/html" },
+        }),
+      ),
+    );
+
+    render(<AdminPage />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "读取记录失败",
+    );
+  });
+
   it("opens on records and loads backups only after selecting that workspace", async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn(
@@ -124,6 +142,54 @@ describe("AdminPage Bangumi entry", () => {
       "aria-selected",
       "true",
     );
+  });
+
+  it("shows delete failures inline without opening a blocking alert", async () => {
+    const user = userEvent.setup();
+    const alertSpy = vi
+      .spyOn(window, "alert")
+      .mockImplementation(() => undefined);
+    vi.stubGlobal("confirm", vi.fn(() => true));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async (
+          input: string | URL | Request,
+          init?: RequestInit,
+        ) => {
+          const url = String(input);
+          if (url === "/api/anime" && init?.method === "DELETE") {
+            return jsonResponse(
+              { error: "存储暂时不可用" },
+              500,
+            );
+          }
+          if (url === "/api/anime") {
+            return jsonResponse([existingAnime]);
+          }
+          if (
+            url === `/api/anime/${existingAnime.id}` &&
+            init?.method === "DELETE"
+          ) {
+            return jsonResponse(
+              { error: "存储暂时不可用" },
+              500,
+            );
+          }
+          throw new Error(`Unexpected fetch: ${url}`);
+        },
+      ),
+    );
+
+    render(<AdminPage />);
+    expect(await screen.findByText("葬送的芙莉莲")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "删除" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "存储暂时不可用",
+    );
+    expect(alertSpy).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
   });
 
   it("searches, prefills, lets the administrator choose tags, and saves locally", async () => {

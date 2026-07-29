@@ -52,7 +52,9 @@ describe("BangumiSearch", () => {
     await user.click(screen.getByRole("button", { name: "搜索" }));
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(screen.getByText("请输入要搜索的番剧名称")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "请输入要搜索的番剧名称",
+    );
   });
 
   it("searches on Enter and selects a detail prefill", async () => {
@@ -125,7 +127,9 @@ describe("BangumiSearch", () => {
       "孤独摇滚{Enter}",
     );
 
-    expect(screen.getByText("Bangumi 服务暂时不可用")).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Bangumi 服务暂时不可用",
+    );
     await user.click(screen.getByRole("button", { name: "改为手动填写" }));
     expect(props.onUseManual).toHaveBeenCalledOnce();
   });

@@ -6,6 +6,8 @@ import type {
   BackupMetadata,
   DatasetDiff,
 } from "@/lib/backups/types";
+import InlineFeedback from "@/components/feedback/inline-feedback";
+import { readApiError } from "@/lib/http/client";
 
 interface BackupManagerProps {
   collapsible?: boolean;
@@ -33,19 +35,6 @@ const reasonLabels: Record<BackupMetadata["reason"], string> = {
   import: "导入数据",
   restore: "恢复历史版本",
 };
-
-async function responseError(response: Response): Promise<string> {
-  try {
-    const body = await response.json();
-    if (Array.isArray(body.issues) && body.issues[0]?.message) {
-      return body.issues[0].message;
-    }
-    if (typeof body.error === "string") return body.error;
-  } catch {
-    // Fall through to the status-based message.
-  }
-  return `请求失败（${response.status}）`;
-}
 
 function formatTime(value: string): string {
   const date = new Date(value);
@@ -101,7 +90,14 @@ export default function BackupManager({
   const loadBackups = useCallback(async () => {
     try {
       const response = await fetch("/api/backups", { cache: "no-store" });
-      if (!response.ok) throw new Error(await responseError(response));
+      if (!response.ok) {
+        throw new Error(
+          await readApiError(
+            response,
+            `请求失败（${response.status}）`,
+          ),
+        );
+      }
       const body = await response.json();
       setBackups(Array.isArray(body.backups) ? body.backups : []);
     } catch (loadError) {
@@ -117,7 +113,14 @@ export default function BackupManager({
     let active = true;
     fetch("/api/backups", { cache: "no-store" })
       .then(async (response) => {
-        if (!response.ok) throw new Error(await responseError(response));
+        if (!response.ok) {
+          throw new Error(
+            await readApiError(
+              response,
+              `请求失败（${response.status}）`,
+            ),
+          );
+        }
         return response.json();
       })
       .then((body) => {
@@ -150,7 +153,14 @@ export default function BackupManager({
       const response = await fetch(`/api/backups/${backup.id}`, {
         cache: "no-store",
       });
-      if (!response.ok) throw new Error(await responseError(response));
+      if (!response.ok) {
+        throw new Error(
+          await readApiError(
+            response,
+            `请求失败（${response.status}）`,
+          ),
+        );
+      }
       setRestorePreview(await response.json());
     } catch (previewError) {
       setError(
@@ -172,7 +182,14 @@ export default function BackupManager({
         `/api/backups/${restorePreview.metadata.id}/restore`,
         { method: "POST" },
       );
-      if (!response.ok) throw new Error(await responseError(response));
+      if (!response.ok) {
+        throw new Error(
+          await readApiError(
+            response,
+            `请求失败（${response.status}）`,
+          ),
+        );
+      }
       setRestorePreview(null);
       setNotice("已恢复到所选历史版本");
       await onDataChanged();
@@ -209,7 +226,14 @@ export default function BackupManager({
         headers: { "Content-Type": "application/json" },
         body: text,
       });
-      if (!response.ok) throw new Error(await responseError(response));
+      if (!response.ok) {
+        throw new Error(
+          await readApiError(
+            response,
+            `请求失败（${response.status}）`,
+          ),
+        );
+      }
       setImportText(text);
       setImportName(file.name);
       setImportPreview(await response.json());
@@ -244,7 +268,14 @@ export default function BackupManager({
           body: importText,
         },
       );
-      if (!response.ok) throw new Error(await responseError(response));
+      if (!response.ok) {
+        throw new Error(
+          await readApiError(
+            response,
+            `请求失败（${response.status}）`,
+          ),
+        );
+      }
       setImportPreview(null);
       setImportText("");
       setImportName("");
@@ -309,20 +340,14 @@ export default function BackupManager({
       </div>
 
       {notice && (
-        <p
-          role="status"
-          className="mt-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700"
-        >
+        <InlineFeedback tone="success" className="mt-4">
           {notice}
-        </p>
+        </InlineFeedback>
       )}
       {error && (
-        <p
-          role="alert"
-          className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-        >
+        <InlineFeedback tone="error" className="mt-4">
           {error}
-        </p>
+        </InlineFeedback>
       )}
 
       {(!collapsible || expanded) && (

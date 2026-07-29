@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { AnimeInput } from "@/lib/types";
+import InlineFeedback from "@/components/feedback/inline-feedback";
 
 const SEASONS = [
   { value: "春", label: "春季-1月" },
@@ -101,9 +102,9 @@ export default function AnimeForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-500/10 text-red-600 text-sm px-4 py-2.5 rounded-lg border border-red-400/40 font-medium">
+        <InlineFeedback tone="error" className="font-medium">
           {error}
-        </div>
+        </InlineFeedback>
       )}
 
       {/* Title */}

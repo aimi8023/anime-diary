@@ -130,7 +130,9 @@ describe("BackupManager", () => {
       within(dialog).getByRole("button", { name: "确认恢复" }),
     );
 
-    expect(await screen.findByText("已恢复到所选历史版本")).toBeInTheDocument();
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "已恢复到所选历史版本",
+    );
     expect(onDataChanged).toHaveBeenCalledOnce();
   });
 
@@ -183,7 +185,9 @@ describe("BackupManager", () => {
       within(dialog).getByRole("button", { name: "确认导入" }),
     );
 
-    expect(await screen.findByText("备份导入成功")).toBeInTheDocument();
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "备份导入成功",
+    );
     expect(onDataChanged).toHaveBeenCalledOnce();
   });
 
@@ -262,9 +266,9 @@ describe("BackupManager", () => {
       jsonFile("{broken"),
     );
 
-    expect(
-      await screen.findByText("文件不是有效的 JSON"),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "文件不是有效的 JSON",
+    );
     expect(
       screen.queryByRole("button", { name: "确认导入" }),
     ).not.toBeInTheDocument();

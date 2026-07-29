@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import InlineFeedback from "@/components/feedback/inline-feedback";
+import { readApiError } from "@/lib/http/client";
 
 export default function LoginPage() {
   const [password, setPassword] = useState("");
@@ -29,8 +31,7 @@ export default function LoginPage() {
         // Use window.location for a full navigation so the cookie is definitely sent
         window.location.href = "/admin";
       } else {
-        const data = await res.json();
-        setError(data.error || "密码错误");
+        setError(await readApiError(res, "密码错误"));
       }
     } catch {
       setError("网络错误，请重试");
@@ -84,9 +85,11 @@ export default function LoginPage() {
             <motion.div 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="mb-5 bg-red-500/10 text-red-600 text-sm px-4 py-3 rounded-lg border border-red-400/40 backdrop-blur-sm font-medium"
+              className="mb-5"
             >
-              {error}
+              <InlineFeedback tone="error" className="font-medium">
+                {error}
+              </InlineFeedback>
             </motion.div>
           )}
 

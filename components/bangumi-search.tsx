@@ -6,20 +6,13 @@ import type {
   BangumiPrefill,
   BangumiSearchResult,
 } from "@/lib/bangumi/types";
+import InlineFeedback from "@/components/feedback/inline-feedback";
+import { readApiError } from "@/lib/http/client";
 
 interface BangumiSearchProps {
   onSelect: (prefill: BangumiPrefill) => void;
   onEditExisting: (localAnimeId: string) => void;
   onUseManual: () => void;
-}
-
-async function responseError(response: Response, fallback: string) {
-  try {
-    const data = (await response.json()) as { error?: string };
-    return data.error || fallback;
-  } catch {
-    return fallback;
-  }
 }
 
 export default function BangumiSearch({
@@ -52,7 +45,9 @@ export default function BangumiSearch({
         `/api/bangumi/search?q=${encodeURIComponent(keyword)}`,
       );
       if (!response.ok) {
-        throw new Error(await responseError(response, "搜索失败，请稍后再试"));
+        throw new Error(
+          await readApiError(response, "搜索失败，请稍后再试"),
+        );
       }
       setResults((await response.json()) as BangumiSearchResult[]);
       setHasSearched(true);
@@ -83,7 +78,10 @@ export default function BangumiSearch({
       );
       if (!response.ok) {
         throw new Error(
-          await responseError(response, "读取条目详情失败，请稍后再试"),
+          await readApiError(
+            response,
+            "读取条目详情失败，请稍后再试",
+          ),
         );
       }
       onSelect((await response.json()) as BangumiPrefill);
@@ -118,9 +116,9 @@ export default function BangumiSearch({
       </form>
 
       {error && (
-        <div className="rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+        <InlineFeedback tone="error">
           {error}
-        </div>
+        </InlineFeedback>
       )}
 
       {hasSearched && results.length === 0 && (

@@ -6,6 +6,31 @@ import { describe, expect, it, vi } from "vitest";
 import AnimeForm from "./anime-form";
 
 describe("AnimeForm Bangumi prefill", () => {
+  it("announces save failures as an inline alert", async () => {
+    const user = userEvent.setup();
+    render(
+      <AnimeForm
+        initial={{
+          title: "孤独摇滚！",
+          season: "2022冬",
+          cover: "",
+          rating: 9.5,
+          comment: "",
+          episodes: 12,
+          tags: [],
+        }}
+        onSave={vi.fn().mockRejectedValue(new Error("保存暂时失败"))}
+        onCancel={() => {}}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "更新" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "保存暂时失败",
+    );
+  });
+
   it("keeps suggested tags opt-in and preserves source metadata on save", async () => {
     const user = userEvent.setup();
     const onSave = vi.fn().mockResolvedValue(undefined);

@@ -11,6 +11,8 @@ import BackupManager from "@/components/backup-manager";
 import AdminSectionNav, {
   type AdminSection,
 } from "@/components/admin/admin-section-nav";
+import InlineFeedback from "@/components/feedback/inline-feedback";
+import { readApiError } from "@/lib/http/client";
 
 type EntryMode = "bangumi" | "manual";
 
@@ -24,28 +26,31 @@ export default function AdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [entryMode, setEntryMode] = useState<EntryMode>("bangumi");
   const [prefill, setPrefill] = useState<BangumiPrefill | null>(null);
+  const [operationError, setOperationError] = useState("");
 
   const fetchList = useCallback(async () => {
+    setOperationError("");
     try {
       const res = await fetch("/api/anime");
-      if (res.ok) {
-        const data = await res.json();
-        setAnimeList(data);
+      if (!res.ok) {
+        throw new Error(
+          await readApiError(res, "读取记录失败"),
+        );
       }
+      const data = await res.json();
+      setAnimeList(data);
     } catch (err) {
-      console.error("Failed to fetch anime list:", err);
+      setOperationError(
+        err instanceof Error ? err.message : "读取记录失败",
+      );
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetch("/api/anime")
-      .then((res) => res.ok ? res.json() : Promise.reject(res))
-      .then((data) => setAnimeList(data))
-      .catch((err) => console.error("Failed to fetch anime list:", err))
-      .finally(() => setLoading(false));
-  }, []);
+    void fetchList();
+  }, [fetchList]);
 
   // Filter by search query
   const filteredList = searchQuery.trim()
@@ -62,9 +67,14 @@ export default function AdminPage() {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const err = await res.json();
-        if (res.status === 409 && err.existingId) {
-          const existing = animeList.find((anime) => anime.id === err.existingId);
+        const details = await res
+          .clone()
+          .json()
+          .catch(() => null) as { existingId?: string } | null;
+        if (res.status === 409 && details?.existingId) {
+          const existing = animeList.find(
+            (anime) => anime.id === details.existingId,
+          );
           if (existing) {
             setEditing(existing);
             setPrefill(null);
@@ -72,7 +82,7 @@ export default function AdminPage() {
             setSection("entry");
           }
         }
-        throw new Error(err.error || "更新失败");
+        throw new Error(await readApiError(res, "更新失败"));
       }
     } else {
       const res = await fetch("/api/anime", {
@@ -81,9 +91,14 @@ export default function AdminPage() {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const err = await res.json();
-        if (res.status === 409 && err.existingId) {
-          const existing = animeList.find((anime) => anime.id === err.existingId);
+        const details = await res
+          .clone()
+          .json()
+          .catch(() => null) as { existingId?: string } | null;
+        if (res.status === 409 && details?.existingId) {
+          const existing = animeList.find(
+            (anime) => anime.id === details.existingId,
+          );
           if (existing) {
             setEditing(existing);
             setPrefill(null);
@@ -91,7 +106,7 @@ export default function AdminPage() {
             setSection("entry");
           }
         }
-        throw new Error(err.error || "添加失败");
+        throw new Error(await readApiError(res, "添加失败"));
       }
     }
     setEditing(null);
@@ -103,13 +118,18 @@ export default function AdminPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("确定要删除这部番剧吗？")) return;
+    setOperationError("");
     setDeleting(id);
     try {
       const res = await fetch(`/api/anime/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("删除失败");
+      if (!res.ok) {
+        throw new Error(await readApiError(res, "删除失败"));
+      }
       fetchList();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "删除失败");
+      setOperationError(
+        err instanceof Error ? err.message : "删除失败",
+      );
     } finally {
       setDeleting(null);
     }
@@ -240,6 +260,12 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+
+          {operationError && (
+            <InlineFeedback tone="error" className="mb-4">
+              {operationError}
+            </InlineFeedback>
+          )}
 
           {loading ? (
             <div className="py-16 text-center text-sm text-gray-600">
