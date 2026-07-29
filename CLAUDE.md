@@ -34,7 +34,7 @@ anime-diary/
 │   ├── page.tsx                     ← 服务端读取一次数据的公开档案首页
 │   ├── globals.css                  ← 白粉主题 + 毛玻璃效果
 │   ├── login/page.tsx               ← 登录页
-│   ├── admin/page.tsx               ← 管理页（增删改番剧 + 本地搜索）
+│   ├── admin/page.tsx               ← 三工作区管理页（记录、添加、备份）
 │   └── api/
 │       ├── auth/route.ts            ← 登录/登出 API
 │       └── anime/
@@ -47,9 +47,12 @@ anime-diary/
 │   │   ├── archive-toolbar.tsx      ← 桌面/移动组合筛选
 │   │   ├── archive-results.tsx      ← 年份和季度结果
 │   │   └── anime-detail-dialog.tsx  ← 可访问的记录详情面板
+│   ├── admin/
+│   │   └── admin-section-nav.tsx    ← 后台工作区导航
 │   ├── star-rating.tsx              ← 星星评分（支持 0.5 步长）
 │   ├── anime-form.tsx               ← 表单组件（标签管理、评分滑块）
-│   ├── anime-list.tsx               ← 管理列表（支持本地搜索过滤）
+│   ├── anime-list.tsx               ← 管理记录列表（页面自然滚动）
+│   ├── backup-manager.tsx           ← 备份导入、导出、预览与恢复
 │   └── timer.tsx                    ← 实时计时器（本站运行时间）
 ├── data/anime.json                  ← 示例数据（本地开发用，含 tags）
 └── public/                          ← 静态资源（bg.png 背景图）
@@ -79,7 +82,7 @@ interface Anime {
 |------|------|------|
 | `/` | 公开 | 服务端首屏的追番档案，支持 URL 组合筛选和年份/季度浏览 |
 | `/login` | 公开 | 密码登录页 |
-| `/admin` | 需登录 | 管理页，增删改番剧，本地搜索栏 |
+| `/admin` | 需登录 | 记录、添加记录、备份恢复三个互斥工作区 |
 | `GET /api/anime` | 公开 | 获取全部番剧数据 |
 | `POST /api/anime` | 需登录 | 新增番剧 |
 | `PUT /api/anime/[id]` | 需登录 | 更新番剧 |
@@ -145,28 +148,34 @@ interface Anime {
 
 ### 管理页功能
 
-1. **本地搜索栏**
-   - 集成在标题栏中，实时过滤列表
-   - 无结果时显示友好提示
+1. **工作区信息架构**
+   - 默认打开记录工作区；添加/编辑与备份恢复分别独立展示
+   - 首次进入不读取备份，选择备份恢复后才挂载并请求历史版本
+   - 保存或取消添加/编辑后返回记录工作区
 
-2. **标签管理**
+2. **本地搜索栏**
+   - 集成在记录工作区，实时过滤列表
+   - 无结果时显示友好提示
+   - 长列表使用页面自然滚动，不使用固定高度的内嵌滚动框
+
+3. **标签管理**
    - 输入框 + 添加按钮，按回车快速添加
    - 每个标签有删除按钮
    - 粉色/蓝色渐变标签样式
 
-3. **年份输入**
+4. **年份输入**
    - 数字输入框，范围 0-9999
 
-4. **季度选择**
+5. **季度选择**
    - 春季-1月、夏季-4月、秋季-7月、冬季-10月
 
-5. **评分滑块**
+6. **评分滑块**
    - 范围：1.0-10.0，步长 0.5
    - 实时显示当前数值（粉色高亮）
    - 下方可视化星星预览
 
-6. **数据导出**
-   - 导出为 JSON 文件下载
+7. **备份恢复**
+   - 独立工作区提供 JSON 导入导出、历史版本、差异预览与恢复
 
 ## 本地开发
 
@@ -192,6 +201,8 @@ npm run start       # 启动生产服务器
 - `app/page.tsx` 是 Server Component，每次渲染只调用一次 `storage.getAll()`；存储失败渲染错误状态
 - `app/layout.tsx` 与 `components/site-header.tsx` 均保持服务端渲染，不再维护全局番剧搜索 Context
 - `components/archive/archive-browser.tsx` 只管理公开浏览交互，所有数据由服务端页面作为 props 注入
+- `app/admin/page.tsx` 只维护局部 `AdminSection` 状态；三个后台工作区互斥挂载，不引入全局状态库
+- `components/backup-manager.tsx` 仅在备份恢复工作区挂载，因此后台首次加载不请求 `/api/backups`
 - `lib/archive/filter.ts` 集中处理 URL 归一化、筛选、排序、分组和统计，且不修改调用方数组
 - `GET /api/anime` 保持公开且响应兼容，但公开首页不调用该 API
 - 评分使用 `Math.round(rating * 2) / 2` 取整到 0.5 步长
