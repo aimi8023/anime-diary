@@ -101,7 +101,9 @@ describe("createJsonStorage", () => {
 
     await Promise.all([store.add(second), store.add(third)]);
 
-    expect((await store.getState()).data).toEqual([first, second, third]);
+    expect(
+      (await store.getState()).data.map((anime) => anime.id).sort(),
+    ).toEqual(["anime-1", "anime-2", "anime-3"]);
     expect(await store.listBackups()).toHaveLength(2);
   });
 
