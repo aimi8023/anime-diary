@@ -13,6 +13,7 @@ const SEASONS = [
 interface AnimeFormProps {
   initial?: Partial<AnimeInput> | null;
   suggestedTags?: string[];
+  submitLabel?: string;
   onSave: (data: AnimeInput) => Promise<void>;
   onCancel: () => void;
 }
@@ -20,6 +21,7 @@ interface AnimeFormProps {
 export default function AnimeForm({
   initial,
   suggestedTags = [],
+  submitLabel,
   onSave,
   onCancel,
 }: AnimeFormProps) {
@@ -305,7 +307,9 @@ export default function AnimeForm({
           disabled={saving}
           className="flex-1 min-h-[44px] bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg"
         >
-          {saving ? "保存中..." : initial ? "更新" : "添加"}
+          {saving
+            ? "保存中..."
+            : submitLabel || (initial ? "更新" : "添加")}
         </button>
         <button
           type="button"

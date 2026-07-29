@@ -3,8 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Anime, AnimeInput } from "@/lib/types";
+import type { BangumiPrefill } from "@/lib/bangumi/types";
 import AnimeList from "@/components/anime-list";
 import AnimeForm from "@/components/anime-form";
+import BangumiSearch from "@/components/bangumi-search";
+
+type EntryMode = "bangumi" | "manual";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -14,6 +18,8 @@ export default function AdminPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [entryMode, setEntryMode] = useState<EntryMode>("bangumi");
+  const [prefill, setPrefill] = useState<BangumiPrefill | null>(null);
 
   const fetchList = useCallback(async () => {
     try {
@@ -53,6 +59,15 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const err = await res.json();
+        if (res.status === 409 && err.existingId) {
+          const existing = animeList.find((anime) => anime.id === err.existingId);
+          if (existing) {
+            setEditing(existing);
+            setPrefill(null);
+            setEntryMode("manual");
+            setShowForm(true);
+          }
+        }
         throw new Error(err.error || "更新失败");
       }
     } else {
@@ -63,10 +78,21 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const err = await res.json();
+        if (res.status === 409 && err.existingId) {
+          const existing = animeList.find((anime) => anime.id === err.existingId);
+          if (existing) {
+            setEditing(existing);
+            setPrefill(null);
+            setEntryMode("manual");
+            setShowForm(true);
+          }
+        }
         throw new Error(err.error || "添加失败");
       }
     }
     setEditing(null);
+    setPrefill(null);
+    setEntryMode("bangumi");
     setShowForm(false);
     fetchList();
   };
@@ -87,12 +113,28 @@ export default function AdminPage() {
 
   const handleEdit = (anime: Anime) => {
     setEditing(anime);
+    setPrefill(null);
+    setEntryMode("manual");
     setShowForm(true);
   };
 
   const handleCancel = () => {
     setEditing(null);
+    setPrefill(null);
+    setEntryMode("bangumi");
     setShowForm(false);
+  };
+
+  const handleStartAdd = () => {
+    setEditing(null);
+    setPrefill(null);
+    setEntryMode("bangumi");
+    setShowForm(true);
+  };
+
+  const handleEditExisting = (localAnimeId: string) => {
+    const existing = animeList.find((anime) => anime.id === localAnimeId);
+    if (existing) handleEdit(existing);
   };
 
   const handleLogout = async () => {
@@ -151,7 +193,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-2">
           {!showForm && (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={handleStartAdd}
               className="bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white text-sm font-medium px-3 sm:px-4 py-2.5 rounded-lg transition-all min-h-[44px] shadow-md hover:shadow-lg whitespace-nowrap"
             >
               + 添加番剧
@@ -187,11 +229,90 @@ export default function AdminPage() {
           <h2 className="text-sm font-semibold text-gray-800 mb-4">
             {editing ? `编辑：${editing.title}` : "添加新番剧"}
           </h2>
-          <AnimeForm
-            initial={editing}
-            onSave={handleSave}
-            onCancel={handleCancel}
-          />
+          {editing ? (
+            <AnimeForm
+              key={editing.id}
+              initial={editing}
+              submitLabel="更新记录"
+              onSave={handleSave}
+              onCancel={handleCancel}
+            />
+          ) : (
+            <>
+              {!prefill && (
+                <div className="grid grid-cols-2 gap-2 mb-4 rounded-xl bg-white/20 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setEntryMode("bangumi")}
+                    className={`min-h-[40px] rounded-lg text-sm font-medium transition-colors ${
+                      entryMode === "bangumi"
+                        ? "bg-white/70 text-pink-600 shadow-sm"
+                        : "text-gray-600 hover:bg-white/30"
+                    }`}
+                  >
+                    从 Bangumi 搜索
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEntryMode("manual")}
+                    className={`min-h-[40px] rounded-lg text-sm font-medium transition-colors ${
+                      entryMode === "manual"
+                        ? "bg-white/70 text-blue-600 shadow-sm"
+                        : "text-gray-600 hover:bg-white/30"
+                    }`}
+                  >
+                    手动填写
+                  </button>
+                </div>
+              )}
+
+              {entryMode === "bangumi" && !prefill ? (
+                <BangumiSearch
+                  onSelect={setPrefill}
+                  onEditExisting={handleEditExisting}
+                  onUseManual={() => setEntryMode("manual")}
+                />
+              ) : (
+                <>
+                  {prefill && (
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-400/30 bg-blue-500/10 px-3 py-2.5">
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">
+                          资料来自 Bangumi
+                        </p>
+                        <a
+                          href={prefill.bangumiUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          查看原条目
+                        </a>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPrefill(null);
+                          setEntryMode("bangumi");
+                        }}
+                        className="text-xs text-gray-600 hover:text-pink-600"
+                      >
+                        重新搜索
+                      </button>
+                    </div>
+                  )}
+                  <AnimeForm
+                    key={prefill ? `bangumi-${prefill.bangumiId}` : "manual"}
+                    initial={prefill}
+                    suggestedTags={prefill?.suggestedTags ?? []}
+                    submitLabel="添加记录"
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                  />
+                </>
+              )}
+            </>
+          )}
         </div>
       )}
 
