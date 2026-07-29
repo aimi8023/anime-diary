@@ -16,6 +16,16 @@ import { readApiError } from "@/lib/http/client";
 
 type EntryMode = "bangumi" | "manual";
 
+async function loadAnimeList(): Promise<Anime[]> {
+  const response = await fetch("/api/anime");
+  if (!response.ok) {
+    throw new Error(
+      await readApiError(response, "读取记录失败"),
+    );
+  }
+  return response.json();
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [animeList, setAnimeList] = useState<Anime[]>([]);
@@ -29,15 +39,9 @@ export default function AdminPage() {
   const [operationError, setOperationError] = useState("");
 
   const fetchList = useCallback(async () => {
-    setOperationError("");
     try {
-      const res = await fetch("/api/anime");
-      if (!res.ok) {
-        throw new Error(
-          await readApiError(res, "读取记录失败"),
-        );
-      }
-      const data = await res.json();
+      const data = await loadAnimeList();
+      setOperationError("");
       setAnimeList(data);
     } catch (err) {
       setOperationError(
@@ -49,8 +53,25 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    void fetchList();
-  }, [fetchList]);
+    let active = true;
+    loadAnimeList()
+      .then((data) => {
+        if (active) setAnimeList(data);
+      })
+      .catch((error) => {
+        if (active) {
+          setOperationError(
+            error instanceof Error ? error.message : "读取记录失败",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Filter by search query
   const filteredList = searchQuery.trim()
