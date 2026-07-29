@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import type {
   BackupMetadata,
   DatasetDiff,
@@ -111,8 +112,33 @@ export default function BackupManager({
   }, []);
 
   useEffect(() => {
-    void loadBackups();
-  }, [loadBackups]);
+    let active = true;
+    fetch("/api/backups", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(await responseError(response));
+        return response.json();
+      })
+      .then((body) => {
+        if (active) {
+          setBackups(Array.isArray(body.backups) ? body.backups : []);
+        }
+      })
+      .catch((loadError) => {
+        if (active) {
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : "读取备份列表失败",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const openRestore = async (backup: BackupMetadata) => {
     setError("");
@@ -249,12 +275,13 @@ export default function BackupManager({
           </p>
         </button>
         <div className="flex flex-wrap gap-2">
-          <a
+          <Link
             href="/api/backups/export"
+            download
             className="min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 bg-white/60 px-3 py-2 text-sm font-medium text-gray-700 hover:border-green-500 hover:text-green-700"
           >
             下载当前数据
-          </a>
+          </Link>
           <label className="min-h-[44px] inline-flex cursor-pointer items-center rounded-lg bg-gradient-to-r from-pink-500 to-blue-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:from-pink-600 hover:to-blue-600">
             {importLoading ? "正在读取…" : "导入 JSON"}
             <input
@@ -311,12 +338,13 @@ export default function BackupManager({
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <a
+                    <Link
                       href={`/api/backups/${backup.id}?download=1`}
+                      download
                       className="min-h-[40px] inline-flex items-center rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-white/70 hover:text-green-700"
                     >
                       下载
-                    </a>
+                    </Link>
                     <button
                       type="button"
                       aria-label={`恢复 ${backup.createdAt}`}

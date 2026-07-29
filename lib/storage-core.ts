@@ -107,6 +107,7 @@ export function createVersionedStorage(
       const nextData = transform(cloneData(current.data));
       const result = await adapter.commit({
         expectedRevision: current.revision,
+        previousData: cloneData(current.data),
         nextData: cloneData(nextData),
         reason,
         snapshot: {

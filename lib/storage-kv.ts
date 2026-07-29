@@ -38,16 +38,8 @@ if tonumber(current.revision) ~= tonumber(ARGV[1]) then
 end
 
 local metadata = cjson.decode(ARGV[3])
-local snapshot = {
-  id = metadata.id,
-  createdAt = metadata.createdAt,
-  reason = metadata.reason,
-  recordCount = metadata.recordCount,
-  schemaVersion = metadata.schemaVersion,
-  data = current.data
-}
 
-redis.call("SET", KEYS[5], cjson.encode(snapshot))
+redis.call("SET", KEYS[5], ARGV[5])
 redis.call("HSET", KEYS[4], metadata.id, ARGV[3])
 redis.call("ZADD", KEYS[3], ARGV[4], metadata.id)
 redis.call("SET", KEYS[1], ARGV[2])
@@ -210,6 +202,10 @@ class RedisStorageAdapter implements VersionedStorageAdapter {
       revision: input.expectedRevision + 1,
       data: structuredClone(input.nextData),
     };
+    const snapshot: BackupSnapshot = {
+      ...input.snapshot,
+      data: structuredClone(input.previousData),
+    };
     const result = parseCommitResult(
       await this.redis.eval(
         COMMIT_SCRIPT,
@@ -225,6 +221,7 @@ class RedisStorageAdapter implements VersionedStorageAdapter {
           JSON.stringify(nextState),
           JSON.stringify(input.snapshot),
           String(Date.parse(input.snapshot.createdAt)),
+          JSON.stringify(snapshot),
         ],
       ),
     );

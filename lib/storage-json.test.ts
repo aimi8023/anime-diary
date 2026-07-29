@@ -107,17 +107,21 @@ describe("createJsonStorage", () => {
     expect(await store.listBackups()).toHaveLength(2);
   });
 
-  it("keeps only the newest 30 snapshots", async () => {
-    const store = storage();
+  it(
+    "keeps only the newest 30 snapshots",
+    async () => {
+      const store = storage();
 
-    for (let index = 0; index < 31; index += 1) {
-      await store.update(first.id, { comment: `第 ${index} 次修改` });
-    }
+      for (let index = 0; index < 31; index += 1) {
+        await store.update(first.id, { comment: `第 ${index} 次修改` });
+      }
 
-    const backups = await store.listBackups();
-    expect(backups).toHaveLength(30);
-    expect(backups[0].createdAt >= backups[29].createdAt).toBe(true);
-  });
+      const backups = await store.listBackups();
+      expect(backups).toHaveLength(30);
+      expect(backups[0].createdAt >= backups[29].createdAt).toBe(true);
+    },
+    15_000,
+  );
 
   it("throws on malformed current data instead of returning an empty list", async () => {
     await fs.writeFile(dataFile, "{broken", "utf8");

@@ -97,11 +97,16 @@ class JsonStorageAdapter implements VersionedStorageAdapter {
   private readonly indexFile: string;
 
   constructor(options: JsonStorageOptions = {}) {
-    this.dataFile = path.resolve(options.dataFile ?? DEFAULT_DATA_FILE);
+    this.dataFile = path.resolve(
+      /* turbopackIgnore: true */ options.dataFile ?? DEFAULT_DATA_FILE,
+    );
     this.revisionFile = path.resolve(
+      /* turbopackIgnore: true */
       options.revisionFile ?? DEFAULT_REVISION_FILE,
     );
-    this.backupDir = path.resolve(options.backupDir ?? DEFAULT_BACKUP_DIR);
+    this.backupDir = path.resolve(
+      /* turbopackIgnore: true */ options.backupDir ?? DEFAULT_BACKUP_DIR,
+    );
     this.indexFile = path.join(this.backupDir, BACKUP_INDEX_FILE);
   }
 

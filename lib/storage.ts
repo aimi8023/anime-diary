@@ -8,6 +8,7 @@ import type {
 
 export interface CommitInput {
   expectedRevision: number;
+  previousData: Anime[];
   nextData: Anime[];
   reason: BackupReason;
   snapshot: BackupMetadata;

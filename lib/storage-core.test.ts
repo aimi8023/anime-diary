@@ -44,7 +44,7 @@ class MemoryAdapter implements VersionedStorageAdapter {
   commits: CommitInput[] = [];
   readCount = 0;
   conflictsRemaining = 0;
-  prune = vi.fn(async (_keep: number) => undefined);
+  prune = vi.fn(async () => undefined);
 
   constructor(data: Anime[] = [first]) {
     this.state = { revision: 0, data: structuredClone(data) };
@@ -77,7 +77,13 @@ class MemoryAdapter implements VersionedStorageAdapter {
   }
 
   async listBackups(): Promise<BackupMetadata[]> {
-    return this.backups.map(({ data: _data, ...metadata }) => metadata);
+    return this.backups.map((backup) => ({
+      id: backup.id,
+      createdAt: backup.createdAt,
+      reason: backup.reason,
+      recordCount: backup.recordCount,
+      schemaVersion: backup.schemaVersion,
+    }));
   }
 
   async getBackup(id: string): Promise<BackupSnapshot | null> {
@@ -105,6 +111,7 @@ describe("createVersionedStorage", () => {
 
     expect(adapter.commits[0]).toMatchObject({
       expectedRevision: 0,
+      previousData: [first],
       reason: "add",
       nextData: [first, second],
       snapshot: {

@@ -70,7 +70,13 @@ class ServiceStorage implements Storage {
   }
 
   async listBackups(): Promise<BackupMetadata[]> {
-    return this.backups.map(({ data: _data, ...metadata }) => metadata);
+    return this.backups.map((backup) => ({
+      id: backup.id,
+      createdAt: backup.createdAt,
+      reason: backup.reason,
+      recordCount: backup.recordCount,
+      schemaVersion: backup.schemaVersion,
+    }));
   }
 
   async getBackup(id: string) {
@@ -79,7 +85,7 @@ class ServiceStorage implements Storage {
     );
   }
 
-  async replaceAll(data: Anime[], _reason: "import") {
+  async replaceAll(data: Anime[]) {
     this.backups.unshift({
       id: "before-import",
       createdAt: "2026-07-29T01:00:00.000Z",

@@ -80,7 +80,28 @@ describe("createKvStorage", () => {
       JSON.stringify({ revision: 1, data: [first, second] }),
       expect.stringContaining('"reason":"add"'),
       expect.any(String),
+      expect.stringContaining(`"data":[${JSON.stringify(first)}]`),
     ]);
+  });
+
+  it("passes an empty previous dataset to Redis as a JSON array", async () => {
+    const redis = redisDouble();
+    vi.mocked(redis.get).mockResolvedValueOnce({
+      revision: 0,
+      data: [],
+    });
+    vi.mocked(redis.eval)
+      .mockResolvedValueOnce({ committed: true, revision: 1 })
+      .mockResolvedValueOnce(0);
+
+    await createKvStorage(redis).add(first);
+
+    const commitCall = vi.mocked(redis.eval).mock.calls[0];
+    expect(JSON.parse(String(commitCall[2][4]))).toMatchObject({
+      reason: "add",
+      recordCount: 0,
+      data: [],
+    });
   });
 
   it("re-reads current state when the script reports a revision conflict", async () => {

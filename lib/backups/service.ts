@@ -47,8 +47,13 @@ export interface ImportPreview {
 function metadataOf(
   snapshot: Awaited<ReturnType<Storage["getBackup"]>> & object,
 ): BackupMetadata {
-  const { data: _data, ...metadata } = snapshot;
-  return metadata;
+  return {
+    id: snapshot.id,
+    createdAt: snapshot.createdAt,
+    reason: snapshot.reason,
+    recordCount: snapshot.recordCount,
+    schemaVersion: snapshot.schemaVersion,
+  };
 }
 
 export function createBackupService(

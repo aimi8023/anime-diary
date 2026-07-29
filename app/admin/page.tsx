@@ -37,8 +37,12 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    void fetchList();
-  }, [fetchList]);
+    fetch("/api/anime")
+      .then((res) => res.ok ? res.json() : Promise.reject(res))
+      .then((data) => setAnimeList(data))
+      .catch((err) => console.error("Failed to fetch anime list:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Filter by search query
   const filteredList = searchQuery.trim()
