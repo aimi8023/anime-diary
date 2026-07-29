@@ -51,6 +51,9 @@ describe("AdminPage Bangumi entry", () => {
         if (url === "/api/anime" && (!init?.method || init.method === "GET")) {
           return jsonResponse([]);
         }
+        if (url === "/api/backups") {
+          return jsonResponse({ backups: [] });
+        }
         if (url.startsWith("/api/bangumi/search")) {
           return jsonResponse([searchResult]);
         }
@@ -66,6 +69,9 @@ describe("AdminPage Bangumi entry", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<AdminPage />);
+    expect(
+      await screen.findByRole("heading", { name: "备份与恢复" }),
+    ).toBeInTheDocument();
     await user.click(
       await screen.findByRole("button", { name: "+ 添加番剧" }),
     );

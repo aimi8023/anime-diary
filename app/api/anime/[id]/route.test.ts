@@ -10,7 +10,7 @@ const storageMock = vi.hoisted(() => ({
 
 vi.mock("@/lib/storage-factory", () => ({ storage: storageMock }));
 
-import { PUT } from "./route";
+import { DELETE, PUT } from "./route";
 
 function putRequest(body: unknown): Request {
   return new Request("http://localhost/api/anime/current-id", {
@@ -34,9 +34,11 @@ describe("PUT /api/anime/[id]", () => {
   });
 
   it("rejects a Bangumi ID owned by another local record", async () => {
-    storageMock.findByBangumiId.mockResolvedValue({
-      id: "another-id",
-      bangumiId: 352821,
+    storageMock.update.mockImplementation(() => {
+      throw Object.assign(new Error("该 Bangumi 条目已收录"), {
+        code: "duplicate_bangumi",
+        existingId: "another-id",
+      });
     });
 
     const response = await PUT(
@@ -49,15 +51,11 @@ describe("PUT /api/anime/[id]", () => {
       error: "该 Bangumi 条目已收录",
       existingId: "another-id",
     });
-    expect(storageMock.update).not.toHaveBeenCalled();
+    expect(storageMock.update).toHaveBeenCalledOnce();
+    expect(storageMock.findByBangumiId).not.toHaveBeenCalled();
   });
 
   it("allows a record to retain its own Bangumi ID", async () => {
-    storageMock.findByBangumiId.mockResolvedValue({
-      id: "current-id",
-      bangumiId: 352821,
-    });
-
     const response = await PUT(
       putRequest({
         bangumiId: 352821,
@@ -75,5 +73,44 @@ describe("PUT /api/anime/[id]", () => {
       originalTitle: "ぼっち・ざ・ろっく！",
       airDate: "2022-10-09",
     });
+    expect(storageMock.findByBangumiId).not.toHaveBeenCalled();
+  });
+
+  it("maps a revision conflict during update to 409", async () => {
+    storageMock.update.mockImplementation(() => {
+      throw Object.assign(new Error("数据已被其他操作更新，请刷新后重试"), {
+        code: "revision_conflict",
+      });
+    });
+
+    const response = await PUT(
+      putRequest({ title: "新标题" }),
+      context(),
+    );
+
+    expect(response.status).toBe(409);
+  });
+});
+
+describe("DELETE /api/anime/[id]", () => {
+  beforeEach(() => {
+    storageMock.remove.mockReset();
+  });
+
+  it("maps a revision conflict during delete to 409", async () => {
+    storageMock.remove.mockImplementation(() => {
+      throw Object.assign(new Error("数据已被其他操作更新，请刷新后重试"), {
+        code: "revision_conflict",
+      });
+    });
+
+    const response = await DELETE(
+      new Request("http://localhost/api/anime/current-id", {
+        method: "DELETE",
+      }),
+      context(),
+    );
+
+    expect(response.status).toBe(409);
   });
 });

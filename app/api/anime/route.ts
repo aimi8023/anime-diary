@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { storage } from "@/lib/storage-factory";
 import type { AnimeInput } from "@/lib/types";
+import { animeMutationErrorResponse } from "@/lib/anime-api-error";
 
 export async function GET() {
   try {
@@ -31,16 +32,6 @@ export async function POST(request: Request) {
         ? Number(body.bangumiId)
         : undefined;
 
-    if (bangumiId !== undefined) {
-      const existing = await storage.findByBangumiId(bangumiId);
-      if (existing) {
-        return NextResponse.json(
-          { error: "该 Bangumi 条目已收录", existingId: existing.id },
-          { status: 409 },
-        );
-      }
-    }
-
     const anime = {
       id: nanoid(12),
       ...body,
@@ -61,8 +52,6 @@ export async function POST(request: Request) {
     await storage.add(anime);
     return NextResponse.json(anime, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "添加失败";
-    console.error("POST /api/anime error:", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return animeMutationErrorResponse(error, "添加");
   }
 }
