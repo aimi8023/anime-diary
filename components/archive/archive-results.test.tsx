@@ -106,4 +106,32 @@ describe("ArchiveResults", () => {
     await user.click(screen.getByRole("button", { name: "清除筛选" }));
     expect(onClearFilters).toHaveBeenCalledOnce();
   });
+
+  it("opens the first remaining year after filtering removes newer years", () => {
+    const { rerender } = render(
+      <ArchiveResults
+        onClearFilters={vi.fn()}
+        onSelect={vi.fn()}
+        records={records}
+        sort="rating"
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "2024 年" }),
+    ).toHaveAttribute("aria-expanded", "false");
+
+    rerender(
+      <ArchiveResults
+        onClearFilters={vi.fn()}
+        onSelect={vi.fn()}
+        records={[records[0]]}
+        sort="rating"
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "2024 年" }),
+    ).toHaveAttribute("aria-expanded", "true");
+  });
 });

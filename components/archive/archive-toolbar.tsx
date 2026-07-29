@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type {
   ArchiveFilters,
   ArchiveOptions,
@@ -204,32 +205,36 @@ export default function ArchiveToolbar(props: ArchiveToolbarProps) {
         <FilterFields {...props} idPrefix="desktop" />
       </div>
 
-      {mobileOpen && (
-        <div
-          aria-label="筛选条件"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-end bg-gray-950/30 md:hidden"
-          id="mobile-archive-filters"
-          role="dialog"
-        >
-          <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">筛选条件</h2>
-              <button
-                aria-label="关闭筛选条件"
-                className="rounded-full border border-gray-200 px-3 py-1.5 text-sm text-gray-600"
-                onClick={() => setMobileOpen(false)}
-                type="button"
-              >
-                完成
-              </button>
+      {mobileOpen &&
+        createPortal(
+          <div
+            aria-label="筛选条件"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-end bg-gray-950/30 md:hidden"
+            id="mobile-archive-filters"
+            role="dialog"
+          >
+            <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl">
+              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-5 flex items-center justify-between border-b border-gray-100 bg-white/95 px-5 py-4 backdrop-blur">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  筛选条件
+                </h2>
+                <button
+                  aria-label="关闭筛选条件"
+                  className="rounded-full border border-gray-200 px-3 py-1.5 text-sm text-gray-600"
+                  onClick={() => setMobileOpen(false)}
+                  type="button"
+                >
+                  完成
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <FilterFields {...props} idPrefix="mobile" />
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <FilterFields {...props} idPrefix="mobile" />
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </section>
   );
 }

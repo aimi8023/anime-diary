@@ -7,6 +7,7 @@ import {
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
   getArchiveOptions,
+  parseArchiveFilters,
   serializeArchiveFilters,
 } from "@/lib/archive/filter";
 import type {
@@ -51,6 +52,19 @@ export default function ArchiveBrowser({
     }, 250);
     return () => window.clearTimeout(timeout);
   }, [queryDraft]);
+
+  useEffect(() => {
+    function restoreFromHistory() {
+      const restored = parseArchiveFilters(
+        new URLSearchParams(window.location.search),
+      );
+      setFilters(restored);
+      setQueryDraft(restored.q);
+    }
+
+    window.addEventListener("popstate", restoreFromHistory);
+    return () => window.removeEventListener("popstate", restoreFromHistory);
+  }, []);
 
   useEffect(() => {
     const nextSearch = serializeArchiveFilters(filters).toString();

@@ -44,7 +44,7 @@ export default function ArchiveResults({
         <YearSection
           group={group}
           initiallyOpen={index === 0}
-          key={group.year}
+          key={`${group.year}-${index}`}
           onSelect={onSelect}
         />
       ))}

@@ -13,18 +13,20 @@ interface HomePageProps {
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const initialFilters = parseArchiveFilters(await searchParams);
+  let records;
 
   try {
-    const records = await storage.getAll();
-    return (
-      <ArchiveBrowser
-        records={records}
-        initialFilters={initialFilters}
-        stats={getArchiveStats(records)}
-      />
-    );
+    records = await storage.getAll();
   } catch (error) {
     console.error("Failed to render public archive:", error);
     return <ArchiveLoadError />;
   }
+
+  return (
+    <ArchiveBrowser
+      records={records}
+      initialFilters={initialFilters}
+      stats={getArchiveStats(records)}
+    />
+  );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import type { Anime } from "@/lib/types";
 
 interface ArchiveAnimeCardProps {
@@ -30,13 +31,15 @@ export default function ArchiveAnimeCard({
         onClick={() => onSelect(anime)}
         type="button"
       >
-        <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-pink-50 to-blue-50">
+        <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-pink-50 to-blue-50">
           {anime.cover ? (
-            <img
+            <Image
               alt=""
-              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-              loading="lazy"
+              className="object-cover transition duration-500 group-hover:scale-105"
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
               src={anime.cover}
+              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center text-4xl text-gray-300">

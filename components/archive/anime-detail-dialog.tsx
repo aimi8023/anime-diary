@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { MouseEvent } from "react";
+import Image from "next/image";
 import type { Anime } from "@/lib/types";
 
 interface AnimeDetailDialogProps {
@@ -49,10 +50,13 @@ export default function AnimeDetailDialog({
       <article className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-h-none sm:max-w-xl sm:rounded-none sm:rounded-l-3xl">
         <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-pink-100 to-blue-100">
           {anime.cover ? (
-            <img
+            <Image
               alt=""
-              className="h-full w-full object-cover"
+              className="object-cover"
+              fill
+              sizes="(max-width: 640px) 100vw, 576px"
               src={anime.cover}
+              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center text-6xl text-gray-300">

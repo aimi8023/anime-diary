@@ -155,6 +155,9 @@ describe("ArchiveBrowser filtering", () => {
     expect(
       screen.getByRole("dialog", { name: "筛选条件" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: "筛选条件" }).parentElement,
+    ).toBe(document.body);
 
     await user.click(
       screen.getByRole("button", { name: "关闭筛选条件" }),
@@ -162,5 +165,15 @@ describe("ArchiveBrowser filtering", () => {
     expect(
       screen.queryByRole("dialog", { name: "筛选条件" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("restores filters from the URL during browser history navigation", () => {
+    renderArchive();
+
+    window.history.replaceState(null, "", "/?year=2024");
+    fireEvent.popState(window);
+
+    expect(screen.getByLabelText("年份")).toHaveValue("2024");
+    expect(screen.getByText("找到 2 部")).toBeInTheDocument();
   });
 });
