@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Anime, AnimeInput } from "@/lib/types";
+import type { AnimeInput } from "@/lib/types";
 
 const SEASONS = [
   { value: "春", label: "春季-1月" },
@@ -11,20 +11,26 @@ const SEASONS = [
 ];
 
 interface AnimeFormProps {
-  initial?: Anime | null;
+  initial?: Partial<AnimeInput> | null;
+  suggestedTags?: string[];
   onSave: (data: AnimeInput) => Promise<void>;
   onCancel: () => void;
 }
 
-export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps) {
+export default function AnimeForm({
+  initial,
+  suggestedTags = [],
+  onSave,
+  onCancel,
+}: AnimeFormProps) {
   const [title, setTitle] = useState(initial?.title || "");
   const [year, setYear] = useState(initial?.season ? parseInt(initial.season.substring(0, 4)) : 2026);
   const [season, setSeason] = useState(initial?.season ? initial.season.substring(4, 5) : SEASONS[0].value);
   const [cover, setCover] = useState(initial?.cover || "");
-  const [rating, setRating] = useState(initial?.rating || 5);
+  const [rating, setRating] = useState(initial?.rating ?? 5);
   const [comment, setComment] = useState(initial?.comment || "");
-  const [episodes, setEpisodes] = useState(initial?.episodes || 0);
-  const [tags, setTags] = useState<string[]>(initial?.tags || []);
+  const [episodes, setEpisodes] = useState(initial?.episodes ?? 0);
+  const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -48,6 +54,10 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
         comment: comment.trim(),
         episodes,
         tags,
+        bangumiId: initial?.bangumiId,
+        bangumiUrl: initial?.bangumiUrl,
+        originalTitle: initial?.originalTitle,
+        airDate: initial?.airDate,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存失败");
@@ -67,6 +77,12 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
+  const handleAddSuggestedTag = (tag: string) => {
+    setTags((current) =>
+      current.includes(tag) ? current : [...current, tag],
+    );
+  };
+
   const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -76,6 +92,9 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
 
   const inputClass =
     "w-full px-3 py-2.5 min-h-[44px] rounded-lg text-sm transition glass-input focus:outline-none";
+  const availableSuggestedTags = [
+    ...new Set(suggestedTags.map((tag) => tag.trim()).filter(Boolean)),
+  ].filter((tag) => !tags.includes(tag));
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -209,6 +228,23 @@ export default function AnimeForm({ initial, onSave, onCancel }: AnimeFormProps)
       {/* Tags */}
       <div>
         <label className="block text-sm font-medium text-gray-800 mb-1.5">标签</label>
+        {availableSuggestedTags.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs text-gray-600 mb-2">Bangumi 推荐标签（点击选择）</p>
+            <div className="flex flex-wrap gap-2">
+              {availableSuggestedTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleAddSuggestedTag(tag)}
+                  className="px-3 py-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 text-sm text-gray-700 hover:bg-blue-500/20 transition-colors"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="flex gap-2 mb-2">
           <input
             type="text"
