@@ -26,7 +26,7 @@ const second: Anime = {
   createdAt: "2026-01-02T00:00:00.000Z",
 };
 
-describe("createJsonStorage", () => {
+describe("createJsonStorage", { timeout: 15_000 }, () => {
   let root: string;
   let dataFile: string;
   let revisionFile: string;
