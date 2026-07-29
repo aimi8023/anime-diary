@@ -22,13 +22,16 @@ anime-diary/
 ├── .env.local                       ← ADMIN_PASSWORD=123456
 ├── lib/
 │   ├── types.ts                     ← Anime 数据模型（tags 字段，无 status）
+│   ├── archive/
+│   │   ├── types.ts                 ← 公开档案筛选、分组和统计类型
+│   │   └── filter.ts                ← URL 解析、筛选、排序、分组纯函数
 │   ├── storage.ts                   ← Storage 接口
 │   ├── storage-json.ts              ← JSON 文件存储实现
 │   ├── storage-kv.ts                ← Upstash Redis 存储实现
 │   └── storage-factory.ts           ← 根据环境自动选择存储
 ├── app/
-│   ├── layout.tsx                   ← 全局布局（Header/Footer + SearchProvider + SearchFilter）
-│   ├── page.tsx                     ← 首页（实时计时器 + 统计胶囊 + 季度卡片）
+│   ├── layout.tsx                   ← 全局布局（服务端 Header/Footer）
+│   ├── page.tsx                     ← 服务端读取一次数据的公开档案首页
 │   ├── globals.css                  ← 白粉主题 + 毛玻璃效果
 │   ├── login/page.tsx               ← 登录页
 │   ├── admin/page.tsx               ← 管理页（增删改番剧 + 本地搜索）
@@ -38,11 +41,12 @@ anime-diary/
 │           ├── route.ts             ← GET 全部 / POST 新增
 │           └── [id]/route.ts        ← PUT 更新 / DELETE 删除
 ├── components/
-│   ├── search-context.tsx           ← 全局搜索状态（React Context）
-│   ├── search-button-client.tsx     ← Header 搜索按钮
-│   ├── search-filter.tsx            ← 全局搜索弹出面板（多条件筛选）
-│   ├── anime-card.tsx               ← 番剧卡片（统一高度，展示标签）
-│   ├── season-section.tsx           ← 季度区块（可折叠，显示月份）
+│   ├── site-header.tsx              ← 服务端站点导航
+│   ├── archive/
+│   │   ├── archive-browser.tsx      ← 筛选、URL 同步与详情状态
+│   │   ├── archive-toolbar.tsx      ← 桌面/移动组合筛选
+│   │   ├── archive-results.tsx      ← 年份和季度结果
+│   │   └── anime-detail-dialog.tsx  ← 可访问的记录详情面板
 │   ├── star-rating.tsx              ← 星星评分（支持 0.5 步长）
 │   ├── anime-form.tsx               ← 表单组件（标签管理、评分滑块）
 │   ├── anime-list.tsx               ← 管理列表（支持本地搜索过滤）
@@ -73,7 +77,7 @@ interface Anime {
 
 | 路由 | 权限 | 说明 |
 |------|------|------|
-| `/` | 公开 | 首页，按季度浏览，评分倒序，全局搜索 |
+| `/` | 公开 | 服务端首屏的追番档案，支持 URL 组合筛选和年份/季度浏览 |
 | `/login` | 公开 | 密码登录页 |
 | `/admin` | 需登录 | 管理页，增删改番剧，本地搜索栏 |
 | `GET /api/anime` | 公开 | 获取全部番剧数据 |
@@ -122,24 +126,22 @@ interface Anime {
 
 1. **实时计时器**
    - 显示"本站已运行 XX天 XX时 XX分 XX秒"
-   - 从 2026-01-01 00:00:00 开始计数
+   - 从 2026-06-08 21:45:00 开始计数
    - 每秒自动更新，彩色数字显示
 
-2. **全局搜索（v1.1.0）**
-   - Header 中搜索按钮，点击弹出搜索面板
-   - 支持按名称/年份/标签/评分筛选
-   - 标签筛选时显示快速标签按钮
-   - 搜索结果实时反映到首页卡片
-   - 统计胶囊显示筛选计数
+2. **组合筛选与可分享 URL**
+   - 支持关键词、年份、季度、标签、最低评分与排序
+   - 所有有效筛选使用 AND 语义，多个标签要求全部命中
+   - URL 使用 `q`、`year`、`season`、`tag`、`rating`、`sort` 参数
+   - 关键词延迟 250ms 更新 URL，其他条件立即更新且不触发网络请求
 
-3. **统计胶囊**
-   - 显示总番剧数和季度数
-   - 搜索活跃时额外显示筛选结果计数
+3. **档案统计与详情**
+   - 显示总番剧数、年份跨度和季度数
+   - 卡片详情面板展示完整短评与可选 Bangumi 信息
 
-4. **季度折叠**
-   - 点击季度标题可展开/收起
-   - 标题显示格式："2023年秋季 - 7月"
-   - 季度内番剧按评分倒序排列
+4. **年份/季度折叠**
+   - 年份和季度均可展开/收起，最新年份默认展开
+   - 年份、季度由新到旧排列，记录支持评分、标题或添加时间排序
 
 ### 管理页功能
 
@@ -187,10 +189,11 @@ npm run start       # 启动生产服务器
 ## 架构注意事项
 
 - `proxy.ts` 是 Next.js 16 的 middleware 新名称（旧版叫 `middleware.ts`）
-- `app/layout.tsx` 是 Server Component，内部使用 Client Component（SearchProvider、SearchFilter、SearchButtonClient）
-- 搜索状态通过 React Context (`search-context.tsx`) 在全局共享
-- `SearchFilter` 放在 `<SearchProvider>` 内部、`<header>` 之前，z-index 设为 `z-[60]` 以高于 header 的 `z-50`
-- `app/page.tsx` 从 Context 读取 `filteredList` 和 `hasActiveSearch`，搜索激活时不覆盖筛选结果
+- `app/page.tsx` 是 Server Component，每次渲染只调用一次 `storage.getAll()`；存储失败渲染错误状态
+- `app/layout.tsx` 与 `components/site-header.tsx` 均保持服务端渲染，不再维护全局番剧搜索 Context
+- `components/archive/archive-browser.tsx` 只管理公开浏览交互，所有数据由服务端页面作为 props 注入
+- `lib/archive/filter.ts` 集中处理 URL 归一化、筛选、排序、分组和统计，且不修改调用方数组
+- `GET /api/anime` 保持公开且响应兼容，但公开首页不调用该 API
 - 评分使用 `Math.round(rating * 2) / 2` 取整到 0.5 步长
 - 浏览器扩展"沉浸式翻译"会导致 hydration 警告，已在 `<html>` 加 `suppressHydrationWarning`
 - `components/` 下大部分组件是 `"use client"`（含交互/动效）
@@ -222,7 +225,7 @@ backdrop-filter: blur(15px);
 编辑 `components/timer.tsx` 中的 `startDate`：
 
 ```typescript
-const startDate = new Date("2026-01-01T00:00:00").getTime();
+const startDate = new Date("2026-06-08T21:45:00").getTime();
 // 修改为你想要的起始时间
 ```
 

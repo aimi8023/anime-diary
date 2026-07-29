@@ -4,9 +4,10 @@
 
 ## ✨ 功能特性
 
-- **首页展示**：按季度分类浏览番剧卡片（评分倒序排列），季度标题显示月份
-- **实时计时**：显示本站运行时间（从2026年1月1日开始）
-- **全局搜索**：Header 中弹出式搜索面板，支持按名称、年份、标签、评分多条件筛选
+- **公开档案**：首页由服务端一次读取记录，首屏直接展示，不再等待客户端二次请求
+- **档案浏览**：按年份和季度折叠浏览，点击卡片可查看完整资料与个人感想
+- **组合筛选**：支持关键词、年份、季度、标签、最低评分和排序，筛选条件可通过 URL 分享
+- **实时计时**：显示本站运行时间
 - **标签系统**：番剧支持自定义标签，首页卡片展示标签，管理页可增删
 - **管理后台**：密码保护的管理页面，可添加、编辑、删除番剧
 - **Bangumi 辅助录入**：按需搜索动画条目，选择后预填资料和候选标签
@@ -57,7 +58,7 @@ BANGUMI_ACCESS_TOKEN=可选的Bangumi访问令牌
 
 ### 页面路由
 
-- **首页 `/`** — 按季度浏览番剧，全局搜索，实时计时
+- **首页 `/`** — 服务端加载的公开追番档案、组合筛选、详情回顾和实时计时
 - **管理页 `/admin`** — 添加、编辑、删除番剧（需密码登录）
 - **登录页 `/login`** — 管理后台密码验证
 
@@ -65,9 +66,12 @@ BANGUMI_ACCESS_TOKEN=可选的Bangumi访问令牌
 
 #### 首页功能
 - **实时计时器**：显示"本站已运行 XX天 XX时 XX分 XX秒"
-- **全局搜索**：点击 Header 搜索按钮弹出面板，支持按名称/年份/标签/评分筛选
-- **统计胶囊**：显示总番剧数和季度数，搜索时显示筛选计数
-- **季度折叠**：点击季度标题展开/收起，格式为"2023年秋季 - 7月"
+- **服务端首屏**：服务端直接读取一次存储并生成首页；读取失败会显示可重试错误，不会伪装成空档案
+- **组合筛选**：关键词、年份、季度、标签、最低评分和排序使用 AND 语义，可逐项或全部清除
+- **可分享 URL**：使用 `q`、`year`、`season`、`tag`、`rating`、`sort` 参数保存当前浏览条件
+- **年份/季度折叠**：年份由新到旧展示，最新年份默认展开，季度和旧年份均可独立展开
+- **记录详情**：卡片打开完整详情面板，支持关闭按钮、点击遮罩和 Escape 键
+- **公开 API 兼容**：`GET /api/anime` 仍可公开读取，但首页不再通过它二次获取数据
 
 #### 管理页功能
 - **Bangumi 辅助录入**：输入中日文标题搜索，选择正确条目后预填标题、封面、季度和话数
@@ -110,15 +114,17 @@ BANGUMI_ACCESS_TOKEN=可选的Bangumi访问令牌
 
 ## 🎯 主要组件
 
-- `components/anime-card.tsx` - 番剧卡片（展示标签、统一高度）
+- `components/site-header.tsx` - 服务端渲染的站点导航
+- `components/archive/archive-browser.tsx` - 公开档案筛选、URL 同步和详情状态
+- `components/archive/archive-toolbar.tsx` - 桌面与移动端组合筛选
+- `components/archive/archive-results.tsx` - 年份/季度档案浏览
+- `components/archive/anime-detail-dialog.tsx` - 完整记录详情面板
 - `components/anime-form.tsx` - 表单组件（标签管理、评分滑块）
 - `components/anime-list.tsx` - 列表组件（支持搜索过滤）
-- `components/season-section.tsx` - 季度区块（可折叠，显示月份）
 - `components/star-rating.tsx` - 星级评分
 - `components/timer.tsx` - 实时计时器
-- `components/search-context.tsx` - 全局搜索状态管理
-- `components/search-filter.tsx` - 搜索弹出面板（多条件筛选）
-- `components/search-button-client.tsx` - Header 搜索按钮
+
+公开档案的解析、筛选、排序、分组和统计纯函数位于 `lib/archive/`。
 
 ## 🔧 自定义配置
 

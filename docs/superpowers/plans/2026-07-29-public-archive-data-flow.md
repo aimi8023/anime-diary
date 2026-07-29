@@ -1,6 +1,6 @@
 # Server-First Public Archive Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the duplicate client-fetched homepage with a server-rendered, URL-filterable public anime archive organized by year and season.
 
@@ -47,7 +47,7 @@
   - `getArchiveOptions(data)`
   - `getArchiveStats(data)`
 
-- [ ] **Step 1: Define test fixtures and write failing URL parsing tests**
+- [x] **Step 1: Define test fixtures and write failing URL parsing tests**
 
 Create `lib/archive/filter.test.ts` with literal anime records covering different titles, original titles, comments, years, seasons, tags, ratings, and creation times.
 
@@ -83,7 +83,7 @@ it("serializes only non-default filters", () => {
 });
 ```
 
-- [ ] **Step 2: Run the parser tests and verify RED**
+- [x] **Step 2: Run the parser tests and verify RED**
 
 Run:
 
@@ -93,7 +93,7 @@ npm test -- lib/archive/filter.test.ts
 
 Expected: FAIL because the archive modules do not exist.
 
-- [ ] **Step 3: Implement archive types and safe URL parsing**
+- [x] **Step 3: Implement archive types and safe URL parsing**
 
 Create `lib/archive/types.ts`:
 
@@ -136,7 +136,7 @@ export interface ArchiveStats {
 
 Implement `parseArchiveFilters` for both server records and `URLSearchParams`. Clamp and round ratings to the nearest 0.5, deduplicate tags while preserving their first order, and fall back to `rating` sorting.
 
-- [ ] **Step 4: Run parser tests and verify GREEN**
+- [x] **Step 4: Run parser tests and verify GREEN**
 
 Run:
 
@@ -146,7 +146,7 @@ npm test -- lib/archive/filter.test.ts
 
 Expected: parser and serializer tests PASS.
 
-- [ ] **Step 5: Write failing filter, grouping, options, and statistics tests**
+- [x] **Step 5: Write failing filter, grouping, options, and statistics tests**
 
 Add literal expectations for:
 
@@ -183,7 +183,7 @@ it("groups years and seasons newest first without mutating input", () => {
 
 Also cover all three sorts, invalid season strings, unique option ordering, empty data, and year-span statistics.
 
-- [ ] **Step 6: Run core behavior tests and verify RED**
+- [x] **Step 6: Run core behavior tests and verify RED**
 
 Run:
 
@@ -193,11 +193,11 @@ npm test -- lib/archive/filter.test.ts
 
 Expected: FAIL because filtering, grouping, options, and statistics are missing.
 
-- [ ] **Step 7: Implement pure archive behavior**
+- [x] **Step 7: Implement pure archive behavior**
 
 Implement functions without mutating caller arrays. Use `localeCompare` with `"zh-CN"` for titles, numeric parsing for year/season order, and timestamp comparison for `added`.
 
-- [ ] **Step 8: Run task tests and commit**
+- [x] **Step 8: Run task tests and commit**
 
 Run:
 
@@ -233,7 +233,7 @@ git commit -m "feat: add public archive filtering core"
   - async `HomePage({ searchParams })`
   - `<ArchiveBrowser records initialFilters stats />`
 
-- [ ] **Step 1: Write failing server-page tests**
+- [x] **Step 1: Write failing server-page tests**
 
 Mock `@/lib/storage-factory` and `@/components/archive/archive-browser`. Call the async page function directly.
 
@@ -269,7 +269,7 @@ it("shows a reloadable error instead of an empty archive", async () => {
 });
 ```
 
-- [ ] **Step 2: Run page tests and verify RED**
+- [x] **Step 2: Run page tests and verify RED**
 
 Run:
 
@@ -279,7 +279,7 @@ npm test -- app/page.test.tsx
 
 Expected: FAIL because the current page is client-fetched and has no server error state.
 
-- [ ] **Step 3: Implement the server page and load error**
+- [x] **Step 3: Implement the server page and load error**
 
 `app/page.tsx` must not contain `"use client"`, `useEffect`, or `fetch("/api/anime")`.
 
@@ -310,7 +310,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
 Keep the initial `ArchiveBrowser` implementation minimal: render a stable container, total count, and an empty-data message. Later tasks add controls and results.
 
-- [ ] **Step 4: Run page and existing API tests**
+- [x] **Step 4: Run page and existing API tests**
 
 Run:
 
@@ -320,7 +320,7 @@ npm test -- app/page.test.tsx app/api/anime/route.test.ts
 
 Expected: PASS and the public API remains unchanged.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/page.tsx app/page.test.tsx components/archive/archive-load-error.tsx components/archive/archive-browser.tsx
@@ -351,7 +351,7 @@ git commit -m "feat: render public archive on the server"
   - immediate select/tag/rating/sort updates
   - mobile filter panel
 
-- [ ] **Step 1: Write failing initial-state and filtering tests**
+- [x] **Step 1: Write failing initial-state and filtering tests**
 
 Mock `next/navigation` with a stable `replace` spy and `useSearchParams`.
 
@@ -381,7 +381,7 @@ it("combines filters and clears them without fetching", async () => {
 });
 ```
 
-- [ ] **Step 2: Run archive-browser tests and verify RED**
+- [x] **Step 2: Run archive-browser tests and verify RED**
 
 Run:
 
@@ -391,7 +391,7 @@ npm test -- components/archive/archive-browser.test.tsx
 
 Expected: FAIL because the hero, toolbar, and filter interactions do not exist.
 
-- [ ] **Step 3: Implement hero, desktop controls, and active filters**
+- [x] **Step 3: Implement hero, desktop controls, and active filters**
 
 `ArchiveHero` renders the title, description, total, year span, season count, and the existing `Timer` as secondary content.
 
@@ -405,7 +405,7 @@ Expected: FAIL because the hero, toolbar, and filter interactions do not exist.
 
 `ActiveFilters` renders the result count, one removable chip per active condition, and “清除全部筛选”.
 
-- [ ] **Step 4: Implement state derivation and URL synchronization**
+- [x] **Step 4: Implement state derivation and URL synchronization**
 
 In `ArchiveBrowser`:
 
@@ -417,7 +417,7 @@ In `ArchiveBrowser`:
 - skip replacement when the serialized query already matches `useSearchParams`;
 - never call `fetch`.
 
-- [ ] **Step 5: Write and run debounce/URL/mobile-panel tests**
+- [x] **Step 5: Write and run debounce/URL/mobile-panel tests**
 
 Use fake timers for the keyword:
 
@@ -446,7 +446,7 @@ npm test -- components/archive/archive-browser.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add components/archive
@@ -475,7 +475,7 @@ git commit -m "feat: add archive filters and shareable URLs"
   - compact record cards
   - controlled detail dialog
 
-- [ ] **Step 1: Write failing grouping and disclosure tests**
+- [x] **Step 1: Write failing grouping and disclosure tests**
 
 ```tsx
 it("renders years and seasons newest first", () => {
@@ -504,7 +504,7 @@ it("keeps the newest year open and allows older years to expand", async () => {
 
 Also verify no-result copy and the clear-filter callback.
 
-- [ ] **Step 2: Run result tests and verify RED**
+- [x] **Step 2: Run result tests and verify RED**
 
 Run:
 
@@ -514,7 +514,7 @@ npm test -- components/archive/archive-results.test.tsx
 
 Expected: FAIL because result components do not exist.
 
-- [ ] **Step 3: Implement year, season, card, and bounded motion**
+- [x] **Step 3: Implement year, season, card, and bounded motion**
 
 - Render years newest first.
 - Default the first year to open and older years closed.
@@ -524,7 +524,7 @@ Expected: FAIL because result components do not exist.
 - Card buttons expose the accessible name `查看《标题》详情`.
 - Cards show cover, title, rating, up to three tags, and one-line comment.
 
-- [ ] **Step 4: Write failing dialog behavior tests**
+- [x] **Step 4: Write failing dialog behavior tests**
 
 ```tsx
 it("shows complete optional metadata and closes with Escape", async () => {
@@ -544,7 +544,7 @@ it("shows complete optional metadata and closes with Escape", async () => {
 
 Also verify missing optional fields are omitted, the close button works, and clicking the backdrop closes only when the backdrop itself is targeted.
 
-- [ ] **Step 5: Implement accessible detail dialog**
+- [x] **Step 5: Implement accessible detail dialog**
 
 - Store the previously focused element when opening.
 - Focus the close button after mount.
@@ -554,11 +554,11 @@ Also verify missing optional fields are omitted, the close button works, and cli
 - Render a desktop side panel and mobile bottom-panel shape with responsive classes.
 - Use `target="_blank"` plus `rel="noreferrer"` for Bangumi links.
 
-- [ ] **Step 6: Integrate results and dialog into ArchiveBrowser**
+- [x] **Step 6: Integrate results and dialog into ArchiveBrowser**
 
 `ArchiveBrowser` owns `selectedAnime: Anime | null`. `ArchiveResults` calls `onSelect`, and `AnimeDetailDialog` receives `anime` plus `onClose`.
 
-- [ ] **Step 7: Run archive component tests and commit**
+- [x] **Step 7: Run archive component tests and commit**
 
 Run:
 
@@ -593,7 +593,7 @@ git commit -m "feat: add archive browsing and record details"
 - Consumes: homepage archive anchor `#archive`
 - Produces: server-rendered header navigation without global anime state
 
-- [ ] **Step 1: Write failing header tests**
+- [x] **Step 1: Write failing header tests**
 
 ```tsx
 it("links search to the public archive without a client search dialog", () => {
@@ -614,7 +614,7 @@ it("keeps the management entry visually secondary", () => {
 });
 ```
 
-- [ ] **Step 2: Run header tests and verify RED**
+- [x] **Step 2: Run header tests and verify RED**
 
 Run:
 
@@ -624,7 +624,7 @@ npm test -- components/site-header.test.tsx
 
 Expected: FAIL because `SiteHeader` does not exist.
 
-- [ ] **Step 3: Extract the server header and remove global provider wiring**
+- [x] **Step 3: Extract the server header and remove global provider wiring**
 
 `SiteHeader` contains:
 
@@ -635,7 +635,7 @@ Expected: FAIL because `SiteHeader` does not exist.
 
 Rewrite `app/layout.tsx` to render `SiteHeader`, `main`, and footer directly. Remove `SearchProvider`, `SearchFilter`, and `SearchButtonClient` imports.
 
-- [ ] **Step 4: Verify deleted components have no consumers**
+- [x] **Step 4: Verify deleted components have no consumers**
 
 Run:
 
@@ -647,7 +647,7 @@ Expected: no matches.
 
 Delete the five obsolete components only after the search confirms that the archive replacements are active.
 
-- [ ] **Step 5: Run header, homepage, admin, and full component tests**
+- [x] **Step 5: Run header, homepage, admin, and full component tests**
 
 Run:
 
@@ -657,7 +657,7 @@ npm test -- components/site-header.test.tsx app/page.test.tsx app/admin/page.tes
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/layout.tsx components
@@ -677,7 +677,7 @@ git commit -m "refactor: remove duplicate global anime search state"
 - Consumes: completed Tasks 1–5
 - Produces: documented, visually checked, deployable first-stage archive
 
-- [ ] **Step 1: Update project documentation**
+- [x] **Step 1: Update project documentation**
 
 Document:
 
@@ -689,7 +689,7 @@ Document:
 
 Update the project tree in `CLAUDE.md` to include `lib/archive/` and `components/archive/`.
 
-- [ ] **Step 2: Run focused automated verification**
+- [x] **Step 2: Run focused automated verification**
 
 Run:
 
@@ -699,7 +699,7 @@ npm test -- lib/archive components/archive app/page.test.tsx components/site-hea
 
 Expected: PASS.
 
-- [ ] **Step 3: Run full automated verification**
+- [x] **Step 3: Run full automated verification**
 
 Run:
 
@@ -717,7 +717,7 @@ Expected:
 - ESLint has 0 errors; report any existing unrelated warnings;
 - production build exits 0.
 
-- [ ] **Step 4: Inspect desktop and mobile behavior**
+- [x] **Step 4: Inspect desktop and mobile behavior**
 
 Start the local app with Redis variables unset and a review-only admin password. In the in-app browser verify:
 
@@ -733,7 +733,7 @@ Start the local app with Redis variables unset and a review-only admin password.
 
 Do not mutate anime data during the visual check.
 
-- [ ] **Step 5: Inspect the final diff**
+- [x] **Step 5: Inspect the final diff**
 
 Run:
 
@@ -750,7 +750,7 @@ Expected:
 - no homepage/client archive fetch of `/api/anime`;
 - only intended public-archive and documentation changes.
 
-- [ ] **Step 6: Mark plan steps complete and commit documentation**
+- [x] **Step 6: Mark plan steps complete and commit documentation**
 
 Check completed plan boxes, then:
 
