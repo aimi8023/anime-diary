@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createHash } from "crypto";
+import { errorResponse } from "@/lib/http/response";
 
 function hashPassword(password: string): string {
   return createHash("sha256").update(password).digest("hex");
@@ -28,13 +29,21 @@ export function proxy(request: NextRequest) {
       pathname.startsWith("/api/anime") &&
       request.method !== "GET"
     ) {
-      return NextResponse.json({ error: "未配置管理员密码" }, { status: 500 });
+      return errorResponse(
+        500,
+        "未配置管理员密码",
+        { code: "auth_not_configured" },
+      );
     }
     if (
       pathname.startsWith("/api/bangumi") ||
       pathname.startsWith("/api/backups")
     ) {
-      return NextResponse.json({ error: "未配置管理员密码" }, { status: 500 });
+      return errorResponse(
+        500,
+        "未配置管理员密码",
+        { code: "auth_not_configured" },
+      );
     }
     return NextResponse.next();
   }
@@ -48,7 +57,11 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/api/backups")
   ) {
     if (!isAuthenticated) {
-      return NextResponse.json({ error: "请先登录" }, { status: 401 });
+      return errorResponse(
+        401,
+        "请先登录",
+        { code: "unauthenticated" },
+      );
     }
     return NextResponse.next();
   }
@@ -67,7 +80,11 @@ export function proxy(request: NextRequest) {
     request.method !== "GET"
   ) {
     if (!isAuthenticated) {
-      return NextResponse.json({ error: "请先登录" }, { status: 401 });
+      return errorResponse(
+        401,
+        "请先登录",
+        { code: "unauthenticated" },
+      );
     }
     return NextResponse.next();
   }
