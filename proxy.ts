@@ -30,12 +30,22 @@ export function proxy(request: NextRequest) {
     ) {
       return NextResponse.json({ error: "未配置管理员密码" }, { status: 500 });
     }
+    if (pathname.startsWith("/api/bangumi")) {
+      return NextResponse.json({ error: "未配置管理员密码" }, { status: 500 });
+    }
     return NextResponse.next();
   }
 
   const expectedToken = hashPassword(adminPassword);
   const cookieToken = request.cookies.get("admin_token")?.value;
   const isAuthenticated = cookieToken === expectedToken;
+
+  if (pathname.startsWith("/api/bangumi")) {
+    if (!isAuthenticated) {
+      return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    }
+    return NextResponse.next();
+  }
 
   // Protect /admin page → redirect to /login
   if (pathname.startsWith("/admin")) {
@@ -68,5 +78,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login/:path*", "/api/anime/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/login/:path*",
+    "/api/anime/:path*",
+    "/api/bangumi/:path*",
+  ],
 };
