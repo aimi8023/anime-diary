@@ -13,6 +13,7 @@ const DEFAULT_BACKUP_LIMIT = 30;
 const DEFAULT_MAX_ATTEMPTS = 3;
 
 export class DuplicateBangumiError extends Error {
+  readonly code = "duplicate_bangumi";
   existingId: string;
 
   constructor(existingId: string) {
@@ -23,6 +24,8 @@ export class DuplicateBangumiError extends Error {
 }
 
 export class RevisionConflictError extends Error {
+  readonly code = "revision_conflict";
+
   constructor() {
     super("数据已被其他操作更新，请刷新后重试");
     this.name = "RevisionConflictError";
@@ -30,6 +33,8 @@ export class RevisionConflictError extends Error {
 }
 
 export class BackupNotFoundError extends Error {
+  readonly code = "backup_not_found";
+
   constructor(id: string) {
     super(`备份 ${id} 不存在`);
     this.name = "BackupNotFoundError";
@@ -37,6 +42,8 @@ export class BackupNotFoundError extends Error {
 }
 
 export class AnimeNotFoundError extends Error {
+  readonly code = "anime_not_found";
+
   constructor(id: string) {
     super(`Anime with id ${id} not found`);
     this.name = "AnimeNotFoundError";
