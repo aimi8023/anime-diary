@@ -151,6 +151,31 @@ describe("POST /api/auth", () => {
     expect(limiterMock.check).not.toHaveBeenCalled();
     expect(limiterMock.recordFailure).not.toHaveBeenCalled();
   });
+
+  it("does not expose or log limiter connection secrets", async () => {
+    limiterMock.check.mockRejectedValue(
+      new Error("redis token=super-secret"),
+    );
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    try {
+      const response = await POST(authRequest({ password: "secret" }));
+
+      expect(response.status).toBe(500);
+      expect(await response.json()).toEqual({ error: "登录失败" });
+      const loggedSecret = consoleError.mock.calls
+        .flat()
+        .some(
+          (value) =>
+            value instanceof Error &&
+            value.message.includes("super-secret"),
+        );
+      expect(loggedSecret).toBe(false);
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
 });
 
 describe("DELETE /api/auth", () => {

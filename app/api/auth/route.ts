@@ -80,7 +80,10 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error("登录 error:", error);
+    console.error(
+      "登录流程失败",
+      error instanceof Error ? error.name : "UnknownError",
+    );
     return errorResponse(500, "登录失败");
   }
 }
