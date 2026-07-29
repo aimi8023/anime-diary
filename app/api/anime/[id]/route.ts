@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { storage } from "@/lib/storage-factory";
 import type { AnimeInput } from "@/lib/types";
+import { animeMutationErrorResponse } from "@/lib/anime-api-error";
 
 export async function PUT(
   request: Request,
@@ -20,16 +21,6 @@ export async function PUT(
       Number(body.bangumiId) > 0
         ? Number(body.bangumiId)
         : undefined;
-
-    if (bangumiId !== undefined) {
-      const existing = await storage.findByBangumiId(bangumiId);
-      if (existing && existing.id !== id) {
-        return NextResponse.json(
-          { error: "该 Bangumi 条目已收录", existingId: existing.id },
-          { status: 409 },
-        );
-      }
-    }
 
     const updates: Partial<AnimeInput> = {};
     if (body.title !== undefined) updates.title = body.title.trim();
@@ -52,10 +43,7 @@ export async function PUT(
     await storage.update(id, updates);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("PUT /api/anime error:", error);
-    const message =
-      error instanceof Error ? error.message : "更新失败";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return animeMutationErrorResponse(error, "更新");
   }
 }
 
@@ -68,9 +56,6 @@ export async function DELETE(
     await storage.remove(id);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("DELETE /api/anime error:", error);
-    const message =
-      error instanceof Error ? error.message : "删除失败";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return animeMutationErrorResponse(error, "删除");
   }
 }

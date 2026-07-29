@@ -44,11 +44,11 @@ describe("POST /api/anime", () => {
   });
 
   it("rejects an already stored Bangumi subject", async () => {
-    storageMock.findByBangumiId.mockResolvedValue({
-      id: "existing-id",
-      ...input,
-      title: "孤独摇滚！",
-      createdAt: "2026-01-01T00:00:00.000Z",
+    storageMock.add.mockImplementation(() => {
+      throw Object.assign(new Error("该 Bangumi 条目已收录"), {
+        code: "duplicate_bangumi",
+        existingId: "existing-id",
+      });
     });
 
     const response = await POST(postRequest());
@@ -58,12 +58,11 @@ describe("POST /api/anime", () => {
       error: "该 Bangumi 条目已收录",
       existingId: "existing-id",
     });
-    expect(storageMock.add).not.toHaveBeenCalled();
+    expect(storageMock.add).toHaveBeenCalledOnce();
+    expect(storageMock.findByBangumiId).not.toHaveBeenCalled();
   });
 
   it("stores normalized Bangumi metadata with a new local record", async () => {
-    storageMock.findByBangumiId.mockResolvedValue(null);
-
     const response = await POST(postRequest());
 
     expect(response.status).toBe(201);
@@ -78,5 +77,21 @@ describe("POST /api/anime", () => {
         airDate: "2022-10-09",
       }),
     );
+    expect(storageMock.findByBangumiId).not.toHaveBeenCalled();
+  });
+
+  it("maps a revision conflict to 409", async () => {
+    storageMock.add.mockImplementation(() => {
+      throw Object.assign(new Error("数据已被其他操作更新，请刷新后重试"), {
+        code: "revision_conflict",
+      });
+    });
+
+    const response = await POST(postRequest());
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: "数据已被其他操作更新，请刷新后重试",
+    });
   });
 });
