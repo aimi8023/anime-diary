@@ -10,6 +10,23 @@ import { POST } from "./route";
 describe("POST /api/backups/import/preview", () => {
   beforeEach(() => serviceMock.previewImport.mockReset());
 
+  it("rejects a foreign origin before reading the import", async () => {
+    const response = await POST(
+      new Request("https://anime.example/api/backups/import/preview", {
+        method: "POST",
+        headers: { Origin: "https://evil.example" },
+        body: "[]",
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      error: "请求来源无效",
+      code: "invalid_origin",
+    });
+    expect(serviceMock.previewImport).not.toHaveBeenCalled();
+  });
+
   it("returns an import difference preview without applying it", async () => {
     serviceMock.previewImport.mockResolvedValue({
       format: "legacy",
@@ -33,5 +50,4 @@ describe("POST /api/backups/import/preview", () => {
       diff: { added: 1 },
     });
   });
-
 });

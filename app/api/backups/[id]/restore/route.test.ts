@@ -22,6 +22,10 @@ describe("POST /api/backups/[id]/restore", () => {
     );
 
     expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      error: "请求来源无效",
+      code: "invalid_origin",
+    });
     expect(serviceMock.restore).not.toHaveBeenCalled();
   });
 

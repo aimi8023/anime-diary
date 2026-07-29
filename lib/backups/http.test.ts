@@ -20,6 +20,7 @@ describe("backupErrorResponse", () => {
 
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({
+      code: "backup_import_invalid",
       issues: [{ code: "invalid_json" }],
     });
   });
@@ -36,19 +37,28 @@ describe("backupErrorResponse", () => {
     });
   });
 
-  it("maps missing backups to 404", () => {
-    expect(
-      backupErrorResponse(
-        new BackupNotFoundError("missing"),
-        "读取备份",
-      ).status,
-    ).toBe(404);
+  it("maps missing backups to 404", async () => {
+    const response = backupErrorResponse(
+      new BackupNotFoundError("missing"),
+      "读取备份",
+    );
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toMatchObject({
+      code: "backup_not_found",
+    });
   });
 
-  it("maps revision conflicts to 409", () => {
-    expect(
-      backupErrorResponse(new RevisionConflictError(), "恢复备份").status,
-    ).toBe(409);
+  it("maps revision conflicts to 409", async () => {
+    const response = backupErrorResponse(
+      new RevisionConflictError(),
+      "恢复备份",
+    );
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      code: "revision_conflict",
+    });
   });
 
   it("maps unexpected failures to a generic 500 response", async () => {

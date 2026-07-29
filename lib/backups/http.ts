@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
 import type { AnimeBackupFile } from "./types";
 import type { BackupIssue } from "./types";
+import { errorResponse } from "@/lib/http/response";
+export { sameOriginError } from "@/lib/http/security";
 
 function hasCode(
   error: unknown,
@@ -13,46 +14,45 @@ function hasCode(
   );
 }
 
-export function sameOriginError(request: Request): NextResponse | null {
-  const origin = request.headers.get("origin");
-  if (!origin || origin !== new URL(request.url).origin) {
-    return NextResponse.json({ error: "请求来源无效" }, { status: 403 });
-  }
-  return null;
-}
-
 export function backupErrorResponse(
   error: unknown,
   operation: string,
-): NextResponse {
+): Response {
   if (hasCode(error, "backup_import_invalid")) {
     const issues =
       "issues" in error && Array.isArray(error.issues)
         ? (error.issues as BackupIssue[])
         : [];
-    return NextResponse.json(
-      { error: error.message, issues },
-      { status: 400 },
+    return errorResponse(
+      400,
+      error.message,
+      { code: "backup_import_invalid", issues },
     );
   }
   if (hasCode(error, "empty_confirmation_required")) {
-    return NextResponse.json(
-      {
-        error: error.message,
-        code: "empty_confirmation_required",
-      },
-      { status: 400 },
+    return errorResponse(
+      400,
+      error.message,
+      { code: "empty_confirmation_required" },
     );
   }
   if (hasCode(error, "backup_not_found")) {
-    return NextResponse.json({ error: error.message }, { status: 404 });
+    return errorResponse(
+      404,
+      error.message,
+      { code: "backup_not_found" },
+    );
   }
   if (hasCode(error, "revision_conflict")) {
-    return NextResponse.json({ error: error.message }, { status: 409 });
+    return errorResponse(
+      409,
+      error.message,
+      { code: "revision_conflict" },
+    );
   }
 
   console.error(`${operation} error:`, error);
-  return NextResponse.json({ error: `${operation}失败` }, { status: 500 });
+  return errorResponse(500, `${operation}失败`);
 }
 
 export function backupDownloadResponse(
