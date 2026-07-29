@@ -8,6 +8,7 @@ import type {
 } from "@/lib/backups/types";
 
 interface BackupManagerProps {
+  collapsible?: boolean;
   currentCount: number;
   onDataChanged: () => void | Promise<void>;
 }
@@ -78,6 +79,7 @@ function DiffSummary({ diff }: { diff: DatasetDiff }) {
 }
 
 export default function BackupManager({
+  collapsible = true,
   currentCount,
   onDataChanged,
 }: BackupManagerProps) {
@@ -262,18 +264,28 @@ export default function BackupManager({
   return (
     <section className="mb-8 glass rounded-xl p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={() => setExpanded((value) => !value)}
-          className="min-h-[44px] text-left"
-          aria-expanded={expanded}
-        >
-          <h2 className="font-semibold text-gray-900">备份与恢复</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            当前 {currentCount} 条记录 ·{" "}
-            {loading ? "正在读取历史版本" : `${backups.length} 个历史版本`}
-          </p>
-        </button>
+        {collapsible ? (
+          <button
+            type="button"
+            onClick={() => setExpanded((value) => !value)}
+            className="min-h-[44px] text-left"
+            aria-expanded={expanded}
+          >
+            <h2 className="font-semibold text-gray-900">备份与恢复</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              当前 {currentCount} 条记录 ·{" "}
+              {loading ? "正在读取历史版本" : `${backups.length} 个历史版本`}
+            </p>
+          </button>
+        ) : (
+          <div>
+            <h2 className="font-semibold text-gray-900">备份与恢复</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              当前 {currentCount} 条记录 ·{" "}
+              {loading ? "正在读取历史版本" : `${backups.length} 个历史版本`}
+            </p>
+          </div>
+        )}
         <div className="flex flex-wrap gap-2">
           <Link
             href="/api/backups/export"
@@ -313,7 +325,7 @@ export default function BackupManager({
         </p>
       )}
 
-      {expanded && (
+      {(!collapsible || expanded) && (
         <div className="mt-4">
           <p className="mb-3 text-xs leading-5 text-gray-500">
             自动快照与当前数据位于同一存储中。建议偶尔下载 JSON，保留一份独立副本。

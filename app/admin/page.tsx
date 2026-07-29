@@ -394,6 +394,7 @@ export default function AdminPage() {
           role="tabpanel"
         >
           <BackupManager
+            collapsible={false}
             currentCount={animeList.length}
             onDataChanged={fetchList}
           />

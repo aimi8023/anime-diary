@@ -33,6 +33,28 @@ afterEach(() => {
 });
 
 describe("BackupManager", () => {
+  it("keeps its content open when rendered as a dedicated workspace", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(response({ backups: [] })),
+    );
+
+    render(
+      <BackupManager
+        collapsible={false}
+        currentCount={3}
+        onDataChanged={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByText("修改记录后，这里会自动出现历史版本。"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /备份与恢复/ }),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows current and historical backup summaries without snapshot bodies", async () => {
     vi.stubGlobal(
       "fetch",

@@ -19,13 +19,13 @@ export default function AnimeList({
   if (animeList.length === 0) {
     return (
       <p className="text-center text-gray-600 py-8 text-sm">
-        还没有添加任何番剧，用下方表单开始吧
+        还没有添加任何番剧，点击添加记录开始吧
       </p>
     );
   }
 
   return (
-    <div className="space-y-2 max-h-[500px] overflow-y-auto">
+    <div className="space-y-2">
       {animeList.map((anime) => (
         <div
           key={anime.id}
