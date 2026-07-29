@@ -29,7 +29,10 @@ const input = {
 function postRequest(body = input): Request {
   return new Request("http://localhost/api/anime", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost",
+    },
     body: JSON.stringify(body),
   });
 }
@@ -41,6 +44,75 @@ describe("POST /api/anime", () => {
     storageMock.update.mockReset();
     storageMock.remove.mockReset();
     storageMock.findByBangumiId.mockReset();
+  });
+
+  it("rejects a foreign origin before validation or storage", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/anime", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "https://evil.example",
+        },
+        body: JSON.stringify(input),
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      error: "请求来源无效",
+      code: "invalid_origin",
+    });
+    expect(storageMock.add).not.toHaveBeenCalled();
+  });
+
+  it("rejects a missing origin", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/anime", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expect(storageMock.add).not.toHaveBeenCalled();
+  });
+
+  it("maps malformed JSON before storage", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/anime", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "http://localhost",
+        },
+        body: "{broken",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      error: "请求内容不是有效的 JSON",
+      code: "invalid_json",
+    });
+    expect(storageMock.add).not.toHaveBeenCalled();
+  });
+
+  it("returns structured input issues before storage", async () => {
+    const response = await POST(postRequest({ ...input, rating: 9.2 }));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      error: "提交的数据不符合要求",
+      code: "invalid_input",
+      issues: [
+        expect.objectContaining({
+          path: "rating",
+        }),
+      ],
+    });
+    expect(storageMock.add).not.toHaveBeenCalled();
   });
 
   it("rejects an already stored Bangumi subject", async () => {
@@ -56,6 +128,7 @@ describe("POST /api/anime", () => {
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({
       error: "该 Bangumi 条目已收录",
+      code: "duplicate_bangumi",
       existingId: "existing-id",
     });
     expect(storageMock.add).toHaveBeenCalledOnce();
@@ -92,6 +165,7 @@ describe("POST /api/anime", () => {
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({
       error: "数据已被其他操作更新，请刷新后重试",
+      code: "revision_conflict",
     });
   });
 });

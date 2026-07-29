@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { storage } from "@/lib/storage-factory";
-import type { AnimeInput } from "@/lib/types";
 import { animeMutationErrorResponse } from "@/lib/anime-api-error";
+import { parseAnimeCreateInput } from "@/lib/anime/validation";
+import { errorResponse, readJsonBody } from "@/lib/http/response";
+import { sameOriginError } from "@/lib/http/security";
 
 export async function GET() {
   try {
@@ -16,36 +18,25 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const originError = sameOriginError(request);
+  if (originError) return originError;
+
+  const body = await readJsonBody(request);
+  if (!body.ok) return body.response;
+
+  const input = parseAnimeCreateInput(body.data);
+  if (!input.ok) {
+    return errorResponse(
+      400,
+      "提交的数据不符合要求",
+      { code: "invalid_input", issues: input.issues },
+    );
+  }
+
   try {
-    const body: AnimeInput = await request.json();
-
-    // Basic validation
-    if (!body.title?.trim()) {
-      return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
-    }
-    if (!body.season?.trim()) {
-      return NextResponse.json({ error: "季度不能为空" }, { status: 400 });
-    }
-
-    const bangumiId =
-      Number.isInteger(Number(body.bangumiId)) && Number(body.bangumiId) > 0
-        ? Number(body.bangumiId)
-        : undefined;
-
     const anime = {
       id: nanoid(12),
-      ...body,
-      title: body.title.trim(),
-      season: body.season.trim(),
-      cover: body.cover?.trim() || "",
-      rating: Math.round(Math.min(10, Math.max(1, Number(body.rating) || 1)) * 2) / 2,
-      comment: body.comment?.trim() || "",
-      episodes: Math.max(0, Number(body.episodes) || 0),
-      tags: Array.isArray(body.tags) ? body.tags : [],
-      bangumiId,
-      bangumiUrl: body.bangumiUrl?.trim() || undefined,
-      originalTitle: body.originalTitle?.trim() || undefined,
-      airDate: body.airDate?.trim() || undefined,
+      ...input.data,
       createdAt: new Date().toISOString(),
     };
 

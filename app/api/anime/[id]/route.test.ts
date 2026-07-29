@@ -15,7 +15,10 @@ import { DELETE, PUT } from "./route";
 function putRequest(body: unknown): Request {
   return new Request("http://localhost/api/anime/current-id", {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost",
+    },
     body: JSON.stringify(body),
   });
 }
@@ -31,6 +34,60 @@ describe("PUT /api/anime/[id]", () => {
     storageMock.update.mockReset();
     storageMock.remove.mockReset();
     storageMock.findByBangumiId.mockReset();
+  });
+
+  it("rejects a foreign origin before validation or storage", async () => {
+    const response = await PUT(
+      new Request("http://localhost/api/anime/current-id", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "https://evil.example",
+        },
+        body: JSON.stringify({ title: "新标题" }),
+      }),
+      context(),
+    );
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({
+      code: "invalid_origin",
+    });
+    expect(storageMock.update).not.toHaveBeenCalled();
+  });
+
+  it("maps malformed JSON before storage", async () => {
+    const response = await PUT(
+      new Request("http://localhost/api/anime/current-id", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "http://localhost",
+        },
+        body: "{broken",
+      }),
+      context(),
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      code: "invalid_json",
+    });
+    expect(storageMock.update).not.toHaveBeenCalled();
+  });
+
+  it("returns structured input issues before storage", async () => {
+    const response = await PUT(
+      putRequest({ episodes: 1.5 }),
+      context(),
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      code: "invalid_input",
+      issues: [expect.objectContaining({ path: "episodes" })],
+    });
+    expect(storageMock.update).not.toHaveBeenCalled();
   });
 
   it("rejects a Bangumi ID owned by another local record", async () => {
@@ -49,6 +106,7 @@ describe("PUT /api/anime/[id]", () => {
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({
       error: "该 Bangumi 条目已收录",
+      code: "duplicate_bangumi",
       existingId: "another-id",
     });
     expect(storageMock.update).toHaveBeenCalledOnce();
@@ -107,10 +165,26 @@ describe("DELETE /api/anime/[id]", () => {
     const response = await DELETE(
       new Request("http://localhost/api/anime/current-id", {
         method: "DELETE",
+        headers: { Origin: "http://localhost" },
       }),
       context(),
     );
 
     expect(response.status).toBe(409);
+  });
+
+  it("rejects a missing origin before storage", async () => {
+    const response = await DELETE(
+      new Request("http://localhost/api/anime/current-id", {
+        method: "DELETE",
+      }),
+      context(),
+    );
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({
+      code: "invalid_origin",
+    });
+    expect(storageMock.remove).not.toHaveBeenCalled();
   });
 });

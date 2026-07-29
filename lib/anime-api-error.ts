@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import type { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/http/response";
 
 function codedError(
   error: unknown,
@@ -19,21 +20,23 @@ export function animeMutationErrorResponse(
 ): NextResponse {
   const domainError = codedError(error);
   if (domainError?.code === "duplicate_bangumi") {
-    return NextResponse.json(
+    return errorResponse(
+      409,
+      domainError.message,
       {
-        error: domainError.message,
+        code: "duplicate_bangumi",
         existingId: domainError.existingId,
       },
-      { status: 409 },
     );
   }
   if (domainError?.code === "revision_conflict") {
-    return NextResponse.json(
-      { error: domainError.message },
-      { status: 409 },
+    return errorResponse(
+      409,
+      domainError.message,
+      { code: "revision_conflict" },
     );
   }
 
   console.error(`${operation}番剧 error:`, error);
-  return NextResponse.json({ error: `${operation}失败` }, { status: 500 });
+  return errorResponse(500, `${operation}失败`);
 }
