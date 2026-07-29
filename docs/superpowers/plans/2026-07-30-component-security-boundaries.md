@@ -1,6 +1,6 @@
 # Component and Security Boundaries Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Unify anime input validation, API/client error handling, inline feedback, mutation same-origin protection, and login failure rate limiting.
 
@@ -68,7 +68,7 @@ export function sameOriginError(request: Request): NextResponse | null;
 
 - Consumers: anime and auth routes in Tasks 2–3; backup HTTP mapping remains compatible.
 
-- [ ] **Step 1: Write failing HTTP response tests**
+- [x] **Step 1: Write failing HTTP response tests**
 
 Create tests proving that `errorResponse(400, "提交失败", { code: "invalid_input", issues })` emits the stable body and that malformed JSON passed to `readJsonBody` returns `400`:
 
@@ -79,23 +79,23 @@ expect(await response.json()).toEqual({
 });
 ```
 
-- [ ] **Step 2: Run response tests and verify RED**
+- [x] **Step 2: Run response tests and verify RED**
 
 Run: `npm test -- lib/http/response.test.ts`
 
 Expected: FAIL because `lib/http/response.ts` does not exist.
 
-- [ ] **Step 3: Implement the response types and helpers**
+- [x] **Step 3: Implement the response types and helpers**
 
 Use `NextResponse.json` for both helpers. `readJsonBody` must catch JSON parsing failures only and return an `invalid_json` response without throwing.
 
-- [ ] **Step 4: Run response tests and verify GREEN**
+- [x] **Step 4: Run response tests and verify GREEN**
 
 Run: `npm test -- lib/http/response.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 5: Write failing strict same-origin tests**
+- [x] **Step 5: Write failing strict same-origin tests**
 
 Cover literal requests:
 
@@ -112,27 +112,27 @@ expect(
 
 Missing, `null`, malformed and `https://evil.example` origins must return `403` with `code: "invalid_origin"`.
 
-- [ ] **Step 6: Run security tests and verify RED**
+- [x] **Step 6: Run security tests and verify RED**
 
 Run: `npm test -- lib/http/security.test.ts`
 
 Expected: FAIL because the shared helper does not exist.
 
-- [ ] **Step 7: Implement strict same-origin comparison**
+- [x] **Step 7: Implement strict same-origin comparison**
 
 Parse `Origin` with `new URL(origin).origin`, reject parse failures and require exact equality with `new URL(request.url).origin`.
 
-- [ ] **Step 8: Run security tests and verify GREEN**
+- [x] **Step 8: Run security tests and verify GREEN**
 
 Run: `npm test -- lib/http/security.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 9: Write backup route regression tests**
+- [x] **Step 9: Write backup route regression tests**
 
 For preview and apply, add a foreign-origin case that expects `403 invalid_origin` and no service call. Preserve restore’s existing foreign-origin test and add the error code assertion.
 
-- [ ] **Step 10: Run backup route tests and verify RED**
+- [x] **Step 10: Run backup route tests and verify RED**
 
 Run:
 
@@ -142,11 +142,11 @@ npm test -- app/api/backups/import/preview/route.test.ts app/api/backups/import/
 
 Expected: FAIL because existing backup origin errors lack `code`.
 
-- [ ] **Step 11: Migrate backup routes to the shared boundary**
+- [x] **Step 11: Migrate backup routes to the shared boundary**
 
 Remove the local implementation from `lib/backups/http.ts`, import or re-export the shared `sameOriginError`, and use `errorResponse` in `backupErrorResponse` while preserving existing `issues` and messages.
 
-- [ ] **Step 12: Run shared and backup tests**
+- [x] **Step 12: Run shared and backup tests**
 
 Run:
 
@@ -156,7 +156,7 @@ npm test -- lib/http/response.test.ts lib/http/security.test.ts lib/backups/http
 
 Expected: PASS.
 
-- [ ] **Step 13: Commit**
+- [x] **Step 13: Commit**
 
 ```powershell
 git add lib/http lib/backups/http.ts lib/backups/http.test.ts app/api/backups
@@ -202,7 +202,7 @@ export function parseAnimeUpdateInput(
 ): ValidationResult<Partial<AnimeInput>>;
 ```
 
-- [ ] **Step 1: Write failing create validation tests**
+- [x] **Step 1: Write failing create validation tests**
 
 Use hand-written inputs to prove trimming and normalization of every supported field. Add separate tests for non-object input, missing title/season, invalid URL, rating outside 1–10 or off the 0.5 step, non-integer episodes, more than 20 tags, invalid Bangumi ID and invalid date.
 
@@ -220,43 +220,43 @@ expect(result).toEqual({
 });
 ```
 
-- [ ] **Step 2: Run create validation tests and verify RED**
+- [x] **Step 2: Run create validation tests and verify RED**
 
 Run: `npm test -- lib/anime/validation.test.ts`
 
 Expected: FAIL because the validator does not exist.
 
-- [ ] **Step 3: Implement create validation**
+- [x] **Step 3: Implement create validation**
 
 Build small field parsers inside `lib/anime/validation.ts`; collect all issues rather than stopping at the first. Do not mutate the caller object. Return an `AnimeInput` only when no issue exists.
 
-- [ ] **Step 4: Run create validation tests and verify GREEN**
+- [x] **Step 4: Run create validation tests and verify GREEN**
 
 Run: `npm test -- lib/anime/validation.test.ts`
 
 Expected: create cases PASS.
 
-- [ ] **Step 5: Write failing update validation tests**
+- [x] **Step 5: Write failing update validation tests**
 
 Prove that an empty update fails, omitted fields remain absent, empty optional metadata becomes `undefined`, and present invalid fields use the same rules as create.
 
-- [ ] **Step 6: Run update tests and verify RED**
+- [x] **Step 6: Run update tests and verify RED**
 
 Run: `npm test -- lib/anime/validation.test.ts`
 
 Expected: FAIL on the new update behavior.
 
-- [ ] **Step 7: Implement partial update validation**
+- [x] **Step 7: Implement partial update validation**
 
 Use the same field parsers and only include recognized fields present on the input object. Return an issue at path `"$"` when no supported field is present.
 
-- [ ] **Step 8: Run validator tests and verify GREEN**
+- [x] **Step 8: Run validator tests and verify GREEN**
 
 Run: `npm test -- lib/anime/validation.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 9: Write failing anime route boundary tests**
+- [x] **Step 9: Write failing anime route boundary tests**
 
 Update all successful requests with `Origin: "http://localhost"`. Add:
 
@@ -266,7 +266,7 @@ Update all successful requests with `Origin: "http://localhost"`. Add:
 - storage is not called for rejected input;
 - normalized create/update data is passed to storage.
 
-- [ ] **Step 10: Run anime route tests and verify RED**
+- [x] **Step 10: Run anime route tests and verify RED**
 
 Run:
 
@@ -276,7 +276,7 @@ npm test -- app/api/anime/route.test.ts app/api/anime/[id]/route.test.ts
 
 Expected: FAIL because routes do not call the shared boundaries.
 
-- [ ] **Step 11: Replace duplicated route normalization**
+- [x] **Step 11: Replace duplicated route normalization**
 
 The POST flow becomes:
 
@@ -296,11 +296,11 @@ if (!parsedInput.ok) {
 
 Use `parsedInput.data` to construct the stored record. PUT follows the same structure with `parseAnimeUpdateInput`; DELETE checks origin before storage.
 
-- [ ] **Step 12: Add stable anime domain error codes**
+- [x] **Step 12: Add stable anime domain error codes**
 
 Write `lib/anime-api-error.test.ts` first, then update `animeMutationErrorResponse` so duplicate and revision conflicts preserve messages while adding `code: "duplicate_bangumi"` and `code: "revision_conflict"`.
 
-- [ ] **Step 13: Run anime boundary tests**
+- [x] **Step 13: Run anime boundary tests**
 
 Run:
 
@@ -310,7 +310,7 @@ npm test -- lib/anime/validation.test.ts lib/anime-api-error.test.ts app/api/ani
 
 Expected: PASS.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```powershell
 git add lib/anime lib/anime-api-error.ts lib/anime-api-error.test.ts app/api/anime
@@ -356,7 +356,7 @@ export function createRedisLoginRateLimiter(redis: Redis): LoginRateLimiter;
 export const loginRateLimiter: LoginRateLimiter;
 ```
 
-- [ ] **Step 1: Write failing client-key and memory limiter tests**
+- [x] **Step 1: Write failing client-key and memory limiter tests**
 
 Prove that:
 
@@ -368,43 +368,43 @@ Prove that:
 - `reset` clears the bucket;
 - expired buckets start over.
 
-- [ ] **Step 2: Run memory limiter tests and verify RED**
+- [x] **Step 2: Run memory limiter tests and verify RED**
 
 Run: `npm test -- lib/auth/rate-limit.test.ts`
 
 Expected: FAIL because the limiter does not exist.
 
-- [ ] **Step 3: Implement the memory limiter**
+- [x] **Step 3: Implement the memory limiter**
 
 Use constants `WINDOW_SECONDS = 900` and `MAX_FAILURES = 5`. Store `{ failures, expiresAt }` in a module-private Map. `recordFailure` returns the state after increment; `check` returns limited only when existing failures are at least five.
 
-- [ ] **Step 4: Run memory limiter tests and verify GREEN**
+- [x] **Step 4: Run memory limiter tests and verify GREEN**
 
 Run: `npm test -- lib/auth/rate-limit.test.ts`
 
 Expected: memory cases PASS.
 
-- [ ] **Step 5: Write failing Redis adapter tests**
+- [x] **Step 5: Write failing Redis adapter tests**
 
 Inject an object exposing `eval`. Assert consumer-visible states for literal Redis results `[5, 840]` and verify `reset` calls `del` for the hashed bucket. Do not assert Lua source text.
 
-- [ ] **Step 6: Run Redis tests and verify RED**
+- [x] **Step 6: Run Redis tests and verify RED**
 
 Run: `npm test -- lib/auth/rate-limit.test.ts`
 
 Expected: FAIL because the Redis adapter is absent.
 
-- [ ] **Step 7: Implement Redis limiter and environment factory**
+- [x] **Step 7: Implement Redis limiter and environment factory**
 
 Use atomic Lua for check/increment plus TTL, and the existing Upstash URL/token aliases. If both URL and token are present, instantiate Redis; otherwise create the memory limiter. Do not perform a network request at module initialization.
 
-- [ ] **Step 8: Run rate limiter tests and verify GREEN**
+- [x] **Step 8: Run rate limiter tests and verify GREEN**
 
 Run: `npm test -- lib/auth/rate-limit.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 9: Write failing auth route tests**
+- [x] **Step 9: Write failing auth route tests**
 
 Mock only the limiter boundary and cover:
 
@@ -416,37 +416,37 @@ Mock only the limiter boundary and cover:
 - missing `ADMIN_PASSWORD` returns `500` without recording a failure;
 - DELETE requires same origin and clears the existing Cookie.
 
-- [ ] **Step 10: Run auth tests and verify RED**
+- [x] **Step 10: Run auth tests and verify RED**
 
 Run: `npm test -- app/api/auth/route.test.ts`
 
 Expected: FAIL because auth has no origin check or limiter.
 
-- [ ] **Step 11: Implement the auth route flow**
+- [x] **Step 11: Implement the auth route flow**
 
 Check origin first, configuration second, limiter third, then parse and compare the password. Preserve SHA-256 Cookie token generation and existing attributes.
 
-- [ ] **Step 12: Run auth tests and verify GREEN**
+- [x] **Step 12: Run auth tests and verify GREEN**
 
 Run: `npm test -- app/api/auth/route.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 13: Write proxy error-shape tests**
+- [x] **Step 13: Write proxy error-shape tests**
 
 Use `NextRequest` to verify protected API requests return `code: "unauthenticated"` and missing configuration returns `code: "auth_not_configured"`, while public `GET /api/anime` remains allowed.
 
-- [ ] **Step 14: Run proxy tests and verify RED**
+- [x] **Step 14: Run proxy tests and verify RED**
 
 Run: `npm test -- proxy.test.ts`
 
 Expected: FAIL because proxy errors lack stable codes.
 
-- [ ] **Step 15: Update proxy error responses**
+- [x] **Step 15: Update proxy error responses**
 
 Use the shared `errorResponse` helper without changing route matching, redirects, token comparison or public access.
 
-- [ ] **Step 16: Run auth and proxy tests**
+- [x] **Step 16: Run auth and proxy tests**
 
 Run:
 
@@ -456,7 +456,7 @@ npm test -- lib/auth/rate-limit.test.ts app/api/auth/route.test.ts proxy.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 17: Commit**
+- [x] **Step 17: Commit**
 
 ```powershell
 git add lib/auth app/api/auth proxy.ts proxy.test.ts
@@ -502,53 +502,53 @@ export interface InlineFeedbackProps {
 }
 ```
 
-- [ ] **Step 1: Write failing client error tests**
+- [x] **Step 1: Write failing client error tests**
 
 Cover a JSON error message, empty error field, HTML response and invalid JSON. Expected fallback must be a literal supplied by the test.
 
-- [ ] **Step 2: Run client helper tests and verify RED**
+- [x] **Step 2: Run client helper tests and verify RED**
 
 Run: `npm test -- lib/http/client.test.ts`
 
 Expected: FAIL because the helper does not exist.
 
-- [ ] **Step 3: Implement safe client error reading**
+- [x] **Step 3: Implement safe client error reading**
 
 Check `Content-Type` for JSON, catch parsing errors and only accept a non-empty string `error`; otherwise return the fallback.
 
-- [ ] **Step 4: Run client helper tests and verify GREEN**
+- [x] **Step 4: Run client helper tests and verify GREEN**
 
 Run: `npm test -- lib/http/client.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 5: Write failing feedback component tests**
+- [x] **Step 5: Write failing feedback component tests**
 
 Prove error renders `role="alert"`, success renders `role="status"` and caller classes are retained.
 
-- [ ] **Step 6: Run feedback tests and verify RED**
+- [x] **Step 6: Run feedback tests and verify RED**
 
 Run: `npm test -- components/feedback/inline-feedback.test.tsx`
 
 Expected: FAIL because the component does not exist.
 
-- [ ] **Step 7: Implement the feedback component**
+- [x] **Step 7: Implement the feedback component**
 
 Keep one shared base class and tone-specific classes. Do not introduce theme tokens in this phase.
 
-- [ ] **Step 8: Run feedback tests and verify GREEN**
+- [x] **Step 8: Run feedback tests and verify GREEN**
 
 Run: `npm test -- components/feedback/inline-feedback.test.tsx`
 
 Expected: PASS.
 
-- [ ] **Step 9: Write failing login and admin feedback tests**
+- [x] **Step 9: Write failing login and admin feedback tests**
 
 Login test: a `429` response displays the server message in an alert and re-enables submit.
 
 Admin test: a DELETE error response displays a row-level workspace alert and does not invoke `window.alert`.
 
-- [ ] **Step 10: Run page tests and verify RED**
+- [x] **Step 10: Run page tests and verify RED**
 
 Run:
 
@@ -558,11 +558,11 @@ npm test -- app/login/page.test.tsx app/admin/page.test.tsx
 
 Expected: FAIL because pages still use local parsing and blocking alert.
 
-- [ ] **Step 11: Migrate login and admin page feedback**
+- [x] **Step 11: Migrate login and admin page feedback**
 
 Use `readApiError` for error responses. Add admin `operationError` state, clear it before mutations, and render `InlineFeedback` above the list. Keep successful navigation and CRUD behavior.
 
-- [ ] **Step 12: Run page tests and verify GREEN**
+- [x] **Step 12: Run page tests and verify GREEN**
 
 Run:
 
@@ -572,11 +572,11 @@ npm test -- app/login/page.test.tsx app/admin/page.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 13: Write or update component feedback tests**
+- [x] **Step 13: Write or update component feedback tests**
 
 For AnimeForm, BangumiSearch and BackupManager, assert error UI uses `role="alert"` and backup success uses `role="status"`. Existing request behavior remains unchanged.
 
-- [ ] **Step 14: Run component tests and verify RED**
+- [x] **Step 14: Run component tests and verify RED**
 
 Run:
 
@@ -586,11 +586,11 @@ npm test -- components/anime-form.test.tsx components/bangumi-search.test.tsx co
 
 Expected: at least one new semantic assertion FAILS.
 
-- [ ] **Step 15: Migrate remaining components**
+- [x] **Step 15: Migrate remaining components**
 
 Replace duplicated error containers with `InlineFeedback` and duplicated response parsing with `readApiError`. Preserve loading, retry, manual fallback, import and restore behavior.
 
-- [ ] **Step 16: Run all focused client tests**
+- [x] **Step 16: Run all focused client tests**
 
 Run:
 
@@ -600,7 +600,7 @@ npm test -- lib/http/client.test.ts components/feedback/inline-feedback.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 17: Commit**
+- [x] **Step 17: Commit**
 
 ```powershell
 git add lib/http/client.ts lib/http/client.test.ts components/feedback app/login app/admin components/anime-form.tsx components/anime-form.test.tsx components/bangumi-search.tsx components/bangumi-search.test.tsx components/backup-manager.tsx components/backup-manager.test.tsx
@@ -620,21 +620,21 @@ git commit -m "refactor: unify client feedback states"
 
 **Interfaces:** None.
 
-- [ ] **Step 1: Update documentation**
+- [x] **Step 1: Update documentation**
 
 Document strict same-origin writes, the error envelope, anime input validation and the 5-failure/15-minute limiter. State that production should configure existing Redis variables for cross-instance limiting and that memory fallback is single-instance.
 
-- [ ] **Step 2: Mark completed plan checkboxes**
+- [x] **Step 2: Mark completed plan checkboxes**
 
 Keep any blocked item unchecked with an exact reason. Do not claim browser verification if the in-app browser still rejects local addresses.
 
-- [ ] **Step 3: Run all tests**
+- [x] **Step 3: Run all tests**
 
 Run: `npm test`
 
 Expected: all test files PASS with zero failures.
 
-- [ ] **Step 4: Run static verification**
+- [x] **Step 4: Run static verification**
 
 Run:
 
@@ -645,13 +645,13 @@ npm run lint
 
 Expected: TypeScript exits 0; ESLint has zero errors. Existing `<img>` warnings may remain.
 
-- [ ] **Step 5: Run production build**
+- [x] **Step 5: Run production build**
 
 Run: `npm run build`
 
 Expected: optimized production build exits 0. If Google Fonts is blocked by the sandbox, rerun the same command with approved network access.
 
-- [ ] **Step 6: Review the final diff against the specification**
+- [x] **Step 6: Review the final diff against the specification**
 
 Check:
 

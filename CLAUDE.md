@@ -25,6 +25,14 @@ anime-diary/
 │   ├── archive/
 │   │   ├── types.ts                 ← 公开档案筛选、分组和统计类型
 │   │   └── filter.ts                ← URL 解析、筛选、排序、分组纯函数
+│   ├── anime/
+│   │   └── validation.ts            ← 新增/更新共享输入校验
+│   ├── auth/
+│   │   └── rate-limit.ts            ← Redis/内存登录失败限流
+│   ├── http/
+│   │   ├── response.ts              ← API 错误响应与 JSON 解析
+│   │   ├── security.ts              ← 严格同源判断
+│   │   └── client.ts                ← 客户端安全错误读取
 │   ├── storage.ts                   ← Storage 接口
 │   ├── storage-json.ts              ← JSON 文件存储实现
 │   ├── storage-kv.ts                ← Upstash Redis 存储实现
@@ -49,6 +57,8 @@ anime-diary/
 │   │   └── anime-detail-dialog.tsx  ← 可访问的记录详情面板
 │   ├── admin/
 │   │   └── admin-section-nav.tsx    ← 后台工作区导航
+│   ├── feedback/
+│   │   └── inline-feedback.tsx      ← 可访问的行内反馈
 │   ├── star-rating.tsx              ← 星星评分（支持 0.5 步长）
 │   ├── anime-form.tsx               ← 表单组件（标签管理、评分滑块）
 │   ├── anime-list.tsx               ← 管理记录列表（页面自然滚动）
@@ -177,6 +187,12 @@ interface Anime {
 7. **备份恢复**
    - 独立工作区提供 JSON 导入导出、历史版本、差异预览与恢复
 
+8. **安全边界**
+   - 所有管理写接口严格验证 `Origin`，认证 Cookie 与同源保护共同构成写入边界
+   - 新增和更新使用同一个纯函数校验器，返回结构化字段问题
+   - 同一客户端 15 分钟失败 5 次后限制登录；成功登录清除计数
+   - Redis 已配置时跨实例共享计数，否则回退到单实例内存
+
 ## 本地开发
 
 ```bash
@@ -203,6 +219,10 @@ npm run start       # 启动生产服务器
 - `components/archive/archive-browser.tsx` 只管理公开浏览交互，所有数据由服务端页面作为 props 注入
 - `app/admin/page.tsx` 只维护局部 `AdminSection` 状态；三个后台工作区互斥挂载，不引入全局状态库
 - `components/backup-manager.tsx` 仅在备份恢复工作区挂载，因此后台首次加载不请求 `/api/backups`
+- `lib/http/response.ts` 统一 `{ error, code?, issues?, existingId? }` 错误结构；旧客户端依赖的 `error` 字段保持不变
+- `lib/http/security.ts` 由每个写路由显式调用；不要只依赖 `proxy.ts` 做 CSRF 防护
+- `lib/anime/validation.ts` 是番剧新增/更新的唯一规范化入口；路由不得复制字段清理逻辑
+- `lib/auth/rate-limit.ts` 不记录明文 IP；生产环境应配置现有 Redis 变量以获得跨实例限流
 - `lib/archive/filter.ts` 集中处理 URL 归一化、筛选、排序、分组和统计，且不修改调用方数组
 - `GET /api/anime` 保持公开且响应兼容，但公开首页不调用该 API
 - 评分使用 `Math.round(rating * 2) / 2` 取整到 0.5 步长
