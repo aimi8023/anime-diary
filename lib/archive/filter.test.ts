@@ -1,0 +1,219 @@
+import { describe, expect, it } from "vitest";
+import type { Anime } from "@/lib/types";
+import {
+  DEFAULT_ARCHIVE_FILTERS,
+  filterAnime,
+  getArchiveOptions,
+  getArchiveStats,
+  groupAnimeByYear,
+  parseArchiveFilters,
+  serializeArchiveFilters,
+} from "./filter";
+
+const records: Anime[] = [
+  {
+    id: "anime-1",
+    title: "孤独摇滚！",
+    originalTitle: "ぼっち・ざ・ろっく！",
+    season: "2024夏",
+    cover: "",
+    rating: 9,
+    comment: "喜欢乐队成长的过程",
+    episodes: 12,
+    tags: ["音乐", "日常"],
+    createdAt: "2024-07-01T00:00:00.000Z",
+  },
+  {
+    id: "anime-2",
+    title: "摇曳露营",
+    season: "2024夏",
+    cover: "",
+    rating: 8.5,
+    comment: "适合放松",
+    episodes: 12,
+    tags: ["日常", "治愈"],
+    createdAt: "2024-08-01T00:00:00.000Z",
+  },
+  {
+    id: "anime-3",
+    title: "葬送的芙莉莲",
+    season: "2025春",
+    cover: "",
+    rating: 9.5,
+    comment: "关于时间与记忆",
+    episodes: 28,
+    tags: ["奇幻", "治愈"],
+    createdAt: "2025-01-01T00:00:00.000Z",
+  },
+  {
+    id: "anime-4",
+    title: "命运石之门",
+    season: "2024冬",
+    cover: "",
+    rating: 10,
+    comment: "",
+    episodes: 24,
+    tags: ["科幻"],
+    createdAt: "2024-10-01T00:00:00.000Z",
+  },
+];
+
+describe("archive filter URL state", () => {
+  it("parses supported URL values and normalizes them", () => {
+    expect(
+      parseArchiveFilters({
+        q: "  音乐  ",
+        year: "2024",
+        season: "夏",
+        tag: "治愈,日常,治愈",
+        rating: "8.3",
+        sort: "title",
+      }),
+    ).toEqual({
+      q: "音乐",
+      year: "2024",
+      season: "夏",
+      tags: ["治愈", "日常"],
+      rating: 8.5,
+      sort: "title",
+    });
+  });
+
+  it("ignores invalid values and uses safe defaults", () => {
+    expect(
+      parseArchiveFilters({
+        year: "24",
+        season: "雨",
+        rating: "many",
+        sort: "unknown",
+      }),
+    ).toEqual(DEFAULT_ARCHIVE_FILTERS);
+  });
+
+  it("reads the first value when a server query parameter is repeated", () => {
+    expect(
+      parseArchiveFilters({
+        year: ["2025", "2024"],
+        season: ["秋", "夏"],
+      }),
+    ).toMatchObject({
+      year: "2025",
+      season: "秋",
+    });
+  });
+
+  it("parses URLSearchParams with the same rules", () => {
+    const params = new URLSearchParams(
+      "q=%E4%B9%90%E9%98%9F&year=2023&rating=10&sort=added",
+    );
+
+    expect(parseArchiveFilters(params)).toMatchObject({
+      q: "乐队",
+      year: "2023",
+      rating: 10,
+      sort: "added",
+    });
+  });
+
+  it("serializes only non-default filters in a stable order", () => {
+    expect(
+      serializeArchiveFilters({
+        ...DEFAULT_ARCHIVE_FILTERS,
+        year: "2024",
+        tags: ["日常", "治愈"],
+      }).toString(),
+    ).toBe("year=2024&tag=%E6%97%A5%E5%B8%B8%2C%E6%B2%BB%E6%84%88");
+  });
+});
+
+describe("archive filtering and grouping", () => {
+  it.each([
+    ["孤独", ["anime-1"]],
+    ["ぼっち", ["anime-1"]],
+    ["音乐", ["anime-1"]],
+    ["乐队", ["anime-1"]],
+  ])("searches title, original title, tags, and comment for %s", (query, ids) => {
+    expect(
+      filterAnime(records, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        q: query,
+      }).map((anime) => anime.id),
+    ).toEqual(ids);
+  });
+
+  it("requires every selected tag and every other active condition", () => {
+    expect(
+      filterAnime(records, {
+        q: "",
+        year: "2024",
+        season: "夏",
+        tags: ["日常", "治愈"],
+        rating: 8,
+        sort: "rating",
+      }).map((anime) => anime.id),
+    ).toEqual(["anime-2"]);
+  });
+
+  it("sorts filtered records without mutating the caller array", () => {
+    const original = structuredClone(records);
+
+    expect(
+      filterAnime(records, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        sort: "added",
+      }).map((anime) => anime.id),
+    ).toEqual(["anime-3", "anime-4", "anime-2", "anime-1"]);
+    expect(records).toEqual(original);
+  });
+
+  it("supports title ordering", () => {
+    const latinRecords = [
+      { ...records[0], id: "beta", title: "Beta" },
+      { ...records[1], id: "alpha", title: "Alpha" },
+    ];
+
+    expect(
+      filterAnime(latinRecords, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        sort: "title",
+      }).map((anime) => anime.id),
+    ).toEqual(["alpha", "beta"]);
+  });
+
+  it("groups years and seasons newest first with the requested inner sort", () => {
+    const groups = groupAnimeByYear(records, "rating");
+
+    expect(groups.map((group) => group.year)).toEqual(["2025", "2024"]);
+    expect(groups[1].seasons.map((group) => group.season)).toEqual([
+      "2024冬",
+      "2024夏",
+    ]);
+    expect(groups[1].seasons[1].records.map((anime) => anime.id)).toEqual([
+      "anime-1",
+      "anime-2",
+    ]);
+  });
+
+  it("returns unique browse options and archive statistics", () => {
+    expect(getArchiveOptions(records)).toEqual({
+      years: ["2025", "2024"],
+      tags: ["科幻", "奇幻", "日常", "音乐", "治愈"],
+    });
+    expect(getArchiveStats(records)).toEqual({
+      total: 4,
+      seasonCount: 3,
+      earliestYear: "2024",
+      latestYear: "2025",
+    });
+  });
+
+  it("returns safe empty options and statistics", () => {
+    expect(getArchiveOptions([])).toEqual({ years: [], tags: [] });
+    expect(getArchiveStats([])).toEqual({
+      total: 0,
+      seasonCount: 0,
+      earliestYear: null,
+      latestYear: null,
+    });
+  });
+});
