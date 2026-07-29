@@ -15,6 +15,8 @@ import type {
 } from "@/lib/archive/types";
 import ActiveFilters from "./active-filters";
 import ArchiveHero from "./archive-hero";
+import AnimeDetailDialog from "./anime-detail-dialog";
+import ArchiveResults from "./archive-results";
 import ArchiveToolbar from "./archive-toolbar";
 
 interface ArchiveBrowserProps {
@@ -33,6 +35,7 @@ export default function ArchiveBrowser({
   const currentSearch = searchParams.toString();
   const [filters, setFilters] = useState(initialFilters);
   const [queryDraft, setQueryDraft] = useState(initialFilters.q);
+  const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
   const options = useMemo(() => getArchiveOptions(records), [records]);
   const filteredRecords = useMemo(
     () => filterAnime(records, filters),
@@ -118,16 +121,18 @@ export default function ArchiveBrowser({
             onRemove={removeFilter}
             resultCount={filteredRecords.length}
           />
-          {filteredRecords.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-gray-300 bg-white/40 px-6 py-16 text-center">
-              <h2 className="font-semibold text-gray-800">没有匹配的记录</h2>
-              <p className="mt-2 text-sm text-gray-600">
-                可以减少筛选条件，或者换一个关键词。
-              </p>
-            </div>
-          )}
+          <ArchiveResults
+            onClearFilters={clearFilters}
+            onSelect={setSelectedAnime}
+            records={filteredRecords}
+            sort={filters.sort}
+          />
         </section>
       )}
+      <AnimeDetailDialog
+        anime={selectedAnime}
+        onClose={() => setSelectedAnime(null)}
+      />
     </div>
   );
 }
