@@ -71,9 +71,21 @@ describe("AnimeDetailDialog", () => {
       name: "孤独摇滚！",
     });
     expect(dialog.parentElement).toBe(document.body);
+    expect(
+      screen.getByRole("region", { name: "作品封面" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "追番详情" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "孤独摇滚！封面" }),
+    ).toBeInTheDocument();
     expect(dialog).toHaveTextContent("ぼっち・ざ・ろっく！");
+    expect(dialog).toHaveTextContent("我的感想");
     expect(dialog).toHaveTextContent("乐队成长的故事");
     expect(dialog).toHaveTextContent("12 话");
+    expect(dialog).toHaveTextContent("2022-10-09");
+    expect(dialog).toHaveTextContent("音乐");
     expect(
       screen.getByRole("link", { name: "在 Bangumi 查看" }),
     ).toHaveAttribute("href", completeAnime.bangumiUrl);
@@ -105,6 +117,20 @@ describe("AnimeDetailDialog", () => {
 
     await user.click(screen.getByRole("button", { name: "关闭详情" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("keeps details readable when a cover is unavailable", async () => {
+    const user = userEvent.setup();
+    render(
+      <DialogHarness anime={{ ...completeAnime, cover: "" }} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "打开详情" }));
+
+    expect(screen.getByText("封面暂缺")).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "追番详情" }),
+    ).toHaveTextContent("孤独摇滚！");
   });
 
   it("closes from the backdrop but not from clicks inside the panel", async () => {
