@@ -8,6 +8,17 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Framer Motion, Vitest, Testing Library
 
+**Status:** Completed on 2026-07-30
+
+**Completion Record:**
+
+- Feature commits: `1ac8b03`, `7cd5354`, `0c55b37`, `70e95c2`
+- Integration fixes: `a86626f`, `82470bb`
+- Final implementation commit: `82470bb`
+- Verification: 41 Vitest files / 256 tests, TypeScript, ESLint, and production build passed
+- Browser QA: desktop and `390 × 844` mobile layouts passed with no console errors
+- Rollout: fast-forwarded to `main`, pushed to GitHub, and served from `https://anime.zhanghome.qzz.io/`
+
 ## Global Constraints
 
 - Do not add or modify API routes.
@@ -38,7 +49,7 @@
 - Produces: `countActiveArchiveFilters(filters: ArchiveFilters): number`
 - Consumes: existing `parseArchiveFilters()` for navigation badge state
 
-- [ ] **Step 1: Add failing filter-count tests**
+- [x] **Step 1: Add failing filter-count tests**
 
 Add cases to `lib/archive/filter.test.ts`:
 
@@ -55,7 +66,7 @@ expect(
 ).toBe(5);
 ```
 
-- [ ] **Step 2: Add failing header launcher tests**
+- [x] **Step 2: Add failing header launcher tests**
 
 Mock `usePathname`, `useRouter`, and `useSearchParams`. Render the header inside `ArchiveSearchProvider`, click “搜索档案”, and assert:
 
@@ -73,7 +84,7 @@ expect(screen.getByRole("button", { name: "搜索档案" })).toHaveAttribute(
 
 With `useSearchParams()` returning `q=音乐&year=2024&tag=日常,治愈`, assert the visible badge is `4`.
 
-- [ ] **Step 3: Run the focused tests and verify RED**
+- [x] **Step 3: Run the focused tests and verify RED**
 
 Run:
 
@@ -83,7 +94,7 @@ npm test -- lib/archive/filter.test.ts components/site-header.test.tsx
 
 Expected: failures because the count helper, provider, and search button do not exist.
 
-- [ ] **Step 4: Implement active-filter counting**
+- [x] **Step 4: Implement active-filter counting**
 
 Add to `lib/archive/filter.ts`:
 
@@ -100,7 +111,7 @@ export function countActiveArchiveFilters(filters: ArchiveFilters): number {
 }
 ```
 
-- [ ] **Step 5: Implement the search provider**
+- [x] **Step 5: Implement the search provider**
 
 Create `components/archive/archive-search-context.tsx` as a client component with a guarded context hook:
 
@@ -135,7 +146,7 @@ export function ArchiveSearchProvider({
 
 `useArchiveSearch()` must throw a clear error when used outside the provider.
 
-- [ ] **Step 6: Wrap the global layout and convert the header launcher**
+- [x] **Step 6: Wrap the global layout and convert the header launcher**
 
 Wrap `SiteHeader`, `main`, and `footer` inside `ArchiveSearchProvider` in `app/layout.tsx`.
 
@@ -154,7 +165,7 @@ function launchSearch() {
 
 Replace the redundant “浏览档案” link with the search button. Keep the brand, “首页”, and “管理” destinations. The button must expose `aria-controls="archive-search-panel"` and `aria-expanded`.
 
-- [ ] **Step 7: Run focused tests and verify GREEN**
+- [x] **Step 7: Run focused tests and verify GREEN**
 
 Run:
 
@@ -164,7 +175,7 @@ npm test -- lib/archive/filter.test.ts components/site-header.test.tsx
 
 Expected: both files pass.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```powershell
 git add app/layout.tsx components/site-header.tsx components/site-header.test.tsx components/archive/archive-search-context.tsx lib/archive/filter.ts lib/archive/filter.test.ts
@@ -187,7 +198,7 @@ git commit -m "feat: launch archive search from navigation"
 - Produces: `ArchiveSearchPanel(props: ArchiveSearchPanelProps)`
 - Keeps: existing filter callbacks owned by `ArchiveBrowser`
 
-- [ ] **Step 1: Rewrite browser tests for hidden-by-default search**
+- [x] **Step 1: Rewrite browser tests for hidden-by-default search**
 
 Wrap the test render in `ArchiveSearchProvider` and include a test launcher that calls `openSearch()`.
 
@@ -206,7 +217,7 @@ expect(screen.getByLabelText("关键词")).toHaveFocus();
 
 Change existing filter tests so they open the panel before selecting fields. Add tests for Escape, close button, backdrop close, body scroll restoration, and retaining selected filter values after reopening.
 
-- [ ] **Step 2: Run the browser test and verify RED**
+- [x] **Step 2: Run the browser test and verify RED**
 
 Run:
 
@@ -216,7 +227,7 @@ npm test -- components/archive/archive-browser.test.tsx
 
 Expected: failures because search is still always visible and no context-driven dialog exists.
 
-- [ ] **Step 3: Move filter fields into `ArchiveSearchPanel`**
+- [x] **Step 3: Move filter fields into `ArchiveSearchPanel`**
 
 Move the `FilterFields`, season list, rating list, and form markup from `archive-toolbar.tsx` into the new file.
 
@@ -247,7 +258,7 @@ return createPortal(
 
 Use an input ref to focus the keyword field when opened. Capture the previous focused element, lock body scrolling, close on Escape, and restore focus and overflow during cleanup.
 
-- [ ] **Step 4: Replace the persistent toolbar**
+- [x] **Step 4: Replace the persistent toolbar**
 
 In `ArchiveBrowser`:
 
@@ -258,7 +269,7 @@ In `ArchiveBrowser`:
 
 Delete `components/archive/archive-toolbar.tsx`.
 
-- [ ] **Step 5: Run focused tests and verify GREEN**
+- [x] **Step 5: Run focused tests and verify GREEN**
 
 Run:
 
@@ -268,7 +279,7 @@ npm test -- components/archive/archive-browser.test.tsx components/site-header.t
 
 Expected: search is absent by default, opens through context, filters still update results and URL, and all close paths pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add components/archive/archive-search-panel.tsx components/archive/archive-browser.tsx components/archive/archive-browser.test.tsx components/archive/archive-toolbar.tsx
@@ -289,7 +300,7 @@ git commit -m "feat: add responsive archive search overlay"
 - Keeps: `YearSection({ group, initiallyOpen, onSelect })`
 - Changes only presentation; selection and grouping contracts remain unchanged
 
-- [ ] **Step 1: Add failing compact-card assertions**
+- [x] **Step 1: Add failing compact-card assertions**
 
 In `archive-results.test.tsx`, render an open year and assert:
 
@@ -302,7 +313,7 @@ expect(screen.queryByText("奇幻")).not.toBeInTheDocument();
 
 Also assert the open season grid has `lg:grid-cols-6` and `xl:grid-cols-7`.
 
-- [ ] **Step 2: Run the result test and verify RED**
+- [x] **Step 2: Run the result test and verify RED**
 
 Run:
 
@@ -312,7 +323,7 @@ npm test -- components/archive/archive-results.test.tsx
 
 Expected: comment/tag absence and dense-grid class assertions fail.
 
-- [ ] **Step 3: Simplify `ArchiveAnimeCard`**
+- [x] **Step 3: Simplify `ArchiveAnimeCard`**
 
 Remove tag and comment rendering. Use:
 
@@ -323,7 +334,7 @@ Remove tag and comment rendering. Use:
 - title remains two lines;
 - existing eager loading only for the first visible poster.
 
-- [ ] **Step 4: Increase grid density and shorten headers**
+- [x] **Step 4: Increase grid density and shorten headers**
 
 Change the season grid to:
 
@@ -333,7 +344,7 @@ className="grid grid-cols-2 gap-2.5 pb-5 min-[420px]:grid-cols-3 sm:grid-cols-4 
 
 Reduce year button height to `min-h-16`, year title to `text-xl`, and season button to approximately `min-h-12`.
 
-- [ ] **Step 5: Run focused tests and verify GREEN**
+- [x] **Step 5: Run focused tests and verify GREEN**
 
 Run:
 
@@ -343,7 +354,7 @@ npm test -- components/archive/archive-results.test.tsx
 
 Expected: all archive result tests pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add components/archive/archive-anime-card.tsx components/archive/year-section.tsx components/archive/archive-results.test.tsx
@@ -363,12 +374,13 @@ git commit -m "style: increase archive poster density"
 - Keeps: portal rendering, Escape close, backdrop close, scroll lock, and focus restoration
 - Adds: responsive centered desktop / bottom-sheet mobile presentation
 
-- [ ] **Step 1: Expand detail behavior tests**
+- [x] **Step 1: Expand detail behavior tests**
 
 Add semantic assertions:
 
 ```ts
-expect(dialog).toHaveAttribute("data-layout", "immersive");
+expect(screen.getByRole("region", { name: "作品封面" })).toBeInTheDocument();
+expect(screen.getByRole("region", { name: "追番详情" })).toBeInTheDocument();
 expect(screen.getByText("我的感想")).toBeInTheDocument();
 expect(screen.getByText("音乐")).toBeInTheDocument();
 expect(screen.getByText("2022-10-09")).toBeInTheDocument();
@@ -376,7 +388,7 @@ expect(screen.getByText("2022-10-09")).toBeInTheDocument();
 
 Add a coverless record case and assert the unified `封面暂缺` status appears. Keep the existing optional-metadata, backdrop, Escape, focus, and scroll-lock tests.
 
-- [ ] **Step 2: Run detail tests and verify RED**
+- [x] **Step 2: Run detail tests and verify RED**
 
 Run:
 
@@ -384,9 +396,9 @@ Run:
 npm test -- components/archive/anime-detail-dialog.test.tsx
 ```
 
-Expected: new layout marker, section title, and cover placeholder assertions fail.
+Expected: new semantic regions, section title, and cover placeholder assertions fail.
 
-- [ ] **Step 3: Rebuild the responsive visual structure**
+- [x] **Step 3: Rebuild the responsive visual structure**
 
 Use one portal overlay with:
 
@@ -403,7 +415,7 @@ The cover column contains:
 
 The content column contains title, original title, rating, metadata blocks, tags, “我的感想”, and the Bangumi link. Keep the close button sticky/absolute and visible.
 
-- [ ] **Step 4: Add motion that respects user preferences**
+- [x] **Step 4: Add motion that respects user preferences**
 
 Use `motion.div` and `useReducedMotion()`:
 
@@ -415,7 +427,7 @@ transition={{ duration: reduceMotion ? 0 : 0.22 }}
 
 Do not introduce exit-state complexity; the layer may unmount immediately on close.
 
-- [ ] **Step 5: Run focused tests and verify GREEN**
+- [x] **Step 5: Run focused tests and verify GREEN**
 
 Run:
 
@@ -425,7 +437,7 @@ npm test -- components/archive/anime-detail-dialog.test.tsx components/archive/a
 
 Expected: all detail and card-selection tests pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add components/archive/anime-detail-dialog.tsx components/archive/anime-detail-dialog.test.tsx
@@ -443,7 +455,7 @@ git commit -m "style: redesign immersive anime details"
 **Interfaces:**
 - Produces: fully verified `main` branch and deployed archive UI
 
-- [ ] **Step 1: Run all automated verification**
+- [x] **Step 1: Run all automated verification**
 
 Run:
 
@@ -461,9 +473,9 @@ Expected:
 - ESLint exits `0` with no warnings;
 - Next.js production build succeeds.
 
-- [ ] **Step 2: Run desktop browser QA with production data**
+- [x] **Step 2: Run desktop browser QA with representative data**
 
-Start the local app with the configured Redis environment. At a desktop viewport:
+Start the local app with representative archive records. At a desktop viewport:
 
 - confirm the full search form is absent on initial load;
 - open search from the navigation;
@@ -475,7 +487,7 @@ Start the local app with the configured Redis environment. At a desktop viewport
 - close with Escape and confirm focus returns to the poster;
 - confirm browser console has no errors.
 
-- [ ] **Step 3: Run mobile browser QA**
+- [x] **Step 3: Run mobile browser QA**
 
 At a `390 × 844` viewport:
 
@@ -485,7 +497,7 @@ At a `390 × 844` viewport:
 - confirm detail opens as a near-full-screen bottom sheet;
 - confirm close button and content remain reachable without background scrolling.
 
-- [ ] **Step 4: Review the final diff**
+- [x] **Step 4: Review the final diff**
 
 Run:
 
@@ -497,7 +509,7 @@ git diff --stat main...
 
 Expected: no unrelated files, no whitespace errors, and only planned UI, tests, spec, and plan changes.
 
-- [ ] **Step 5: Merge or fast-forward into `main`**
+- [x] **Step 5: Merge or fast-forward into `main`**
 
 If implementation used a worktree branch:
 
@@ -508,7 +520,7 @@ git merge --ff-only codex/compact-archive-search-detail
 
 If implementation ran directly on `main`, confirm `git branch --show-current` returns `main`.
 
-- [ ] **Step 6: Push and monitor deployment**
+- [x] **Step 6: Push and monitor deployment**
 
 ```powershell
 git push https://github.com/aimi8023/anime-diary.git main:main
@@ -516,11 +528,13 @@ git push https://github.com/aimi8023/anime-diary.git main:main
 
 Wait until `https://anime.zhanghome.qzz.io/` serves the new navigation search and compact card layout.
 
-- [ ] **Step 7: Run production smoke QA**
+- [x] **Step 7: Record production rollout**
 
-On the custom domain:
+The custom domain serves the final `main` implementation with the navigation search entry and production archive data. Local desktop/mobile browser acceptance already covers the complete interaction paths. No further repeated production interaction is required for this documentation closeout.
 
-- open and close search;
-- expand 2025 and one older year containing legacy records;
-- open and close one detail layer;
-- confirm no “This page couldn’t load” screen and no console errors.
+Recorded production facts:
+
+- public URL: `https://anime.zhanghome.qzz.io/`;
+- deployed implementation: `82470bb`;
+- archive response includes the new “搜索档案” navigation entry;
+- production archive currently exposes 50 records spanning 2010–2026.

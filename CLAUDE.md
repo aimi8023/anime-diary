@@ -38,7 +38,7 @@ anime-diary/
 │   ├── storage-kv.ts                ← Upstash Redis 存储实现
 │   └── storage-factory.ts           ← 根据环境自动选择存储
 ├── app/
-│   ├── layout.tsx                   ← 全局布局（服务端 Header/Footer）
+│   ├── layout.tsx                   ← 全局布局与公开搜索状态边界
 │   ├── page.tsx                     ← 服务端读取一次数据的公开档案首页
 │   ├── globals.css                  ← 水光档案令牌 + 全局语义样式
 │   ├── login/page.tsx               ← 登录页
@@ -49,12 +49,13 @@ anime-diary/
 │           ├── route.ts             ← GET 全部 / POST 新增
 │           └── [id]/route.ts        ← PUT 更新 / DELETE 删除
 ├── components/
-│   ├── site-header.tsx              ← 服务端站点导航
+│   ├── site-header.tsx              ← 客户端导航、搜索入口与筛选徽标
 │   ├── archive/
+│   │   ├── archive-search-context.tsx ← 搜索层打开/关闭状态
 │   │   ├── archive-browser.tsx      ← 筛选、URL 同步与详情状态
-│   │   ├── archive-toolbar.tsx      ← 桌面/移动组合筛选
+│   │   ├── archive-search-panel.tsx ← 桌面浮层/手机底部抽屉筛选
 │   │   ├── archive-results.tsx      ← 年份和季度结果
-│   │   └── anime-detail-dialog.tsx  ← 可访问的记录详情面板
+│   │   └── anime-detail-dialog.tsx  ← 响应式沉浸式记录详情层
 │   ├── admin/
 │   │   └── admin-section-nav.tsx    ← 后台工作区导航
 │   ├── feedback/
@@ -133,17 +134,22 @@ interface Anime {
 
 2. **组合筛选与可分享 URL**
    - 支持关键词、年份、季度、标签、最低评分与排序
+   - 完整筛选表单默认隐藏，由导航栏“搜索”按钮按需打开
+   - 桌面端显示居中浮层，手机端显示底部抽屉；打开后关键词自动聚焦
    - 所有有效筛选使用 AND 语义，多个标签要求全部命中
    - URL 使用 `q`、`year`、`season`、`tag`、`rating`、`sort` 参数
    - 关键词延迟 250ms 更新 URL，其他条件立即更新且不触发网络请求
 
 3. **档案统计与详情**
    - 显示总番剧数、年份跨度和季度数
-   - 卡片详情面板展示完整短评与可选 Bangumi 信息
+   - 卡片只显示封面、评分、季度和标题，标签与感想进入详情层
+   - 桌面详情使用约 960px 居中双栏，手机端使用近全屏底部抽屉
+   - 详情展示完整短评、标签、元数据与可选 Bangumi 信息
 
 4. **年份/季度折叠**
    - 年份和季度均可展开/收起，最新年份默认展开
    - 年份、季度由新到旧排列，记录支持评分、标题或添加时间排序
+   - 海报网格按断点使用 2/3/4/6/7 列，提高公开档案浏览密度
 
 ### 管理页功能
 
@@ -204,8 +210,10 @@ npm run start       # 启动生产服务器
 
 - `proxy.ts` 是 Next.js 16 的 middleware 新名称（旧版叫 `middleware.ts`）
 - `app/page.tsx` 是 Server Component，每次渲染只调用一次 `storage.getAll()`；存储失败渲染错误状态
-- `app/layout.tsx` 与 `components/site-header.tsx` 均保持服务端渲染，不再维护全局番剧搜索 Context
+- `app/layout.tsx` 仍是 Server Component，并用 `ArchiveSearchProvider` 包裹站点外壳；Provider 只维护搜索层开关，不持有筛选条件
+- `components/site-header.tsx` 是 Client Component，负责打开搜索层和显示筛选数量；读取 URL 的徽标子树放在 `Suspense` 中，保证静态 404 可构建
 - `components/archive/archive-browser.tsx` 只管理公开浏览交互，所有数据由服务端页面作为 props 注入
+- `components/archive/archive-search-panel.tsx` 复用唯一一份筛选字段，通过 Portal 响应式呈现桌面浮层或手机抽屉
 - `app/admin/page.tsx` 只维护局部 `AdminSection` 状态；三个后台工作区互斥挂载，不引入全局状态库
 - `components/backup-manager.tsx` 仅在备份恢复工作区挂载，因此后台首次加载不请求 `/api/backups`
 - `lib/http/response.ts` 统一 `{ error, code?, issues?, existingId? }` 错误结构；旧客户端依赖的 `error` 字段保持不变
@@ -218,9 +226,19 @@ npm run start       # 启动生产服务器
 - 浏览器扩展"沉浸式翻译"会导致 hydration 警告，已在 `<html>` 加 `suppressHydrationWarning`
 - `components/` 下大部分组件是 `"use client"`（含交互/动效）
 - 外部封面统一使用 `next/image` 的 `unoptimized` 模式，避免远程域名配置耦合；父容器必须提供明确尺寸
-- 公开卡片使用 2:3 海报比例，标题和短评最多两行，评分放在封面角标
+- 公开卡片使用 2:3 海报比例，只显示评分、季度和最多两行标题；标签、短评及其他元数据只在详情层出现
+- `components/archive/anime-detail-dialog.tsx` 维持 Portal、滚动锁、Escape、遮罩关闭和焦点恢复，并遵守 `prefers-reduced-motion`
 - `app/globals.css` 是视觉令牌唯一来源；组件不要复制表面、焦点和按钮阴影
 - 所有新增动画必须同时验证 `prefers-reduced-motion`
+
+## 当前验证基线
+
+截至 2026-07-30 的公开档案最终版本：
+
+- 41 个 Vitest 测试文件、256 项测试全部通过
+- `npx tsc --noEmit`、`npm run lint`、`npm run build` 通过
+- 桌面和 `390 × 844` 手机视口完成搜索、网格与详情交互验收
+- 公开部署地址为 `https://anime.zhanghome.qzz.io/`
 
 ## 自定义配置
 
