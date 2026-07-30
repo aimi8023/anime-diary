@@ -18,6 +18,19 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   sort: "rating",
 };
 
+export function countActiveArchiveFilters(
+  filters: ArchiveFilters,
+): number {
+  return (
+    Number(Boolean(filters.q)) +
+    Number(Boolean(filters.year)) +
+    Number(Boolean(filters.season)) +
+    filters.tags.length +
+    Number(filters.rating !== null) +
+    Number(filters.sort !== "rating")
+  );
+}
+
 function readParam(
   params: ArchiveSearchParams | URLSearchParams,
   key: string,

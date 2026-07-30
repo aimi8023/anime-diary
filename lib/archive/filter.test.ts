@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Anime } from "@/lib/types";
 import {
+  countActiveArchiveFilters,
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
   getArchiveOptions,
@@ -57,6 +58,21 @@ const records: Anime[] = [
     createdAt: "2024-10-01T00:00:00.000Z",
   },
 ];
+
+describe("archive active filter count", () => {
+  it("counts every effective filter including individual tags", () => {
+    expect(countActiveArchiveFilters(DEFAULT_ARCHIVE_FILTERS)).toBe(0);
+    expect(
+      countActiveArchiveFilters({
+        ...DEFAULT_ARCHIVE_FILTERS,
+        q: "音乐",
+        year: "2024",
+        tags: ["日常", "治愈"],
+        sort: "title",
+      }),
+    ).toBe(5);
+  });
+});
 
 describe("archive filter URL state", () => {
   it("parses supported URL values and normalizes them", () => {
