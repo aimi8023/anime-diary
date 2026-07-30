@@ -16,17 +16,20 @@ describe("SiteHeader", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("keeps home, brand, and the secondary management entry", () => {
+  it("gives the brand and management destinations explicit names", () => {
     render(<SiteHeader />);
 
     expect(
-      screen.getByRole("link", { name: "追番记录" }),
+      screen.getByRole("link", { name: "追番记录首页" }),
     ).toHaveAttribute("href", "/");
+    expect(
+      screen.getByRole("navigation", { name: "主导航" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "首页" })).toHaveAttribute(
       "href",
       "/",
     );
-    expect(screen.getByRole("link", { name: "管理" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "管理后台" })).toHaveAttribute(
       "href",
       "/admin",
     );

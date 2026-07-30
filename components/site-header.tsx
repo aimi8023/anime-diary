@@ -2,15 +2,20 @@ import Link from "next/link";
 
 export default function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur-xl">
-      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-pink-100/40 via-transparent to-blue-100/40" />
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/72 shadow-[0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-2xl">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link
-          aria-label="追番记录"
-          className="relative text-lg font-bold tracking-tight text-gray-900"
+          aria-label="追番记录首页"
+          className="ui-focus group relative inline-flex min-h-11 items-center gap-2 rounded-full pr-2 text-lg font-bold tracking-tight text-gray-900"
           href="/"
         >
-          <span className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <span
+            aria-hidden="true"
+            className="grid h-8 w-8 place-items-center rounded-full border border-white/80 bg-white/70 text-sm shadow-sm transition group-hover:rotate-6"
+          >
+            ✦
+          </span>
+          <span className="bg-gradient-to-r from-pink-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
             追番记录
           </span>
         </Link>
@@ -20,20 +25,20 @@ export default function SiteHeader() {
           className="relative flex items-center gap-1 sm:gap-2"
         >
           <Link
-            className="rounded-full px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-white hover:text-pink-700 sm:px-4"
+            className="ui-focus inline-flex min-h-11 items-center rounded-full px-3 text-sm font-semibold text-gray-700 transition hover:bg-white/75 hover:text-pink-700 sm:px-4"
             href="/#archive"
           >
             浏览档案
           </Link>
           <Link
-            className="hidden rounded-full px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-white hover:text-pink-700 sm:inline-flex"
+            className="ui-focus hidden min-h-11 items-center rounded-full px-4 text-sm font-semibold text-gray-700 transition hover:bg-white/75 hover:text-pink-700 sm:inline-flex"
             href="/"
           >
             首页
           </Link>
           <Link
-            aria-label="管理"
-            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/55 px-3 py-2 text-sm text-gray-500 transition hover:border-blue-200 hover:text-blue-700 sm:px-4"
+            aria-label="管理后台"
+            className="ui-button ui-button-secondary px-3 sm:px-4"
             href="/admin"
           >
             <svg

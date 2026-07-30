@@ -1,153 +1,369 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #fff5f7;
-  --color-foreground: #2d1f3d;
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-/* ── Background with Custom Image ── */
+:root {
+  --canvas: #f9f7fb;
+  --canvas-tint: #fff5f8;
+  --canvas-blue: #eef7ff;
+  --surface: rgba(255, 255, 255, 0.66);
+  --surface-strong: rgba(255, 255, 255, 0.88);
+  --surface-soft: rgba(255, 255, 255, 0.48);
+  --surface-border: rgba(255, 255, 255, 0.78);
+  --ink: #211d35;
+  --ink-muted: #625d70;
+  --ink-subtle: #878191;
+  --accent: #db4f87;
+  --accent-strong: #bd2f6c;
+  --accent-soft: #fce7f0;
+  --info: #397cae;
+  --info-soft: #e8f4fc;
+  --warning: #a96513;
+  --warning-soft: #fff5db;
+  --danger: #c54554;
+  --danger-soft: #fff0f1;
+  --shadow-sm: 0 8px 24px rgba(60, 45, 82, 0.08);
+  --shadow-md: 0 18px 48px rgba(60, 45, 82, 0.13);
+  --shadow-lg: 0 28px 72px rgba(49, 39, 73, 0.2);
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-pill: 999px;
+  --duration-fast: 160ms;
+  --duration-normal: 240ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   min-height: 100vh;
-  background: 
-    /* Very light overlay to let background image show through clearly */
-    linear-gradient(135deg, rgba(255, 245, 247, 0.15) 0%, rgba(255, 240, 245, 0.10) 50%, rgba(250, 235, 245, 0.15) 100%),
-    url('/bg.png');
-  background-size: cover;
+  overflow-x: hidden;
+  background-color: var(--canvas);
+  background-image: url("/bg.png");
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  color: #2d1f3d;
-  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  background-size: cover;
+  color: var(--ink);
+  font-family:
+    var(--font-sans), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
-/* ─ Sparkle Overlay (very subtle) ── */
-body::before {
+body::before,
+body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+body::before {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 250, 252, 0.42) 0%,
+      rgba(248, 250, 255, 0.28) 45%,
+      rgba(244, 248, 255, 0.5) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 246, 250, 0.22),
+      transparent 48%,
+      rgba(234, 246, 255, 0.22)
+    );
+}
+
+body::after {
+  opacity: 0.55;
   background-image:
-    radial-gradient(2px 2px at 20% 30%, rgba(255, 182, 193, 0.3), transparent),
-    radial-gradient(2px 2px at 40% 70%, rgba(255, 182, 193, 0.25), transparent),
-    radial-gradient(2px 2px at 60% 20%, rgba(255, 182, 193, 0.3), transparent),
-    radial-gradient(2px 2px at 80% 50%, rgba(255, 182, 193, 0.25), transparent),
-    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 90% 10%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.3), transparent);
-  animation: sparkleFloat 8s ease-in-out infinite alternate;
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.65) 0 1px, transparent 2px),
+    radial-gradient(circle at 83% 24%, rgba(255, 255, 255, 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 22% 78%, rgba(255, 234, 243, 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 66%, rgba(225, 243, 255, 0.55) 0 1px, transparent 2px);
+  background-size: 210px 210px, 260px 260px, 230px 230px, 280px 280px;
 }
 
-@keyframes sparkleFloat {
-  0%, 100% { opacity: 0.2; transform: translateY(0); }
-  50% { opacity: 0.35; transform: translateY(-5px); }
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* ── Light & Airy Glass Card - zi0.cc Style ─ */
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(219, 79, 135, 0.22);
+  color: var(--ink);
+}
+
+.ui-panel,
 .glass {
-  background: rgba(255, 255, 255, 0.3);  /* 15% 透明度，让背景更清晰 */
-  backdrop-filter: blur(12px);              /* 降低模糊，背景更清楚 */
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.3);  /* 边框也更淡 */
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);   /* 阴影减弱 */
-  position: relative;
-  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
 }
 
-/* Subtle shimmer on hover */
-.glass::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-  pointer-events: none;
+.ui-panel-strong {
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(24px) saturate(1.08);
+  -webkit-backdrop-filter: blur(24px) saturate(1.08);
 }
 
-.glass:hover::before {
-  left: 100%;
+.ui-field,
+.glass-input {
+  min-height: 44px;
+  border: 1px solid rgba(91, 83, 112, 0.16);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
+}
+
+.ui-field:hover,
+.glass-input:hover {
+  border-color: rgba(91, 83, 112, 0.28);
+}
+
+.ui-field:focus,
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(219, 79, 135, 0.66);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 0 0 4px rgba(219, 79, 135, 0.12);
+}
+
+.ui-field::placeholder,
+.glass-input::placeholder {
+  color: var(--ink-subtle);
+}
+
+.ui-button,
+.ui-icon-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.ui-button {
+  gap: 0.5rem;
+  padding: 0.75rem 1.1rem;
+}
+
+.ui-icon-button {
+  width: 44px;
+  padding: 0;
+}
+
+.ui-button:hover:not(:disabled),
+.ui-icon-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ui-button:active:not(:disabled),
+.ui-icon-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ui-button:disabled,
+.ui-icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.ui-button-primary {
+  border: 1px solid rgba(189, 47, 108, 0.18);
+  background: linear-gradient(135deg, var(--accent-strong), #8755ba);
+  color: white;
+  box-shadow: 0 10px 24px rgba(168, 49, 113, 0.2);
+}
+
+.ui-button-primary:hover:not(:disabled) {
+  box-shadow: 0 14px 30px rgba(168, 49, 113, 0.28);
+}
+
+.ui-button-secondary {
+  border: 1px solid rgba(91, 83, 112, 0.16);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink-muted);
+}
+
+.ui-button-secondary:hover:not(:disabled) {
+  border-color: rgba(219, 79, 135, 0.3);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--accent-strong);
+}
+
+.ui-button-danger {
+  border: 1px solid rgba(197, 69, 84, 0.2);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.ui-button-danger:hover:not(:disabled) {
+  border-color: rgba(197, 69, 84, 0.35);
+  background: #ffe5e8;
+}
+
+.ui-chip {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(91, 83, 112, 0.13);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.64);
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  transition:
+    border-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.ui-chip:hover {
+  border-color: rgba(219, 79, 135, 0.3);
+  transform: translateY(-1px);
+}
+
+.ui-chip-active {
+  border-color: rgba(219, 79, 135, 0.38);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.ui-kicker {
+  color: var(--accent-strong);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.ui-focus:focus-visible,
+.ui-button:focus-visible,
+.ui-icon-button:focus-visible,
+.ui-chip:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(219, 79, 135, 0.34);
+  outline-offset: 3px;
 }
 
 .glass-hover {
-  transition: all 0.3s ease;
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) ease;
 }
 
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.3);    /* 悬停时稍微实一点 */
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: var(--shadow-md);
 }
 
-/* ── Subtle Accent Borders ── */
-.glass-neon-purple {
-  border-color: rgba(236, 72, 153, 0.4);
-  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.1);
+.glass-neon-purple,
+.glass-neon-pink {
+  border-color: rgba(219, 79, 135, 0.3);
 }
 
 .glass-neon-blue {
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+  border-color: rgba(57, 124, 174, 0.3);
 }
 
-.glass-neon-pink {
-  border-color: rgba(244, 63, 94, 0.4);
-  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.1);
-}
-
-/* ── Glass Input - Light Theme ── */
-.glass-input {
-  background: rgba(255, 255, 255, 0.25);  /* 输入框也更透明 */
-  backdrop-filter: blur(6px);              /* 降低模糊 */
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.4);  /* 边框更淡 */
-  border-radius: 12px;
-  color: #1a1a1a;
-  transition: all 0.2s ease;
-}
-.glass-input:focus {
-  outline: none;
-  border-color: rgba(236, 72, 153, 0.5);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
-  background: rgba(255, 255, 255, 0.35);   /* 聚焦时稍微实一点 */
-}
-.glass-input::placeholder {
-  color: rgba(0, 0, 0, 0.35);
-}
-
-/* ── Custom scrollbar ── */
 ::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.3);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 182, 193, 0.5);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 182, 193, 0.7);
+  width: 9px;
 }
 
-/* ── Line clamp ── */
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.34);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background: rgba(126, 105, 148, 0.4);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(219, 79, 135, 0.54);
+  background-clip: padding-box;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-/* ── Safe area for mobile ── */
 .pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (max-width: 640px) {
+  body {
+    background-attachment: scroll;
+    background-position: 52% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

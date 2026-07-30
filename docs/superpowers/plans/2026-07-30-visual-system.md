@@ -32,7 +32,7 @@
 - Consumes: 现有 Tailwind 4 和 `public/bg.png`。
 - Produces: `.ui-panel`, `.ui-panel-strong`, `.ui-field`, `.ui-button*`, `.ui-icon-button`, `.ui-chip*`, `.ui-kicker`, `.ui-focus`，供后续任务使用。
 
-- [ ] **Step 1: 写失败测试，固定站点导航语义**
+- [x] **Step 1: 写失败测试，固定站点导航语义**
 
 在 `components/site-header.test.tsx` 增加断言：
 
@@ -42,13 +42,13 @@ expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument(
 expect(screen.getByRole("link", { name: "管理后台" })).toBeInTheDocument();
 ```
 
-- [ ] **Step 2: 运行测试并确认失败**
+- [x] **Step 2: 运行测试并确认失败**
 
 Run: `npm test -- components/site-header.test.tsx`
 
 Expected: FAIL，因为当前品牌链接名称是“追番记录”，管理链接名称是“管理”。
 
-- [ ] **Step 3: 实现视觉令牌、全局画布与 Header/Footer**
+- [x] **Step 3: 实现视觉令牌、全局画布与 Header/Footer**
 
 在 `app/globals.css` 根级定义设计令牌，新增语义类，并让旧 `.glass`/`.glass-input` 引用新令牌。静态色洗替代持续闪光动画，加入：
 
@@ -65,7 +65,7 @@ Expected: FAIL，因为当前品牌链接名称是“追番记录”，管理链
 
 更新 `SiteHeader` 的品牌、导航胶囊和可访问名称；更新 `app/layout.tsx` Footer 的表面、字级和间距。Header 高度保持 64px，供 sticky 筛选使用 `top-20`。
 
-- [ ] **Step 4: 运行聚焦测试、类型与 lint**
+- [x] **Step 4: 运行聚焦测试、类型与 lint**
 
 Run:
 
@@ -77,7 +77,7 @@ npm run lint
 
 Expected: 测试与类型通过；lint 不新增警告。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```powershell
 git add app/globals.css app/layout.tsx components/site-header.tsx components/site-header.test.tsx
