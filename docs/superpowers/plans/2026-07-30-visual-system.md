@@ -303,11 +303,11 @@ git commit -m "style: unify admin workspace surfaces"
 - Consumes: Tasks 1–4 的完整实现。
 - Produces: 更新后的视觉说明、验证证据和可合并主分支。
 
-- [ ] **Step 1: 更新项目文档**
+- [x] **Step 1: 更新项目文档**
 
 README 和 CLAUDE 记录“水光档案”令牌、语义类、2:3 封面、减少动态规则与 `next/image unoptimized` 约束，删除旧的固定透明度说明和“封面使用 `<img>`”说明。
 
-- [ ] **Step 2: 运行完整自动化验证**
+- [x] **Step 2: 运行完整自动化验证**
 
 Run:
 
@@ -327,7 +327,7 @@ Expected:
 - Next.js 生产构建成功。
 - Git 差异无空白错误。
 
-- [ ] **Step 3: 浏览器视觉检查**
+- [x] **Step 3: 浏览器视觉检查**
 
 使用本地 JSON 存储启动开发服务，检查公开首页首屏、筛选、年份/季度、作品卡片、详情抽屉、空筛选和登录页。记录并修复：
 
@@ -337,7 +337,7 @@ Expected:
 - 水平溢出、控件不足 44px 或焦点不可见。
 - 控制台新增错误。
 
-- [ ] **Step 4: 提交文档与验收修正**
+- [x] **Step 4: 提交文档与验收修正**
 
 ```powershell
 git add README.md CLAUDE.md docs/superpowers/plans/2026-07-30-visual-system.md app components

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { Anime } from "@/lib/types";
 
@@ -37,12 +38,13 @@ export default function AnimeDetailDialog({
   }, [anime, onClose]);
 
   if (!anime) return null;
+  if (typeof document === "undefined") return null;
 
   function closeFromBackdrop(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) onClose();
   }
 
-  return (
+  return createPortal(
     <div
       aria-labelledby="anime-detail-title"
       aria-modal="true"
@@ -159,6 +161,7 @@ export default function AnimeDetailDialog({
           )}
         </div>
       </article>
-    </div>
+    </div>,
+    document.body,
   );
 }

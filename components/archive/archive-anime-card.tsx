@@ -39,6 +39,7 @@ export default function ArchiveAnimeCard({
               alt=""
               className="object-cover transition duration-500 group-hover:scale-105"
               fill
+              loading={index === 0 ? "eager" : "lazy"}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
               src={anime.cover}
               unoptimized

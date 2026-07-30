@@ -1,6 +1,6 @@
 # Anime Diary — 追番日记
 
-一个个人追番记录网站，按季度记录和浏览追过的番剧。采用轻盈的毛玻璃设计风格，清新明亮的视觉体验。支持公网访问，管理功能密码保护。
+一个个人追番记录网站，按季度记录和浏览追过的番剧。采用“水光档案”视觉系统，以粉蓝插画作为氛围层，并用稳定的瓷白表面承载内容。支持公网访问，管理功能密码保护。
 
 ## 技术栈
 
@@ -40,7 +40,7 @@ anime-diary/
 ├── app/
 │   ├── layout.tsx                   ← 全局布局（服务端 Header/Footer）
 │   ├── page.tsx                     ← 服务端读取一次数据的公开档案首页
-│   ├── globals.css                  ← 白粉主题 + 毛玻璃效果
+│   ├── globals.css                  ← 水光档案令牌 + 全局语义样式
 │   ├── login/page.tsx               ← 登录页
 │   ├── admin/page.tsx               ← 三工作区管理页（记录、添加、备份）
 │   └── api/
@@ -106,32 +106,21 @@ interface Anime {
 
 ### 设计特点
 
-- **Glassmorphism 轻盈风格**：白色背景图 + 半透明毛玻璃卡片
-- **配色方案**：粉色 (#ec4899) + 蓝色 (#3b82f6) + 玫瑰色 (#f43f5e)
-- **毛玻璃参数**：35% 透明度 + 10px 模糊 + 16px 圆角
-- **文字颜色**：深灰色主文字 (#gray-900)，彩色强调元素
-- **卡片高度**：统一最小高度 200px，底部信息对齐
+- **水光档案**：保留 `public/bg.png`，通过静态色洗让插画退到氛围层
+- **语义配色**：樱粉负责主操作，湖蓝负责信息，琥珀负责评分，红色只用于危险与错误
+- **稳定表面**：`surface`、`surface-strong` 和 `surface-soft` 不依赖背景图片提供文字对比度
+- **海报比例**：公开卡片使用 2:3；管理列表和表单预览使用 `next/image`
+- **可访问性**：交互目标至少 44×44px，统一 `focus-visible`，动效遵守 `prefers-reduced-motion`
 
 ### 关键样式类
 
-```css
-/* 主毛玻璃卡片 */
-.glass {
-  background: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
+- 表面：`.ui-panel`、`.ui-panel-strong`
+- 表单：`.ui-field`
+- 操作：`.ui-button` 与 primary/secondary/danger 变体、`.ui-icon-button`
+- 选择：`.ui-chip`、`.ui-chip-active`
+- 层级：`.ui-kicker`、`.ui-focus`
 
-/* 输入框 */
-.glass-input {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(8px);
-  border-radius: 12px;
-}
-```
-
-详细配置请参考 THEME-CONFIG.md。
+`.glass` 和 `.glass-input` 仅作为兼容别名保留，新组件应优先使用语义类。详细配置请参考 THEME-CONFIG.md。
 
 ## 主要功能
 
@@ -228,28 +217,16 @@ npm run start       # 启动生产服务器
 - 评分使用 `Math.round(rating * 2) / 2` 取整到 0.5 步长
 - 浏览器扩展"沉浸式翻译"会导致 hydration 警告，已在 `<html>` 加 `suppressHydrationWarning`
 - `components/` 下大部分组件是 `"use client"`（含交互/动效）
-- 封面图片使用 `<img>` 而非 `next/image`（外部 CDN URL 需额外配置）
-- 卡片高度统一：最小高度 200px，评论区域固定 40px（两行），底部信息始终对齐
+- 外部封面统一使用 `next/image` 的 `unoptimized` 模式，避免远程域名配置耦合；父容器必须提供明确尺寸
+- 公开卡片使用 2:3 海报比例，标题和短评最多两行，评分放在封面角标
+- `app/globals.css` 是视觉令牌唯一来源；组件不要复制表面、焦点和按钮阴影
+- 所有新增动画必须同时验证 `prefers-reduced-motion`
 
 ## 自定义配置
 
-### 透明度调整
+### 主题调整
 
-编辑 `app/globals.css` 中的 `.glass` 类：
-
-```css
-/* 更透明 */
-background: rgba(255, 255, 255, 0.25);
-backdrop-filter: blur(8px);
-
-/* 平衡（当前） */
-background: rgba(255, 255, 255, 0.35);
-backdrop-filter: blur(10px);
-
-/* 更实 */
-background: rgba(255, 255, 255, 0.55);
-backdrop-filter: blur(15px);
-```
+编辑 `app/globals.css` 的 `:root` 令牌，不在组件内散落新的颜色和阴影。表面、文字、强调色、阴影、圆角和动效变量说明见 `THEME-CONFIG.md`。
 
 ### 计时器起始时间
 

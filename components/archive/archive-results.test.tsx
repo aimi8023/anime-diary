@@ -22,7 +22,7 @@ const records: Anime[] = [
     id: "anime-2025",
     title: "葬送的芙莉莲",
     season: "2025春",
-    cover: "",
+    cover: "https://lain.bgm.tv/pic/cover/l/frieren.jpg",
     rating: 9.5,
     comment: "时间与记忆",
     episodes: 28,
@@ -32,6 +32,22 @@ const records: Anime[] = [
 ];
 
 describe("ArchiveResults", () => {
+  it("loads the first visible poster eagerly for the page LCP", () => {
+    const { container } = render(
+      <ArchiveResults
+        onClearFilters={vi.fn()}
+        onSelect={vi.fn()}
+        records={records}
+        sort="rating"
+      />,
+    );
+
+    expect(container.querySelector("img")).toHaveAttribute(
+      "loading",
+      "eager",
+    );
+  });
+
   it("renders years newest first and keeps only the newest open initially", () => {
     render(
       <ArchiveResults

@@ -70,6 +70,7 @@ describe("AnimeDetailDialog", () => {
     const dialog = screen.getByRole("dialog", {
       name: "孤独摇滚！",
     });
+    expect(dialog.parentElement).toBe(document.body);
     expect(dialog).toHaveTextContent("ぼっち・ざ・ろっく！");
     expect(dialog).toHaveTextContent("乐队成长的故事");
     expect(dialog).toHaveTextContent("12 话");
