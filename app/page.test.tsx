@@ -2,6 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ArchiveSearchProvider } from "@/components/archive/archive-search-context";
 import type { Anime } from "@/lib/types";
 
 const { getAll } = vi.hoisted(() => ({
@@ -40,9 +41,11 @@ describe("HomePage", () => {
     getAll.mockResolvedValueOnce([anime]);
 
     render(
-      await HomePage({
-        searchParams: Promise.resolve({ year: "2024" }),
-      }),
+      <ArchiveSearchProvider>
+        {await HomePage({
+          searchParams: Promise.resolve({ year: "2024" }),
+        })}
+      </ArchiveSearchProvider>,
     );
 
     expect(getAll).toHaveBeenCalledTimes(1);
@@ -57,9 +60,11 @@ describe("HomePage", () => {
     getAll.mockResolvedValueOnce([]);
 
     render(
-      await HomePage({
-        searchParams: Promise.resolve({}),
-      }),
+      <ArchiveSearchProvider>
+        {await HomePage({
+          searchParams: Promise.resolve({}),
+        })}
+      </ArchiveSearchProvider>,
     );
 
     expect(screen.getByText("还没有建立追番档案")).toBeInTheDocument();
@@ -70,9 +75,11 @@ describe("HomePage", () => {
     getAll.mockRejectedValueOnce(new Error("unavailable"));
 
     render(
-      await HomePage({
-        searchParams: Promise.resolve({}),
-      }),
+      <ArchiveSearchProvider>
+        {await HomePage({
+          searchParams: Promise.resolve({}),
+        })}
+      </ArchiveSearchProvider>,
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
