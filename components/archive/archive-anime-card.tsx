@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import type { Anime } from "@/lib/types";
 
@@ -15,23 +15,25 @@ export default function ArchiveAnimeCard({
   index,
   onSelect,
 }: ArchiveAnimeCardProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <motion.article
       animate={{ opacity: 1, y: 0 }}
-      className="group relative overflow-hidden rounded-2xl border border-white/80 bg-white/65 shadow-sm transition-shadow hover:shadow-xl hover:shadow-pink-100/60"
-      initial={{ opacity: 0, y: 18 }}
+      className="group relative overflow-hidden rounded-[1.15rem] border border-white/85 bg-[rgba(255,255,255,0.72)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-md)]"
+      initial={{ opacity: 0, y: reduceMotion ? 0 : 14 }}
       transition={{
-        delay: Math.min(index, 8) * 0.04,
-        duration: 0.35,
+        delay: reduceMotion ? 0 : Math.min(index, 8) * 0.035,
+        duration: reduceMotion ? 0 : 0.3,
       }}
     >
       <button
         aria-label={`查看《${anime.title}》详情`}
-        className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pink-500"
+        className="ui-focus archive-poster-card block h-full w-full rounded-[1.15rem] text-left"
         onClick={() => onSelect(anime)}
         type="button"
       >
-        <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-pink-50 to-blue-50">
+        <div className="relative aspect-[2/3] overflow-hidden bg-gradient-to-br from-pink-50 to-blue-50">
           {anime.cover ? (
             <Image
               alt=""
@@ -46,24 +48,26 @@ export default function ArchiveAnimeCard({
               ◌
             </div>
           )}
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#211d35]/38 to-transparent" />
+          <span className="absolute right-2.5 top-2.5 rounded-full border border-white/80 bg-[rgba(255,248,228,0.9)] px-2.5 py-1 text-xs font-black text-[var(--warning)] shadow-sm backdrop-blur">
+            ★ {anime.rating}
+          </span>
         </div>
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-3">
-            <h4
-              className="min-w-0 truncate font-semibold text-gray-900"
-              title={anime.title}
-            >
-              {anime.title}
-            </h4>
-            <span className="shrink-0 rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">
-              ★ {anime.rating}
-            </span>
-          </div>
+        <div className="p-3.5 sm:p-4">
+          <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--accent-strong)]">
+            {anime.season}
+          </p>
+          <h4
+            className="mt-1.5 line-clamp-2 min-h-11 font-bold leading-[1.4] text-[var(--ink)]"
+            title={anime.title}
+          >
+            {anime.title}
+          </h4>
           {anime.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="mt-3 flex min-h-6 flex-wrap gap-1.5">
               {anime.tags.slice(0, 3).map((tag) => (
                 <span
-                  className="rounded-full bg-gray-100 px-2 py-1 text-[11px] text-gray-600"
+                  className="rounded-full bg-white/72 px-2 py-1 text-[10px] font-medium text-[var(--ink-muted)]"
                   key={tag}
                 >
                   {tag}
@@ -71,7 +75,7 @@ export default function ArchiveAnimeCard({
               ))}
             </div>
           )}
-          <p className="mt-3 truncate text-xs leading-5 text-gray-600">
+          <p className="mt-3 line-clamp-2 min-h-10 text-xs leading-5 text-[var(--ink-muted)]">
             {anime.comment || "还没有写下感想"}
           </p>
         </div>

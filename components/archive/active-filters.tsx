@@ -54,17 +54,17 @@ export default function ActiveFilters({
   }
 
   return (
-    <div className="mb-8 flex min-h-9 flex-wrap items-center gap-2">
+    <div className="mb-8 flex min-h-11 flex-wrap items-center gap-2 rounded-2xl px-1">
       <p
         aria-live="polite"
-        className="mr-2 text-sm font-medium text-gray-700"
+        className="mr-2 text-sm font-bold text-[var(--ink)]"
       >
         找到 {resultCount} 部
       </p>
       {chips.map((chip) => (
         <button
           aria-label={`移除${chip.label}`}
-          className="rounded-full border border-pink-100 bg-pink-50/70 px-3 py-1.5 text-xs font-medium text-pink-700 transition hover:border-pink-300"
+          className="ui-chip ui-chip-active min-h-9 px-3 text-xs"
           key={`${chip.key}-${chip.value ?? chip.label}`}
           onClick={() => onRemove(chip.key, chip.value)}
           type="button"
@@ -77,7 +77,7 @@ export default function ActiveFilters({
       ))}
       {hasActiveFilters(filters) && (
         <button
-          className="ml-auto rounded-full border border-gray-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-pink-200 hover:text-pink-700"
+          className="ui-button ui-button-secondary ml-auto min-h-9 px-3 py-2 text-xs"
           onClick={onClear}
           type="button"
         >

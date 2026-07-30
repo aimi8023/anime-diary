@@ -104,7 +104,7 @@ git commit -m "style: establish waterlight visual tokens"
 - Consumes: Task 1 的语义视觉类；现有 `ArchiveFilters`, `ArchiveOptions`, `ArchiveStats`。
 - Produces: 左对齐 Hero、统一筛选工具栏、2:3 海报卡片、清晰年份/季度层级和统一空/错误状态。
 
-- [ ] **Step 1: 写失败测试，固定海报与筛选结构**
+- [x] **Step 1: 写失败测试，固定海报与筛选结构**
 
 在现有公开档案测试中增加：
 
@@ -116,7 +116,7 @@ expect(screen.getByRole("button", { name: /查看《.*》详情/ }))
 
 筛选容器从 `section aria-label` 改成 `search aria-label`；测试数据至少渲染一张可打开详情的卡片。海报比例属于视觉决策，由浏览器验收，不用脆弱的 class 断言固定。
 
-- [ ] **Step 2: 运行测试并确认失败**
+- [x] **Step 2: 运行测试并确认失败**
 
 Run:
 
@@ -126,11 +126,11 @@ npm test -- components/archive/archive-browser.test.tsx components/archive/archi
 
 Expected: FAIL，因为当前筛选不是 `search` landmark。
 
-- [ ] **Step 3: 重构 Hero 与工具栏表现**
+- [x] **Step 3: 重构 Hero 与工具栏表现**
 
 `ArchiveBrowser` 使用较宽但更稳定的内容内边距；`ArchiveHero` 在 `lg` 两栏排列标题与统计。`ArchiveToolbar` 使用 `.ui-panel-strong`、`top-20`、`.ui-field` 和 `.ui-chip`，桌面搜索占两列，移动抽屉支持点击遮罩关闭并保留“完成”按钮。
 
-- [ ] **Step 4: 重构结果层级与海报卡片**
+- [x] **Step 4: 重构结果层级与海报卡片**
 
 `YearSection` 使用箭头 SVG 表示展开状态；季度数量使用徽标。`ArchiveAnimeCard`：
 
@@ -142,7 +142,7 @@ Expected: FAIL，因为当前筛选不是 `search` landmark。
 
 评分放到封面角标，卡片按钮添加 `archive-poster-card ui-focus`；正文按标题、季度、标签、短评排列。空结果和加载错误改用 `.ui-panel-strong` 与 `.ui-button-primary`。
 
-- [ ] **Step 5: 运行公开档案测试**
+- [x] **Step 5: 运行公开档案测试**
 
 Run:
 
@@ -153,7 +153,7 @@ npm test -- app/page.test.tsx
 
 Expected: 全部 PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add components/archive app/page.test.tsx

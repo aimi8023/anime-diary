@@ -107,16 +107,22 @@ export default function ArchiveBrowser({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-3 py-8 sm:px-4 sm:py-12">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
       <ArchiveHero stats={stats} />
 
       {records.length === 0 ? (
-        <section className="py-20 text-center">
-          <h2 className="text-xl font-semibold text-gray-800">
+        <section className="ui-panel-strong mx-auto max-w-2xl px-6 py-16 text-center">
+          <span
+            aria-hidden="true"
+            className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[var(--accent-soft)] text-2xl text-[var(--accent-strong)]"
+          >
+            ◌
+          </span>
+          <h2 className="mt-5 text-xl font-bold text-[var(--ink)]">
             还没有建立追番档案
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            添加第一条记录后，它会出现在这里。
+          <p className="mt-2 text-sm text-[var(--ink-muted)]">
+            添加第一条记录后，属于你的季度回忆会从这里开始。
           </p>
         </section>
       ) : (

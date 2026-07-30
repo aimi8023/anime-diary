@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import type {
   ArchiveFilters,
@@ -35,8 +36,9 @@ function FilterFields({
   idPrefix,
 }: FilterFieldsProps) {
   const fieldClassName =
-    "h-11 w-full rounded-xl border border-gray-200 bg-white/80 px-3 text-sm text-gray-800 outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-100";
-  const labelClassName = "mb-1.5 block text-xs font-medium text-gray-600";
+    "ui-field h-11 w-full px-3 text-sm";
+  const labelClassName =
+    "mb-2 block text-[11px] font-bold tracking-[0.08em] text-[var(--ink-muted)]";
 
   return (
     <>
@@ -146,10 +148,8 @@ function FilterFields({
               const selected = filters.tags.includes(tag);
               return (
                 <label
-                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition ${
-                    selected
-                      ? "border-pink-300 bg-pink-50 text-pink-700"
-                      : "border-gray-200 bg-white/70 text-gray-600 hover:border-gray-300"
+                  className={`ui-chip cursor-pointer px-3 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-pink-300 ${
+                    selected ? "ui-chip-active" : ""
                   }`}
                   key={tag}
                 >
@@ -173,17 +173,23 @@ function FilterFields({
 export default function ArchiveToolbar(props: ArchiveToolbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  function closeFromBackdrop(event: MouseEvent<HTMLDivElement>) {
+    if (event.target === event.currentTarget) setMobileOpen(false);
+  }
+
   return (
-    <section
+    <form
       aria-label="档案筛选"
-      className="sticky top-3 z-20 mb-6 rounded-3xl border border-white/80 bg-white/75 p-3 shadow-lg shadow-gray-200/40 backdrop-blur-xl sm:p-5"
+      className="ui-panel-strong sticky top-20 z-20 mb-6 p-3 sm:p-5"
+      onSubmit={(event) => event.preventDefault()}
+      role="search"
     >
       <div className="grid grid-cols-[1fr_auto] gap-2 md:hidden">
         <label className="sr-only" htmlFor="compact-query">
           快速搜索关键词
         </label>
         <input
-          className="h-11 min-w-0 rounded-xl border border-gray-200 bg-white/80 px-3 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+          className="ui-field h-11 min-w-0 px-3 text-sm"
           id="compact-query"
           onChange={(event) => props.onQueryChange(event.target.value)}
           placeholder="搜索档案"
@@ -193,7 +199,7 @@ export default function ArchiveToolbar(props: ArchiveToolbarProps) {
         <button
           aria-controls="mobile-archive-filters"
           aria-expanded={mobileOpen}
-          className="h-11 rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700"
+          className="ui-button ui-button-secondary rounded-xl px-4"
           onClick={() => setMobileOpen(true)}
           type="button"
         >
@@ -210,18 +216,22 @@ export default function ArchiveToolbar(props: ArchiveToolbarProps) {
           <div
             aria-label="筛选条件"
             aria-modal="true"
-            className="fixed inset-0 z-50 flex items-end bg-gray-950/30 md:hidden"
+            className="fixed inset-0 z-50 flex items-end bg-[#211d35]/38 backdrop-blur-sm md:hidden"
             id="mobile-archive-filters"
+            onClick={closeFromBackdrop}
             role="dialog"
           >
-            <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl">
-              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-5 flex items-center justify-between border-b border-gray-100 bg-white/95 px-5 py-4 backdrop-blur">
-                <h2 className="text-lg font-semibold text-gray-900">
+            <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-[2rem] border border-white/90 bg-[var(--canvas)] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-lg)]">
+              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-5 flex items-center justify-between border-b border-white/80 bg-[rgba(249,247,251,0.94)] px-5 py-4 backdrop-blur-xl">
+                <div>
+                  <p className="ui-kicker mb-1">FILTERS</p>
+                  <h2 className="text-lg font-bold text-[var(--ink)]">
                   筛选条件
-                </h2>
+                  </h2>
+                </div>
                 <button
                   aria-label="关闭筛选条件"
-                  className="rounded-full border border-gray-200 px-3 py-1.5 text-sm text-gray-600"
+                  className="ui-button ui-button-secondary"
                   onClick={() => setMobileOpen(false)}
                   type="button"
                 >
@@ -235,6 +245,6 @@ export default function ArchiveToolbar(props: ArchiveToolbarProps) {
           </div>,
           document.body,
         )}
-    </section>
+    </form>
   );
 }

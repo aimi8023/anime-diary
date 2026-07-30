@@ -20,26 +20,37 @@ function SeasonSection({
   const contentId = `archive-season-${season}`;
 
   return (
-    <section className="border-t border-gray-100 first:border-t-0">
+    <section className="border-t border-[rgba(91,83,112,0.1)] first:border-t-0">
       <h3>
         <button
           aria-controls={contentId}
           aria-expanded={open}
           aria-label={season}
-          className="flex w-full items-center justify-between py-4 text-left"
+          className="ui-focus flex min-h-14 w-full items-center justify-between rounded-xl px-2 py-3 text-left"
           onClick={() => setOpen((current) => !current)}
           type="button"
         >
-          <span className="font-medium text-gray-800">{season}</span>
-          <span className="flex items-center gap-3 text-xs text-gray-500">
-            {records.length} 部
-            <span aria-hidden="true">{open ? "−" : "+"}</span>
+          <span className="font-bold text-[var(--ink)]">{season}</span>
+          <span className="flex items-center gap-2 text-xs text-[var(--ink-subtle)]">
+            <span className="rounded-full bg-white/70 px-2.5 py-1">
+              {records.length} 部
+            </span>
+            <svg
+              aria-hidden="true"
+              className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </span>
         </button>
       </h3>
       {open && (
         <div
-          className="grid grid-cols-2 gap-3 pb-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          className="grid grid-cols-2 gap-3 pb-6 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5"
           id={contentId}
         >
           {records.map((anime, index) => (
@@ -75,22 +86,31 @@ export default function YearSection({
   );
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-white/80 bg-white/55 px-4 shadow-sm sm:px-6">
+    <section className="ui-panel overflow-hidden px-3 sm:px-6">
       <h2>
         <button
           aria-controls={contentId}
           aria-expanded={open}
           aria-label={`${group.year} 年`}
-          className="flex w-full items-center justify-between py-5 text-left"
+          className="ui-focus flex min-h-20 w-full items-center justify-between rounded-2xl px-2 py-5 text-left"
           onClick={() => setOpen((current) => !current)}
           type="button"
         >
-          <span className="text-xl font-bold text-gray-900">
+          <span className="text-2xl font-black tracking-tight text-[var(--ink)]">
             {group.year} 年
           </span>
-          <span className="flex items-center gap-3 text-sm text-gray-500">
-            {recordCount} 部
-            <span aria-hidden="true">{open ? "收起" : "展开"}</span>
+          <span className="flex items-center gap-2 text-sm text-[var(--ink-muted)]">
+            <span>{recordCount} 部</span>
+            <svg
+              aria-hidden="true"
+              className={`h-5 w-5 transition-transform ${open ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </span>
         </button>
       </h2>

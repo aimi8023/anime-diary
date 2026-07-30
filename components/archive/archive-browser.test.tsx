@@ -104,6 +104,9 @@ describe("ArchiveBrowser filtering", () => {
     expect(
       screen.getByRole("button", { name: "移除标签 治愈" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("search", { name: "档案筛选" }),
+    ).toBeInTheDocument();
   });
 
   it("combines filters and clears them without fetching", async () => {
@@ -162,6 +165,18 @@ describe("ArchiveBrowser filtering", () => {
     await user.click(
       screen.getByRole("button", { name: "关闭筛选条件" }),
     );
+    expect(
+      screen.queryByRole("dialog", { name: "筛选条件" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("closes the mobile filter panel from its backdrop", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+
+    await user.click(screen.getByRole("button", { name: "筛选" }));
+    fireEvent.click(screen.getByRole("dialog", { name: "筛选条件" }));
+
     expect(
       screen.queryByRole("dialog", { name: "筛选条件" }),
     ).not.toBeInTheDocument();
