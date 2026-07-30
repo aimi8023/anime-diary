@@ -39,6 +39,7 @@ export default function AnimeDetailDialog({
 
   if (!anime) return null;
   if (typeof document === "undefined") return null;
+  const tags = Array.isArray(anime.tags) ? anime.tags : [];
 
   function closeFromBackdrop(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) onClose();
@@ -125,9 +126,9 @@ export default function AnimeDetailDialog({
             )}
           </dl>
 
-          {anime.tags.length > 0 && (
+          {tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {anime.tags.map((tag) => (
+              {tags.map((tag) => (
                 <span
                   className="ui-chip ui-chip-active min-h-8 px-3 text-xs"
                   key={tag}

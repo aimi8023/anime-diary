@@ -16,6 +16,7 @@ export default function ArchiveAnimeCard({
   onSelect,
 }: ArchiveAnimeCardProps) {
   const reduceMotion = useReducedMotion();
+  const tags = Array.isArray(anime.tags) ? anime.tags : [];
 
   return (
     <motion.article
@@ -64,9 +65,9 @@ export default function ArchiveAnimeCard({
           >
             {anime.title}
           </h4>
-          {anime.tags.length > 0 && (
+          {tags.length > 0 && (
             <div className="mt-3 flex min-h-6 flex-wrap gap-1.5">
-              {anime.tags.slice(0, 3).map((tag) => (
+              {tags.slice(0, 3).map((tag) => (
                 <span
                   className="rounded-full bg-white/72 px-2 py-1 text-[10px] font-medium text-[var(--ink-muted)]"
                   key={tag}

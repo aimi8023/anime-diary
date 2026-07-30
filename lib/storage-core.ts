@@ -62,8 +62,20 @@ function cloneData(data: Anime[]): Anime[] {
   return structuredClone(data);
 }
 
+function normalizeStoredData(data: Anime[]): Anime[] {
+  return data.map((anime) => {
+    const cloned = structuredClone(anime);
+    return {
+      ...cloned,
+      tags: Array.isArray(cloned.tags)
+        ? cloned.tags.filter((tag): tag is string => typeof tag === "string")
+        : [],
+    };
+  });
+}
+
 function sortedForDisplay(data: Anime[]): Anime[] {
-  return cloneData(data).sort(
+  return normalizeStoredData(data).sort(
     (a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
@@ -104,17 +116,18 @@ export function createVersionedStorage(
   ): Promise<AnimeState> {
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       const current = await adapter.readState();
-      const nextData = transform(cloneData(current.data));
+      const currentData = normalizeStoredData(current.data);
+      const nextData = transform(cloneData(currentData));
       const result = await adapter.commit({
         expectedRevision: current.revision,
-        previousData: cloneData(current.data),
+        previousData: cloneData(currentData),
         nextData: cloneData(nextData),
         reason,
         snapshot: {
           id: createId(),
           createdAt: now(),
           reason,
-          recordCount: current.data.length,
+          recordCount: currentData.length,
           schemaVersion: 1,
         },
       });
@@ -138,13 +151,18 @@ export function createVersionedStorage(
 
     async getState() {
       const state = await adapter.readState();
-      return { revision: state.revision, data: cloneData(state.data) };
+      return {
+        revision: state.revision,
+        data: normalizeStoredData(state.data),
+      };
     },
 
     async findByBangumiId(bangumiId: number) {
       const state = await adapter.readState();
       return (
-        state.data.find((anime) => anime.bangumiId === bangumiId) ?? null
+        normalizeStoredData(state.data).find(
+          (anime) => anime.bangumiId === bangumiId,
+        ) ?? null
       );
     },
 
@@ -188,7 +206,10 @@ export function createVersionedStorage(
     },
 
     async getBackup(id: string) {
-      return adapter.getBackup(id);
+      const backup = await adapter.getBackup(id);
+      return backup
+        ? { ...backup, data: normalizeStoredData(backup.data) }
+        : null;
     },
 
     async replaceAll(data: Anime[], reason: "import") {
@@ -198,7 +219,7 @@ export function createVersionedStorage(
     async restore(id: string) {
       const backup = await adapter.getBackup(id);
       if (!backup) throw new BackupNotFoundError(id);
-      return mutate("restore", () => cloneData(backup.data));
+      return mutate("restore", () => normalizeStoredData(backup.data));
     },
   };
 }

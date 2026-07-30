@@ -106,6 +106,29 @@ describe("ArchiveResults", () => {
     expect(onSelect).toHaveBeenCalledWith(records[0]);
   });
 
+  it("keeps an older year usable when a legacy record has nullable tags", async () => {
+    const user = userEvent.setup();
+    const legacyRecord = {
+      ...records[0],
+      tags: null,
+    } as unknown as Anime;
+
+    render(
+      <ArchiveResults
+        onClearFilters={vi.fn()}
+        onSelect={vi.fn()}
+        records={[records[1], legacyRecord]}
+        sort="rating"
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "2024 年" }));
+
+    expect(
+      screen.getByRole("button", { name: "查看《孤独摇滚！》详情" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders a recoverable no-result state", async () => {
     const user = userEvent.setup();
     const onClearFilters = vi.fn();

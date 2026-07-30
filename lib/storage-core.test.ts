@@ -103,6 +103,21 @@ function createStorage(adapter: MemoryAdapter) {
 }
 
 describe("createVersionedStorage", () => {
+  it("normalizes nullable tags from legacy stored records", async () => {
+    const legacyRecord = {
+      ...first,
+      tags: null,
+    } as unknown as Anime;
+    const storage = createStorage(new MemoryAdapter([legacyRecord]));
+
+    await expect(storage.getAll()).resolves.toEqual([
+      { ...first, tags: [] },
+    ]);
+    await expect(storage.getState()).resolves.toMatchObject({
+      data: [{ ...first, tags: [] }],
+    });
+  });
+
   it("commits an add with a snapshot of the previous state", async () => {
     const adapter = new MemoryAdapter();
     const storage = createStorage(adapter);
