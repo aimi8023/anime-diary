@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   usePathname,
@@ -12,14 +13,28 @@ import {
 } from "@/lib/archive/filter";
 import { useArchiveSearch } from "@/components/archive/archive-search-context";
 
-export default function SiteHeader() {
-  const pathname = usePathname();
-  const router = useRouter();
+function ActiveFilterBadge() {
   const searchParams = useSearchParams();
-  const { isSearchOpen, openSearch } = useArchiveSearch();
   const activeFilterCount = countActiveArchiveFilters(
     parseArchiveFilters(new URLSearchParams(searchParams.toString())),
   );
+
+  if (activeFilterCount === 0) return null;
+
+  return (
+    <span
+      aria-label={`${activeFilterCount} 个筛选条件`}
+      className="grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--accent-strong)] px-1 text-[10px] font-black text-white"
+    >
+      {activeFilterCount}
+    </span>
+  );
+}
+
+export default function SiteHeader() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isSearchOpen, openSearch } = useArchiveSearch();
 
   function launchSearch() {
     openSearch();
@@ -78,14 +93,9 @@ export default function SiteHeader() {
               />
             </svg>
             <span className="hidden sm:inline">搜索</span>
-            {activeFilterCount > 0 && (
-              <span
-                aria-label={`${activeFilterCount} 个筛选条件`}
-                className="grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--accent-strong)] px-1 text-[10px] font-black text-white"
-              >
-                {activeFilterCount}
-              </span>
-            )}
+            <Suspense fallback={null}>
+              <ActiveFilterBadge />
+            </Suspense>
           </button>
           <Link
             aria-label="管理后台"
