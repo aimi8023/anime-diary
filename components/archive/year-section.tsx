@@ -26,7 +26,7 @@ function SeasonSection({
           aria-controls={contentId}
           aria-expanded={open}
           aria-label={season}
-          className="ui-focus flex min-h-14 w-full items-center justify-between rounded-xl px-2 py-3 text-left"
+          className="ui-focus flex min-h-12 w-full items-center justify-between rounded-xl px-2 py-2 text-left"
           onClick={() => setOpen((current) => !current)}
           type="button"
         >
@@ -50,7 +50,7 @@ function SeasonSection({
       </h3>
       {open && (
         <div
-          className="grid grid-cols-2 gap-3 pb-6 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5"
+          className="grid grid-cols-2 gap-2.5 pb-5 min-[420px]:grid-cols-3 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6 xl:grid-cols-7"
           id={contentId}
         >
           {records.map((anime, index) => (
@@ -86,17 +86,17 @@ export default function YearSection({
   );
 
   return (
-    <section className="ui-panel overflow-hidden px-3 sm:px-6">
+    <section className="ui-panel overflow-hidden px-2 sm:px-4">
       <h2>
         <button
           aria-controls={contentId}
           aria-expanded={open}
           aria-label={`${group.year} 年`}
-          className="ui-focus flex min-h-20 w-full items-center justify-between rounded-2xl px-2 py-5 text-left"
+          className="ui-focus flex min-h-16 w-full items-center justify-between rounded-2xl px-2 py-3 text-left"
           onClick={() => setOpen((current) => !current)}
           type="button"
         >
-          <span className="text-2xl font-black tracking-tight text-[var(--ink)]">
+          <span className="text-xl font-black tracking-tight text-[var(--ink)]">
             {group.year} 年
           </span>
           <span className="flex items-center gap-2 text-sm text-[var(--ink-muted)]">

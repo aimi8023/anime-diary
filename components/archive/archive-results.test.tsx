@@ -32,6 +32,28 @@ const records: Anime[] = [
 ];
 
 describe("ArchiveResults", () => {
+  it("uses compact poster cards in a dense responsive grid", () => {
+    render(
+      <ArchiveResults
+        onClearFilters={vi.fn()}
+        onSelect={vi.fn()}
+        records={records}
+        sort="rating"
+      />,
+    );
+
+    const seasonButton = screen.getByRole("button", { name: "2025春" });
+    expect(seasonButton).toBeInTheDocument();
+    expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
+    expect(screen.queryByText("时间与记忆")).not.toBeInTheDocument();
+    expect(screen.queryByText("奇幻")).not.toBeInTheDocument();
+
+    const grid = document.getElementById(
+      seasonButton.getAttribute("aria-controls") ?? "",
+    );
+    expect(grid).toHaveClass("lg:grid-cols-6", "xl:grid-cols-7");
+  });
+
   it("loads the first visible poster eagerly for the page LCP", () => {
     const { container } = render(
       <ArchiveResults
