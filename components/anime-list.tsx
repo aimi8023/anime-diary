@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import type { Anime } from "@/lib/types";
-import StarRating from "./star-rating";
 
 interface AnimeListProps {
   animeList: Anime[];
@@ -18,60 +18,72 @@ export default function AnimeList({
 }: AnimeListProps) {
   if (animeList.length === 0) {
     return (
-      <p className="text-center text-gray-600 py-8 text-sm">
-        还没有添加任何番剧，点击添加记录开始吧
-      </p>
+      <div className="rounded-2xl border border-dashed border-[rgba(91,83,112,0.2)] bg-white/38 px-5 py-12 text-center">
+        <span
+          aria-hidden="true"
+          className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-strong)]"
+        >
+          ＋
+        </span>
+        <p className="mt-4 text-sm font-medium text-[var(--ink-muted)]">
+          还没有添加任何番剧，点击添加记录开始吧
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {animeList.map((anime) => (
         <div
           key={anime.id}
-          className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-white/50 hover:bg-white/40 transition-colors"
+          className="group flex items-center gap-3 rounded-2xl border border-white/75 bg-white/48 p-2.5 transition-colors hover:bg-white/72 sm:gap-4 sm:p-3"
         >
-          {/* Mini cover */}
-          <div className="w-10 h-14 rounded-md overflow-hidden bg-white/20 flex-shrink-0 border border-white/40">
+          <div className="relative h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-white/70 bg-white/40 shadow-sm">
             {anime.cover ? (
-              <img
+              <Image
                 src={anime.cover}
-                alt={anime.title}
-                className="w-full h-full object-cover"
+                alt={`${anime.title}封面`}
+                className="object-cover"
+                fill
+                sizes="56px"
+                unoptimized
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400/50 text-xs">
+              <div className="flex h-full w-full items-center justify-center text-xs text-[var(--ink-subtle)]">
                 无
               </div>
             )}
           </div>
 
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-900 truncate">
-                {anime.title}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-[var(--ink)] sm:text-base">
+              {anime.title}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--ink-muted)]">
+              <span className="font-semibold text-[var(--accent-strong)]">
+                {anime.season}
               </span>
-            </div>
-            <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
-              <span>{anime.season}</span>
               {anime.episodes > 0 && <span>{anime.episodes}话</span>}
-              <StarRating rating={anime.rating} />
+              <span className="rounded-full bg-[var(--warning-soft)] px-2 py-1 font-bold text-[var(--warning)]">
+                ★ {anime.rating}
+              </span>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex flex-shrink-0 items-center gap-1">
             <button
+              aria-label={`编辑《${anime.title}》`}
               onClick={() => onEdit(anime)}
-              className="px-2.5 py-2 text-xs text-gray-700 hover:text-blue-600 hover:bg-white/50 rounded-md transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="ui-button ui-button-secondary min-w-11 px-3 text-xs"
             >
               编辑
             </button>
             <button
+              aria-label={`删除《${anime.title}》`}
               onClick={() => onDelete(anime.id)}
               disabled={deleting === anime.id}
-              className="px-2.5 py-2 text-xs text-gray-600 hover:text-red-500 hover:bg-white/50 rounded-md transition-colors disabled:opacity-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="ui-button min-w-11 px-3 text-xs text-[var(--ink-subtle)] hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
             >
               {deleting === anime.id ? "..." : "删除"}
             </button>

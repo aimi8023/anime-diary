@@ -122,7 +122,9 @@ describe("AdminPage Bangumi entry", () => {
     render(<AdminPage />);
     expect(await screen.findByText("葬送的芙莉莲")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "编辑" }));
+    await user.click(
+      screen.getByRole("button", { name: "编辑《葬送的芙莉莲》" }),
+    );
     expect(
       screen.getByRole("heading", { name: "编辑记录" }),
     ).toBeInTheDocument();
@@ -183,7 +185,9 @@ describe("AdminPage Bangumi entry", () => {
 
     render(<AdminPage />);
     expect(await screen.findByText("葬送的芙莉莲")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "删除" }));
+    await user.click(
+      screen.getByRole("button", { name: "删除《葬送的芙莉莲》" }),
+    );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "存储暂时不可用",

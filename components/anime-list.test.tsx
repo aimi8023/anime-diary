@@ -8,7 +8,7 @@ const anime = {
   id: "anime-1",
   title: "葬送的芙莉莲",
   season: "2023秋",
-  cover: "",
+  cover: "https://lain.bgm.tv/pic/cover/l/example.jpg",
   rating: 9.5,
   comment: "时间与记忆",
   episodes: 28,
@@ -28,6 +28,15 @@ describe("AnimeList", () => {
     );
 
     expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "葬送的芙莉莲封面" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "编辑《葬送的芙莉莲》" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "删除《葬送的芙莉莲》" }),
+    ).toBeInTheDocument();
     expect(container.firstElementChild).not.toHaveClass("max-h-[500px]");
     expect(container.firstElementChild).not.toHaveClass("overflow-y-auto");
   });

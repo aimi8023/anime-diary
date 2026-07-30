@@ -7,8 +7,10 @@ interface InlineFeedbackProps {
 }
 
 const toneClasses = {
-  error: "border-red-200 bg-red-50 text-red-700",
-  success: "border-green-200 bg-green-50 text-green-700",
+  error:
+    "border-[rgba(197,69,84,0.24)] bg-[var(--danger-soft)] text-[var(--danger)]",
+  success:
+    "border-[rgba(57,124,174,0.22)] bg-[var(--info-soft)] text-[var(--info)]",
 } as const;
 
 export default function InlineFeedback({
@@ -18,7 +20,7 @@ export default function InlineFeedback({
 }: InlineFeedbackProps) {
   return (
     <div
-      className={`rounded-lg border px-3 py-2 text-sm ${toneClasses[tone]} ${className}`}
+      className={`rounded-xl border px-3.5 py-3 text-sm leading-6 ${toneClasses[tone]} ${className}`}
       role={tone === "error" ? "alert" : "status"}
     >
       {children}

@@ -50,17 +50,17 @@ function formatTime(value: string): string {
 
 function DiffSummary({ diff }: { diff: DatasetDiff }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
-      <div className="rounded-lg bg-green-50 px-3 py-2 text-green-700">
+    <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+      <div className="rounded-xl bg-[var(--info-soft)] px-3 py-2 text-[var(--info)]">
         新增 {diff.added} 条
       </div>
-      <div className="rounded-lg bg-red-50 px-3 py-2 text-red-700">
+      <div className="rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-[var(--danger)]">
         移除 {diff.removed} 条
       </div>
-      <div className="rounded-lg bg-amber-50 px-3 py-2 text-amber-700">
+      <div className="rounded-xl bg-[var(--warning-soft)] px-3 py-2 text-[var(--warning)]">
         修改 {diff.changed} 条
       </div>
-      <div className="rounded-lg bg-gray-50 px-3 py-2 text-gray-600">
+      <div className="rounded-xl bg-white/70 px-3 py-2 text-[var(--ink-muted)]">
         不变 {diff.unchanged} 条
       </div>
     </div>
@@ -293,7 +293,7 @@ export default function BackupManager({
   };
 
   return (
-    <section className="mb-8 glass rounded-xl p-4 sm:p-5">
+    <section className="ui-panel-strong mb-8 p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {collapsible ? (
           <button
@@ -302,16 +302,17 @@ export default function BackupManager({
             className="min-h-[44px] text-left"
             aria-expanded={expanded}
           >
-            <h2 className="font-semibold text-gray-900">备份与恢复</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="font-black text-[var(--ink)]">备份与恢复</h2>
+            <p className="mt-1 text-sm text-[var(--ink-muted)]">
               当前 {currentCount} 条记录 ·{" "}
               {loading ? "正在读取历史版本" : `${backups.length} 个历史版本`}
             </p>
           </button>
         ) : (
           <div>
-            <h2 className="font-semibold text-gray-900">备份与恢复</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="ui-kicker mb-1">BACKUP VAULT</p>
+            <h2 className="text-xl font-black text-[var(--ink)]">备份与恢复</h2>
+            <p className="mt-1 text-sm text-[var(--ink-muted)]">
               当前 {currentCount} 条记录 ·{" "}
               {loading ? "正在读取历史版本" : `${backups.length} 个历史版本`}
             </p>
@@ -321,11 +322,11 @@ export default function BackupManager({
           <Link
             href="/api/backups/export"
             download
-            className="min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 bg-white/60 px-3 py-2 text-sm font-medium text-gray-700 hover:border-green-500 hover:text-green-700"
+            className="ui-button ui-button-secondary rounded-xl"
           >
             下载当前数据
           </Link>
-          <label className="min-h-[44px] inline-flex cursor-pointer items-center rounded-lg bg-gradient-to-r from-pink-500 to-blue-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:from-pink-600 hover:to-blue-600">
+          <label className="ui-button ui-button-primary cursor-pointer rounded-xl">
             {importLoading ? "正在读取…" : "导入 JSON"}
             <input
               type="file"
@@ -352,11 +353,11 @@ export default function BackupManager({
 
       {(!collapsible || expanded) && (
         <div className="mt-4">
-          <p className="mb-3 text-xs leading-5 text-gray-500">
+          <p className="mb-3 text-xs leading-5 text-[var(--ink-subtle)]">
             自动快照与当前数据位于同一存储中。建议偶尔下载 JSON，保留一份独立副本。
           </p>
           {!loading && backups.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-gray-300 px-4 py-6 text-center text-sm text-gray-500">
+            <div className="rounded-2xl border border-dashed border-[rgba(91,83,112,0.2)] px-4 py-8 text-center text-sm text-[var(--ink-muted)]">
               修改记录后，这里会自动出现历史版本。
             </div>
           ) : (
@@ -364,13 +365,13 @@ export default function BackupManager({
               {backups.map((backup) => (
                 <li
                   key={backup.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/50 bg-white/45 px-3 py-3"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/48 px-4 py-3"
                 >
                   <div>
-                    <p className="text-sm font-medium text-gray-800">
+                    <p className="text-sm font-bold text-[var(--ink)]">
                       {reasonLabels[backup.reason]}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-[var(--ink-subtle)]">
                       {formatTime(backup.createdAt)} · {backup.recordCount} 条记录
                     </p>
                   </div>
@@ -378,7 +379,7 @@ export default function BackupManager({
                     <Link
                       href={`/api/backups/${backup.id}?download=1`}
                       download
-                      className="min-h-[40px] inline-flex items-center rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-white/70 hover:text-green-700"
+                      className="ui-button min-h-10 px-3 py-2 text-sm text-[var(--ink-muted)] hover:bg-white/70 hover:text-[var(--info)]"
                     >
                       下载
                     </Link>
@@ -387,7 +388,7 @@ export default function BackupManager({
                       aria-label={`恢复 ${backup.createdAt}`}
                       disabled={restoreLoading}
                       onClick={() => void openRestore(backup)}
-                      className="min-h-[40px] rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+                      className="ui-button ui-button-secondary min-h-10 rounded-xl px-3 py-2 text-sm text-[var(--info)]"
                     >
                       恢复
                     </button>
@@ -404,16 +405,16 @@ export default function BackupManager({
           role="dialog"
           aria-modal="true"
           aria-labelledby="restore-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/30 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#211d35]/42 p-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-2xl">
+          <div className="ui-panel-strong w-full max-w-lg p-5 sm:p-6">
             <h3
               id="restore-dialog-title"
-              className="text-lg font-semibold text-gray-900"
+              className="text-lg font-black text-[var(--ink)]"
             >
               恢复备份
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-[var(--ink-muted)]">
               将恢复到 {formatTime(restorePreview.metadata.createdAt)}。恢复前会自动保存当前状态。
             </p>
             <div className="mt-4">
@@ -423,7 +424,7 @@ export default function BackupManager({
               <button
                 type="button"
                 onClick={() => setRestorePreview(null)}
-                className="min-h-[44px] rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                className="ui-button ui-button-secondary"
               >
                 取消
               </button>
@@ -431,7 +432,7 @@ export default function BackupManager({
                 type="button"
                 disabled={restoreLoading}
                 onClick={() => void applyRestore()}
-                className="min-h-[44px] rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="ui-button ui-button-primary"
               >
                 {restoreLoading ? "正在恢复…" : "确认恢复"}
               </button>
@@ -445,27 +446,27 @@ export default function BackupManager({
           role="dialog"
           aria-modal="true"
           aria-labelledby="import-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/30 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#211d35]/42 p-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-2xl">
+          <div className="ui-panel-strong w-full max-w-lg p-5 sm:p-6">
             <h3
               id="import-dialog-title"
-              className="text-lg font-semibold text-gray-900"
+              className="text-lg font-black text-[var(--ink)]"
             >
               导入预览
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-[var(--ink-muted)]">
               {importName} · 文件包含 {importPreview.recordCount} 条记录
             </p>
             <div className="mt-4">
               <DiffSummary diff={importPreview.diff} />
             </div>
             {importPreview.isEmpty && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3">
-                <p className="text-sm font-medium text-red-700">
+              <div className="mt-4 rounded-xl border border-red-200 bg-[var(--danger-soft)] p-3">
+                <p className="text-sm font-bold text-[var(--danger)]">
                   这会清空当前全部记录
                 </p>
-                <label className="mt-2 flex cursor-pointer items-start gap-2 text-sm text-red-700">
+                <label className="mt-2 flex cursor-pointer items-start gap-2 text-sm text-[var(--danger)]">
                   <input
                     type="checkbox"
                     checked={confirmEmpty}
@@ -485,7 +486,7 @@ export default function BackupManager({
                   setImportName("");
                   setConfirmEmpty(false);
                 }}
-                className="min-h-[44px] rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                className="ui-button ui-button-secondary"
               >
                 取消
               </button>
@@ -496,7 +497,7 @@ export default function BackupManager({
                   (importPreview.isEmpty && !confirmEmpty)
                 }
                 onClick={() => void applyImport()}
-                className="min-h-[44px] rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium text-white hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="ui-button ui-button-danger"
               >
                 {importLoading ? "正在导入…" : "确认导入"}
               </button>

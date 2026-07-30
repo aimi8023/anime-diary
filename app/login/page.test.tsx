@@ -10,6 +10,17 @@ afterEach(() => {
 });
 
 describe("LoginPage", () => {
+  it("describes the single management task before requesting a password", () => {
+    render(<LoginPage />);
+
+    expect(
+      screen.getByRole("heading", { name: "欢迎回来" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("输入密码进入追番管理后台"),
+    ).toBeInTheDocument();
+  });
+
   it("shows a rate-limit response as an accessible inline error", async () => {
     const user = userEvent.setup();
     vi.stubGlobal(

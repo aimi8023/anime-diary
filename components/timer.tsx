@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export default function Timer() {
+  const reduceMotion = useReducedMotion();
   const [timeElapsed, setTimeElapsed] = useState({
     days: 0,
     hours: 0,
@@ -39,29 +40,29 @@ export default function Timer() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass"
+      transition={{ duration: reduceMotion ? 0 : 0.28 }}
+      className="ui-panel inline-flex items-center gap-2 rounded-full px-4 py-2.5"
     >
       <div className="flex items-center gap-1.5">
-        <span className="text-sm text-gray-700 font-medium">本站已运行</span>
-        <span className="text-lg font-bold text-pink-600 tabular-nums">
+        <span className="text-xs font-semibold text-[var(--ink-muted)] sm:text-sm">本站已运行</span>
+        <span className="font-black tabular-nums text-[var(--accent-strong)]">
           {formatNumber(timeElapsed.days)}
         </span>
-        <span className="text-xs text-gray-600">天</span>
-        <span className="text-lg font-bold text-blue-600 tabular-nums ml-1">
+        <span className="text-[10px] text-[var(--ink-subtle)]">天</span>
+        <span className="ml-1 font-black tabular-nums text-[var(--info)]">
           {formatNumber(timeElapsed.hours)}
         </span>
-        <span className="text-xs text-gray-600">时</span>
-        <span className="text-lg font-bold text-purple-600 tabular-nums ml-1">
+        <span className="text-[10px] text-[var(--ink-subtle)]">时</span>
+        <span className="ml-1 font-black tabular-nums text-purple-700">
           {formatNumber(timeElapsed.minutes)}
         </span>
-        <span className="text-xs text-gray-600">分</span>
-        <span className="text-lg font-bold text-rose-600 tabular-nums ml-1">
+        <span className="text-[10px] text-[var(--ink-subtle)]">分</span>
+        <span className="ml-1 font-black tabular-nums text-rose-700">
           {formatNumber(timeElapsed.seconds)}
         </span>
-        <span className="text-xs text-gray-600">秒</span>
+        <span className="text-[10px] text-[var(--ink-subtle)]">秒</span>
       </div>
     </motion.div>
   );

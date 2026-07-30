@@ -199,27 +199,25 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
-      <header className="mb-6 flex items-start justify-between gap-4">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <header className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold tracking-[0.2em] text-pink-600">
-            ADMIN WORKSPACE
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
+          <p className="ui-kicker">ADMIN WORKSPACE</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--ink)] sm:text-4xl">
             追番管理后台
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm leading-6 text-[var(--ink-muted)]">
             维护记录、添加条目，并在需要时管理备份。
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleLogout}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/70 bg-white/50 px-3 text-gray-600 transition hover:border-red-200 hover:text-red-600"
+            className="ui-icon-button ui-button-secondary hover:border-red-200 hover:text-[var(--danger)]"
             title="退出登录"
             aria-label="退出登录"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
             </svg>
           </button>
@@ -235,16 +233,17 @@ export default function AdminPage() {
       {section === "records" && (
         <section
           aria-labelledby="admin-tab-records"
-          className="mt-6"
+          className="ui-panel-strong mt-6 p-4 sm:p-6"
           id="admin-panel-records"
           role="tabpanel"
         >
-          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-white/70 bg-white/45 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-5 flex flex-col gap-4 border-b border-[rgba(91,83,112,0.1)] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <p className="ui-kicker mb-1">LIBRARY</p>
+              <h2 className="text-xl font-black text-[var(--ink)]">
                 记录管理
               </h2>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-[var(--ink-muted)]">
                 共 {animeList.length} 条记录，编辑或删除会自动创建快照。
               </p>
             </div>
@@ -254,7 +253,7 @@ export default function AdminPage() {
                   搜索记录
                 </label>
                 <input
-                  className="glass-input min-h-[44px] w-full rounded-xl px-3 pr-10 text-sm focus:outline-none"
+                  className="ui-field min-h-11 w-full px-3 pr-10 text-sm"
                   id="admin-record-search"
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="搜索番剧..."
@@ -264,7 +263,7 @@ export default function AdminPage() {
                 {searchQuery && (
                   <button
                     aria-label="清除记录搜索"
-                    className="absolute right-2 top-1/2 min-h-8 min-w-8 -translate-y-1/2 rounded-full text-gray-500 hover:bg-white/60"
+                    className="absolute right-1.5 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-[var(--ink-subtle)] hover:bg-white/70"
                     onClick={() => setSearchQuery("")}
                     type="button"
                   >
@@ -273,7 +272,7 @@ export default function AdminPage() {
                 )}
               </div>
               <button
-                className="min-h-[44px] whitespace-nowrap rounded-xl bg-gradient-to-r from-pink-500 to-blue-500 px-4 text-sm font-medium text-white shadow-md transition hover:from-pink-600 hover:to-blue-600"
+                className="ui-button ui-button-primary whitespace-nowrap rounded-xl"
                 onClick={handleStartAdd}
                 type="button"
               >
@@ -289,17 +288,17 @@ export default function AdminPage() {
           )}
 
           {loading ? (
-            <div className="py-16 text-center text-sm text-gray-600">
-              加载中...
+            <div className="py-16 text-center text-sm font-medium text-[var(--ink-muted)]">
+              正在读取记录…
             </div>
           ) : filteredList.length === 0 && searchQuery ? (
-            <div className="rounded-2xl border border-dashed border-gray-300 bg-white/35 py-16 text-center">
-              <p className="text-lg font-medium text-gray-700">
+            <div className="rounded-2xl border border-dashed border-[rgba(91,83,112,0.2)] bg-white/35 py-16 text-center">
+              <p className="text-lg font-bold text-[var(--ink)]">
                 未找到相关番剧
               </p>
-              <p className="mt-2 text-sm text-gray-500">试试其他关键词吧</p>
+              <p className="mt-2 text-sm text-[var(--ink-muted)]">试试其他关键词吧</p>
               <button
-                className="mt-4 rounded-full border border-gray-200 bg-white/60 px-4 py-2 text-sm text-gray-600"
+                className="ui-button ui-button-secondary mt-4"
                 onClick={() => setSearchQuery("")}
                 type="button"
               >
@@ -324,20 +323,21 @@ export default function AdminPage() {
           id="admin-panel-entry"
           role="tabpanel"
         >
-          <div className="glass rounded-2xl p-4 sm:p-6">
+          <div className="ui-panel-strong p-4 sm:p-6">
             <div className="mb-5 flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <p className="ui-kicker mb-1">ENTRY</p>
+                <h2 className="text-xl font-black text-[var(--ink)]">
                   {editing ? "编辑记录" : "添加记录"}
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-[var(--ink-muted)]">
                   {editing
                     ? `正在编辑《${editing.title}》`
                     : "先从 Bangumi 查找，找不到时再手动填写。"}
                 </p>
               </div>
               <button
-                className="min-h-[40px] rounded-lg px-3 text-sm text-gray-600 hover:bg-white/50"
+                className="ui-button ui-button-secondary"
                 onClick={handleCancel}
                 type="button"
               >
@@ -356,14 +356,14 @@ export default function AdminPage() {
           ) : (
             <>
               {!prefill && (
-                <div className="grid grid-cols-2 gap-2 mb-4 rounded-xl bg-white/20 p-1">
+                <div className="mb-5 grid grid-cols-2 gap-1.5 rounded-2xl border border-white/70 bg-white/38 p-1.5">
                   <button
                     type="button"
                     onClick={() => setEntryMode("bangumi")}
-                    className={`min-h-[40px] rounded-lg text-sm font-medium transition-colors ${
+                    className={`min-h-11 rounded-xl text-sm font-bold transition-colors ${
                       entryMode === "bangumi"
-                        ? "bg-white/70 text-pink-600 shadow-sm"
-                        : "text-gray-600 hover:bg-white/30"
+                        ? "bg-white text-[var(--accent-strong)] shadow-sm"
+                        : "text-[var(--ink-muted)] hover:bg-white/45"
                     }`}
                   >
                     从 Bangumi 搜索
@@ -371,10 +371,10 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setEntryMode("manual")}
-                    className={`min-h-[40px] rounded-lg text-sm font-medium transition-colors ${
+                    className={`min-h-11 rounded-xl text-sm font-bold transition-colors ${
                       entryMode === "manual"
-                        ? "bg-white/70 text-blue-600 shadow-sm"
-                        : "text-gray-600 hover:bg-white/30"
+                        ? "bg-white text-[var(--info)] shadow-sm"
+                        : "text-[var(--ink-muted)] hover:bg-white/45"
                     }`}
                   >
                     手动填写
@@ -391,16 +391,16 @@ export default function AdminPage() {
               ) : (
                 <>
                   {prefill && (
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-400/30 bg-blue-500/10 px-3 py-2.5">
+                    <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-blue-200/70 bg-[var(--info-soft)] px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-gray-800">
+                        <p className="text-sm font-bold text-[var(--ink)]">
                           资料来自 Bangumi
                         </p>
                         <a
                           href={prefill.bangumiUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-xs text-blue-600 hover:underline"
+                          className="text-xs font-medium text-[var(--info)] hover:underline"
                         >
                           查看原条目
                         </a>
@@ -411,7 +411,7 @@ export default function AdminPage() {
                           setPrefill(null);
                           setEntryMode("bangumi");
                         }}
-                        className="text-xs text-gray-600 hover:text-pink-600"
+                        className="ui-button min-h-9 px-3 text-xs text-[var(--ink-muted)] hover:bg-white/70 hover:text-[var(--accent-strong)]"
                       >
                         重新搜索
                       </button>

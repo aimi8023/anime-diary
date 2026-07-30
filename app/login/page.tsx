@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 import { readApiError } from "@/lib/http/client";
 
@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,71 +42,60 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 relative">
-      {/* Background glow - subtle */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-500/3 via-transparent to-blue-500/3 blur-3xl pointer-events-none" />
-      
-      <div className="w-full max-w-sm relative z-10">
-        <div className="text-center mb-10">
-          <motion.span 
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.6, type: "spring", bounce: 0.5 }}
-            className="inline-block text-5xl"
+    <div className="relative flex min-h-[76vh] items-center justify-center px-4 py-12">
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className="ui-panel-strong relative z-10 w-full max-w-md overflow-hidden p-6 sm:p-8"
+        initial={{ opacity: 0, y: reduceMotion ? 0 : 14 }}
+        transition={{ duration: reduceMotion ? 0 : 0.32 }}
+      >
+        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--info-soft)] blur-3xl" />
+        <div className="relative">
+          <span
+            aria-hidden="true"
+            className="grid h-12 w-12 place-items-center rounded-2xl border border-white/90 bg-white/75 text-xl text-[var(--accent-strong)] shadow-sm"
           >
-            🔒
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            className="mt-4 text-2xl font-bold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent"
-          >
-            需要密码
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="mt-2 text-sm text-gray-700 font-medium"
-          >
-            管理功能仅限本人使用
-          </motion.p>
+            ◇
+          </span>
+          <p className="ui-kicker mt-6">PRIVATE WORKSPACE</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--ink)]">
+            欢迎回来
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-[var(--ink-muted)]">
+            输入密码进入追番管理后台
+          </p>
         </div>
 
-        {/* Glass card - light theme */}
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          onSubmit={handleSubmit}
-          className="glass rounded-xl p-8 shadow-md"
-        >
+        <form className="relative mt-8" onSubmit={handleSubmit}>
           {error && (
-            <motion.div 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="mb-5"
-            >
+            <div className="mb-5">
               <InlineFeedback tone="error" className="font-medium">
                 {error}
               </InlineFeedback>
-            </motion.div>
+            </div>
           )}
 
+          <label
+            className="mb-2 block text-xs font-bold text-[var(--ink-muted)]"
+            htmlFor="admin-password"
+          >
+            管理密码
+          </label>
           <input
+            autoComplete="current-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="输入管理密码"
-            className="w-full px-4 py-3.5 min-h-[48px] rounded-lg text-sm transition-all duration-300 glass-input focus:border-pink-400/50 focus:ring-2 focus:ring-pink-400/20"
+            className="ui-field min-h-12 w-full px-4 text-sm"
             autoFocus
+            id="admin-password"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-5 min-h-[48px] bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 disabled:opacity-50 text-white text-sm font-semibold py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg active:scale-[0.98]"
+            className="ui-button ui-button-primary mt-5 min-h-12 w-full"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -119,8 +109,8 @@ export default function LoginPage() {
               "登录"
             )}
           </button>
-        </motion.form>
-      </div>
+        </form>
+      </motion.div>
     </div>
   );
 }

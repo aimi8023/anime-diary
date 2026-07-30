@@ -26,7 +26,7 @@ export default function AdminSectionNav({
   return (
     <div
       aria-label="管理工作区"
-      className="grid grid-cols-3 gap-1 rounded-2xl border border-white/70 bg-white/45 p-1.5 shadow-sm backdrop-blur"
+      className="admin-segmented-control ui-panel grid grid-cols-3 gap-1.5 p-1.5"
       role="tablist"
     >
       {sections.map((section) => {
@@ -36,10 +36,10 @@ export default function AdminSectionNav({
             aria-controls={`admin-panel-${section.id}`}
             aria-label={section.label}
             aria-selected={selected}
-            className={`min-h-14 rounded-xl px-2 py-2 text-left transition sm:min-h-16 sm:px-4 ${
+            className={`ui-focus relative min-h-14 rounded-xl px-2 py-2 text-left transition sm:min-h-16 sm:px-4 ${
               selected
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:bg-white/45 hover:text-gray-900"
+                ? "bg-white text-[var(--ink)] shadow-sm"
+                : "text-[var(--ink-muted)] hover:bg-white/45 hover:text-[var(--ink)]"
             }`}
             id={`admin-tab-${section.id}`}
             key={section.id}
@@ -47,17 +47,23 @@ export default function AdminSectionNav({
             role="tab"
             type="button"
           >
-            <span className="flex items-center gap-2 text-sm font-semibold">
+            <span className="flex items-center gap-2 text-sm font-bold">
               {section.label}
               {section.id === "records" && (
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-500">
+                <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[11px] text-[var(--accent-strong)]">
                   {recordCount}
                 </span>
               )}
             </span>
-            <span className="mt-1 hidden text-xs text-gray-500 sm:block">
+            <span className="mt-1 hidden text-xs text-[var(--ink-subtle)] sm:block">
               {section.description}
             </span>
+            {selected && (
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-4 bottom-0 h-0.5 rounded-full bg-[var(--accent)]"
+              />
+            )}
           </button>
         );
       })}

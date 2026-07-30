@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { AnimeInput } from "@/lib/types";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 
@@ -94,13 +95,13 @@ export default function AnimeForm({
   };
 
   const inputClass =
-    "w-full px-3 py-2.5 min-h-[44px] rounded-lg text-sm transition glass-input focus:outline-none";
+    "ui-field min-h-11 w-full px-3 py-2.5 text-sm";
   const availableSuggestedTags = [
     ...new Set(suggestedTags.map((tag) => tag.trim()).filter(Boolean)),
   ].filter((tag) => !tags.includes(tag));
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <InlineFeedback tone="error" className="font-medium">
           {error}
@@ -109,8 +110,8 @@ export default function AnimeForm({
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1.5">
-          标题 <span className="text-red-500">*</span>
+        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">
+          标题 <span className="text-[var(--danger)]">*</span>
         </label>
         <input
           type="text"
@@ -122,9 +123,9 @@ export default function AnimeForm({
       </div>
 
       {/* Year + Season + Episodes */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
-          <label className="block text-sm font-medium text-gray-800 mb-1.5">年份</label>
+          <label className="mb-2 block text-sm font-bold text-[var(--ink)]">年份</label>
           <input
             type="number"
             value={year}
@@ -136,7 +137,7 @@ export default function AnimeForm({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-800 mb-1.5">季度</label>
+          <label className="mb-2 block text-sm font-bold text-[var(--ink)]">季度</label>
           <select
             value={season}
             onChange={(e) => setSeason(e.target.value)}
@@ -150,7 +151,7 @@ export default function AnimeForm({
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-800 mb-1.5">话数</label>
+          <label className="mb-2 block text-sm font-bold text-[var(--ink)]">话数</label>
           <input
             type="number"
             value={episodes}
@@ -163,7 +164,7 @@ export default function AnimeForm({
 
       {/* Cover URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1.5">封面图片链接</label>
+        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">封面图片链接</label>
         <input
           type="url"
           value={cover}
@@ -172,11 +173,14 @@ export default function AnimeForm({
           placeholder="https://..."
         />
         {cover && (
-          <div className="mt-2 w-16 h-22 rounded-lg overflow-hidden bg-white/30 border border-white/50">
-            <img
+          <div className="relative mt-3 aspect-[2/3] w-20 overflow-hidden rounded-xl border border-white/70 bg-white/40 shadow-sm">
+            <Image
               src={cover}
               alt="封面预览"
-              className="w-full h-full object-cover"
+              className="object-cover"
+              fill
+              sizes="80px"
+              unoptimized
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
               }}
@@ -187,8 +191,8 @@ export default function AnimeForm({
 
       {/* Rating Slider */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-2">
-          评分：<span className="text-pink-600 font-bold text-base">{rating.toFixed(1)}</span>
+        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">
+          评分：<span className="text-base font-black text-[var(--warning)]">{rating.toFixed(1)}</span>
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -198,9 +202,9 @@ export default function AnimeForm({
             step="0.5"
             value={rating}
             onChange={(e) => setRating(parseFloat(e.target.value))}
-            className="flex-1 h-2 bg-gradient-to-r from-pink-400 to-blue-400 rounded-lg appearance-none cursor-pointer accent-pink-500"
+            className="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gradient-to-r from-pink-300 to-blue-300 accent-[var(--accent)]"
           />
-          <div className="flex items-center gap-1 text-xs text-gray-600">
+          <div className="flex items-center gap-1 text-xs text-[var(--ink-subtle)]">
             <span>1</span>
             <span>-</span>
             <span>10</span>
@@ -230,17 +234,17 @@ export default function AnimeForm({
 
       {/* Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1.5">标签</label>
+        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">标签</label>
         {availableSuggestedTags.length > 0 && (
           <div className="mb-3">
-            <p className="text-xs text-gray-600 mb-2">Bangumi 推荐标签（点击选择）</p>
+            <p className="mb-2 text-xs text-[var(--ink-muted)]">Bangumi 推荐标签（点击选择）</p>
             <div className="flex flex-wrap gap-2">
               {availableSuggestedTags.map((tag) => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => handleAddSuggestedTag(tag)}
-                  className="px-3 py-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 text-sm text-gray-700 hover:bg-blue-500/20 transition-colors"
+                  className="ui-chip min-h-9 px-3"
                 >
                   {tag}
                 </button>
@@ -260,7 +264,7 @@ export default function AnimeForm({
           <button
             type="button"
             onClick={handleAddTag}
-            className="px-4 min-h-[44px] bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+            className="ui-button ui-button-primary whitespace-nowrap rounded-xl"
           >
             添加
           </button>
@@ -270,13 +274,13 @@ export default function AnimeForm({
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-500/10 to-blue-500/10 border border-pink-400/30 text-sm text-gray-700 group hover:border-red-400/50 transition-colors"
+                className="ui-chip ui-chip-active group gap-1.5 px-3"
               >
                 {tag}
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="ml-0.5 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors rounded-full hover:bg-red-500/10"
+                  className="ml-0.5 flex h-6 w-6 items-center justify-center rounded-full text-[var(--ink-subtle)] transition-colors hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
                   title="删除标签"
                 >
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -291,7 +295,7 @@ export default function AnimeForm({
 
       {/* Comment */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">短评</label>
+        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">短评</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -306,7 +310,7 @@ export default function AnimeForm({
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 min-h-[44px] bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg"
+          className="ui-button ui-button-primary flex-1 rounded-xl"
         >
           {saving
             ? "保存中..."
@@ -315,7 +319,7 @@ export default function AnimeForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 min-h-[44px] text-sm text-gray-700 hover:text-gray-900 border border-white/60 rounded-lg hover:bg-white/40 transition-colors"
+          className="ui-button ui-button-secondary rounded-xl px-4"
         >
           取消
         </button>

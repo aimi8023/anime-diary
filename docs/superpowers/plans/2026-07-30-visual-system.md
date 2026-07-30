@@ -232,7 +232,7 @@ git commit -m "style: polish archive detail drawer"
 - Consumes: Task 1 视觉类和现有管理回调接口。
 - Produces: 统一登录卡、后台外壳、分段导航、列表/表单/搜索/备份层级；管理封面全部使用 `next/image`。
 
-- [ ] **Step 1: 写失败测试，固定后台视觉语义和图片迁移**
+- [x] **Step 1: 写失败测试，固定后台视觉语义和图片迁移**
 
 更新/增加：
 
@@ -245,7 +245,7 @@ expect(screen.getByRole("button", { name: "删除《测试番剧》" })).toBeInT
 
 在 `components/anime-list.test.tsx` mock `next/image`，验证封面 `alt` 和动作名称；表单测试验证预览图片仍显示。
 
-- [ ] **Step 2: 运行测试并确认失败**
+- [x] **Step 2: 运行测试并确认失败**
 
 Run:
 
@@ -255,13 +255,13 @@ npm test -- app/login/page.test.tsx app/admin/page.test.tsx components/admin/adm
 
 Expected: FAIL，因为当前登录标题、tablist 类和逐条动作可访问名称不匹配。
 
-- [ ] **Step 3: 实现登录页与后台框架**
+- [x] **Step 3: 实现登录页与后台框架**
 
 登录页使用 `.ui-panel-strong`, `.ui-field`, `.ui-button-primary`，标题改为“欢迎回来”，说明明确为“输入密码进入追番管理后台”。入场动画距离缩短，使用 Framer Motion `useReducedMotion()` 在减少动态时禁用位移。
 
 后台页统一 Header、退出图标按钮、分段导航和三个工作区强表面。记录工具行在桌面横排、移动堆叠；加载骨架、空状态和错误反馈使用同一表面层级。
 
-- [ ] **Step 4: 统一记录、表单、Bangumi、备份与反馈**
+- [x] **Step 4: 统一记录、表单、Bangumi、备份与反馈**
 
 `AnimeList` 和 `AnimeForm` 导入 `next/image`，外部图片使用 `unoptimized`，提供明确 `sizes`。为每条记录动作加入：
 
@@ -272,7 +272,7 @@ aria-label={`删除《${anime.title}》`}
 
 表单、Bangumi 搜索、备份卡片和 `InlineFeedback` 迁移到语义字段、按钮、状态色和表面类；保留全部原有请求和回调逻辑。
 
-- [ ] **Step 5: 运行后台聚焦测试和 lint**
+- [x] **Step 5: 运行后台聚焦测试和 lint**
 
 Run:
 
@@ -283,7 +283,7 @@ npm run lint
 
 Expected: 全部 PASS；原有两个 `<img>` 警告消失，lint 0 errors/0 warnings。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add app/login/page.tsx app/login/page.test.tsx app/admin/page.tsx app/admin/page.test.tsx components

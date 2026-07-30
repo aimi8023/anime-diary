@@ -97,19 +97,19 @@ export default function BangumiSearch({
   };
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSearch} className="flex gap-2">
+    <div className="space-y-5">
+      <form onSubmit={handleSearch} className="flex flex-col gap-2 sm:flex-row">
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="输入中文或日文标题"
-          className="flex-1 px-3 py-2.5 min-h-[44px] rounded-lg text-sm glass-input focus:outline-none"
+          className="ui-field min-h-11 flex-1 px-3 py-2.5 text-sm"
         />
         <button
           type="submit"
           disabled={loading}
-          className="min-w-20 px-4 py-2.5 rounded-lg bg-gradient-to-r from-pink-500 to-blue-500 text-white text-sm font-medium disabled:opacity-50"
+          className="ui-button ui-button-primary min-w-24 rounded-xl"
         >
           {loading ? "搜索中..." : "搜索"}
         </button>
@@ -122,13 +122,13 @@ export default function BangumiSearch({
       )}
 
       {hasSearched && results.length === 0 && (
-        <p className="py-4 text-center text-sm text-gray-600">
+        <p className="rounded-2xl border border-dashed border-[rgba(91,83,112,0.18)] bg-white/35 py-8 text-center text-sm text-[var(--ink-muted)]">
           没有找到匹配的动画条目
         </p>
       )}
 
       {results.length > 0 && (
-        <div className="space-y-2 max-h-[440px] overflow-y-auto">
+        <div className="max-h-[460px] space-y-2 overflow-y-auto pr-1">
           {results.map((result) => {
             const actionLabel = result.alreadyAdded
               ? `编辑已收录的 ${result.title}`
@@ -140,9 +140,9 @@ export default function BangumiSearch({
                 aria-label={actionLabel}
                 disabled={selectingId !== null}
                 onClick={() => handleSelect(result)}
-                className="w-full flex items-center gap-3 rounded-xl border border-white/50 bg-white/25 p-3 text-left hover:bg-white/45 disabled:opacity-60 transition-colors"
+                className="ui-focus flex w-full items-center gap-3 rounded-2xl border border-white/70 bg-white/42 p-3 text-left transition-colors hover:bg-white/72 disabled:opacity-60"
               >
-                <div className="w-12 h-16 flex-shrink-0 overflow-hidden rounded-md bg-white/30">
+                <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-white/70 bg-white/35 shadow-sm">
                   {result.cover ? (
                     <Image
                       src={result.cover}
@@ -150,37 +150,38 @@ export default function BangumiSearch({
                       width={48}
                       height={64}
                       className="h-full w-full object-cover"
+                      unoptimized
                     />
                   ) : (
-                    <div className="h-full w-full flex items-center justify-center text-xs text-gray-400">
+                    <div className="flex h-full w-full items-center justify-center text-xs text-[var(--ink-subtle)]">
                       无图
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate font-medium text-gray-900">
+                    <span className="truncate font-bold text-[var(--ink)]">
                       {result.title}
                     </span>
                     {result.alreadyAdded && (
-                      <span className="flex-shrink-0 rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-700">
+                      <span className="flex-shrink-0 rounded-full bg-[var(--info-soft)] px-2 py-0.5 text-xs font-semibold text-[var(--info)]">
                         已收录
                       </span>
                     )}
                   </div>
                   {result.originalTitle !== result.title && (
-                    <p className="truncate text-xs text-gray-500">
+                    <p className="truncate text-xs text-[var(--ink-subtle)]">
                       {result.originalTitle}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-gray-600">
+                  <p className="mt-1 text-xs text-[var(--ink-muted)]">
                     {result.airDate || "日期未知"} ·{" "}
                     {result.episodes > 0
                       ? `${result.episodes} 话`
                       : "话数未知"}
                   </p>
                 </div>
-                <span className="text-xs font-medium text-blue-600">
+                <span className="text-xs font-bold text-[var(--info)]">
                   {selectingId === result.bangumiId
                     ? "读取中..."
                     : result.alreadyAdded
@@ -196,7 +197,7 @@ export default function BangumiSearch({
       <button
         type="button"
         onClick={onUseManual}
-        className="w-full min-h-[44px] rounded-lg border border-white/60 text-sm text-gray-700 hover:bg-white/40"
+        className="ui-button ui-button-secondary w-full rounded-xl"
       >
         改为手动填写
       </button>
