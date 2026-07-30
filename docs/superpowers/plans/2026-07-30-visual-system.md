@@ -39,14 +39,14 @@
 ```tsx
 expect(screen.getByRole("link", { name: "追番记录首页" })).toBeInTheDocument();
 expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
-expect(screen.getByRole("link", { name: "管理后台" })).toHaveClass("ui-button");
+expect(screen.getByRole("link", { name: "管理后台" })).toBeInTheDocument();
 ```
 
 - [ ] **Step 2: 运行测试并确认失败**
 
 Run: `npm test -- components/site-header.test.tsx`
 
-Expected: FAIL，因为当前品牌链接名称是“追番记录”，管理链接名称是“管理”且没有语义按钮类。
+Expected: FAIL，因为当前品牌链接名称是“追番记录”，管理链接名称是“管理”。
 
 - [ ] **Step 3: 实现视觉令牌、全局画布与 Header/Footer**
 
@@ -111,11 +111,10 @@ git commit -m "style: establish waterlight visual tokens"
 ```tsx
 expect(screen.getByRole("search", { name: "档案筛选" })).toBeInTheDocument();
 expect(screen.getByRole("button", { name: /查看《.*》详情/ }))
-  .toHaveClass("archive-poster-card");
-expect(screen.getByTestId("archive-poster")).toHaveClass("aspect-[2/3]");
+  .toBeInTheDocument();
 ```
 
-筛选容器从 `section aria-label` 改成 `search aria-label`；测试数据至少渲染一张卡片。
+筛选容器从 `section aria-label` 改成 `search aria-label`；测试数据至少渲染一张可打开详情的卡片。海报比例属于视觉决策，由浏览器验收，不用脆弱的 class 断言固定。
 
 - [ ] **Step 2: 运行测试并确认失败**
 
@@ -125,7 +124,7 @@ Run:
 npm test -- components/archive/archive-browser.test.tsx components/archive/archive-results.test.tsx
 ```
 
-Expected: FAIL，因为当前筛选不是 `search` landmark，卡片没有海报测试标识与语义类。
+Expected: FAIL，因为当前筛选不是 `search` landmark。
 
 - [ ] **Step 3: 重构 Hero 与工具栏表现**
 
@@ -239,7 +238,7 @@ git commit -m "style: polish archive detail drawer"
 
 ```tsx
 expect(screen.getByRole("heading", { name: "欢迎回来" })).toBeInTheDocument();
-expect(screen.getByRole("tablist", { name: "管理工作区" })).toHaveClass("admin-segmented-control");
+expect(screen.getByRole("tablist", { name: "管理工作区" })).toBeInTheDocument();
 expect(screen.getByRole("button", { name: "编辑《测试番剧》" })).toBeInTheDocument();
 expect(screen.getByRole("button", { name: "删除《测试番剧》" })).toBeInTheDocument();
 ```
