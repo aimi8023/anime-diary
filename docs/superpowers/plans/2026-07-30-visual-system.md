@@ -344,7 +344,7 @@ git add README.md CLAUDE.md docs/superpowers/plans/2026-07-30-visual-system.md a
 git commit -m "docs: document waterlight visual system"
 ```
 
-- [ ] **Step 5: 合并并在 main 复验**
+- [x] **Step 5: 合并并在 main 复验**
 
 在主工作树执行：
 
@@ -357,7 +357,7 @@ git diff origin/main..HEAD --check
 
 Expected: 快进合并成功，主分支复验全部通过。
 
-- [ ] **Step 6: 清理并推送**
+- [x] **Step 6: 清理并推送**
 
 删除本次 `codex/visual-system` 工作树和本地功能分支，仅保留其他已有工作树，然后：
 
