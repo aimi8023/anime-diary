@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import type { MouseEvent } from "react";
+import { useEffect, useRef } from "react";
+import type { MouseEvent, RefObject } from "react";
 import { createPortal } from "react-dom";
 import type {
   ArchiveFilters,
@@ -9,6 +9,7 @@ import type {
   ArchiveSeason,
   ArchiveSort,
 } from "@/lib/archive/types";
+import { useArchiveSearch } from "./archive-search-context";
 
 interface ArchiveToolbarProps {
   filters: ArchiveFilters;
@@ -21,6 +22,7 @@ interface ArchiveToolbarProps {
 
 interface FilterFieldsProps extends ArchiveToolbarProps {
   idPrefix: string;
+  queryInputRef: RefObject<HTMLInputElement | null>;
 }
 
 const seasons: ArchiveSeason[] = ["", "春", "夏", "秋", "冬"];
@@ -34,6 +36,7 @@ function FilterFields({
   onFilterChange,
   onToggleTag,
   idPrefix,
+  queryInputRef,
 }: FilterFieldsProps) {
   const fieldClassName =
     "ui-field h-11 w-full px-3 text-sm";
@@ -42,7 +45,7 @@ function FilterFields({
 
   return (
     <>
-      <div className="sm:col-span-2">
+      <div className="col-span-2 md:col-span-4">
         <label className={labelClassName} htmlFor={`${idPrefix}-query`}>
           关键词
         </label>
@@ -51,6 +54,7 @@ function FilterFields({
           id={`${idPrefix}-query`}
           onChange={(event) => onQueryChange(event.target.value)}
           placeholder="搜索标题、标签或感想"
+          ref={queryInputRef}
           type="search"
           value={queryDraft}
         />
@@ -141,7 +145,7 @@ function FilterFields({
       </div>
 
       {options.tags.length > 0 && (
-        <fieldset className="sm:col-span-2 lg:col-span-6">
+        <fieldset className="col-span-2 md:col-span-4">
           <legend className={labelClassName}>标签</legend>
           <div className="flex flex-wrap gap-2">
             {options.tags.map((tag) => {
@@ -170,81 +174,77 @@ function FilterFields({
   );
 }
 
-export default function ArchiveToolbar(props: ArchiveToolbarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export default function ArchiveSearchPanel(props: ArchiveToolbarProps) {
+  const { isSearchOpen, closeSearch } = useArchiveSearch();
+  const queryInputRef = useRef<HTMLInputElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    queryInputRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") closeSearch();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocusRef.current?.focus();
+    };
+  }, [closeSearch, isSearchOpen]);
 
   function closeFromBackdrop(event: MouseEvent<HTMLDivElement>) {
-    if (event.target === event.currentTarget) setMobileOpen(false);
+    if (event.target === event.currentTarget) closeSearch();
   }
 
-  return (
-    <form
-      aria-label="档案筛选"
-      className="ui-panel-strong sticky top-20 z-20 mb-6 p-3 sm:p-5"
-      onSubmit={(event) => event.preventDefault()}
-      role="search"
+  if (!isSearchOpen || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      aria-label="搜索与筛选"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-end bg-[#211d35]/28 backdrop-blur-sm md:items-start md:justify-center md:px-6 md:pt-20"
+      id="archive-search-panel"
+      onClick={closeFromBackdrop}
+      role="dialog"
     >
-      <div className="grid grid-cols-[1fr_auto] gap-2 md:hidden">
-        <label className="sr-only" htmlFor="compact-query">
-          快速搜索关键词
-        </label>
-        <input
-          className="ui-field h-11 min-w-0 px-3 text-sm"
-          id="compact-query"
-          onChange={(event) => props.onQueryChange(event.target.value)}
-          placeholder="搜索档案"
-          type="search"
-          value={props.queryDraft}
-        />
-        <button
-          aria-controls="mobile-archive-filters"
-          aria-expanded={mobileOpen}
-          className="ui-button ui-button-secondary rounded-xl px-4"
-          onClick={() => setMobileOpen(true)}
-          type="button"
-        >
-          筛选
-        </button>
-      </div>
-
-      <div className="hidden grid-cols-2 gap-3 md:grid lg:grid-cols-6">
-        <FilterFields {...props} idPrefix="desktop" />
-      </div>
-
-      {mobileOpen &&
-        createPortal(
-          <div
-            aria-label="筛选条件"
-            aria-modal="true"
-            className="fixed inset-0 z-50 flex items-end bg-[#211d35]/38 backdrop-blur-sm md:hidden"
-            id="mobile-archive-filters"
-            onClick={closeFromBackdrop}
-            role="dialog"
+      <form
+        aria-label="档案筛选"
+        className="max-h-[88vh] w-full overflow-y-auto rounded-t-[2rem] border border-white/90 bg-[rgba(249,247,251,0.98)] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-lg)] md:max-w-3xl md:rounded-[1.75rem] md:p-6"
+        onSubmit={(event) => event.preventDefault()}
+        role="search"
+      >
+        <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-5 flex items-center justify-between border-b border-white/80 bg-[rgba(249,247,251,0.94)] px-5 py-4 backdrop-blur-xl md:-mx-6 md:-mt-6 md:px-6">
+          <div>
+            <p className="ui-kicker mb-1">FIND IN ARCHIVE</p>
+            <h2 className="text-lg font-bold text-[var(--ink)]">
+              搜索与筛选
+            </h2>
+          </div>
+          <button
+            aria-label="关闭搜索与筛选"
+            className="ui-button ui-button-secondary"
+            onClick={closeSearch}
+            type="button"
           >
-            <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-[2rem] border border-white/90 bg-[var(--canvas)] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-lg)]">
-              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-5 flex items-center justify-between border-b border-white/80 bg-[rgba(249,247,251,0.94)] px-5 py-4 backdrop-blur-xl">
-                <div>
-                  <p className="ui-kicker mb-1">FILTERS</p>
-                  <h2 className="text-lg font-bold text-[var(--ink)]">
-                  筛选条件
-                  </h2>
-                </div>
-                <button
-                  aria-label="关闭筛选条件"
-                  className="ui-button ui-button-secondary"
-                  onClick={() => setMobileOpen(false)}
-                  type="button"
-                >
-                  完成
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <FilterFields {...props} idPrefix="mobile" />
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )}
-    </form>
+            完成
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <FilterFields
+            {...props}
+            idPrefix="archive-search"
+            queryInputRef={queryInputRef}
+          />
+        </div>
+      </form>
+    </div>,
+    document.body,
   );
 }

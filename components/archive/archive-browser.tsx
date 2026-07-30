@@ -18,7 +18,7 @@ import ActiveFilters from "./active-filters";
 import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
-import ArchiveToolbar from "./archive-toolbar";
+import ArchiveSearchPanel from "./archive-search-panel";
 
 interface ArchiveBrowserProps {
   records: Anime[];
@@ -109,6 +109,14 @@ export default function ArchiveBrowser({
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
       <ArchiveHero stats={stats} />
+      <ArchiveSearchPanel
+        filters={filters}
+        onFilterChange={updateFilters}
+        onQueryChange={setQueryDraft}
+        onToggleTag={toggleTag}
+        options={options}
+        queryDraft={queryDraft}
+      />
 
       {records.length === 0 ? (
         <section className="ui-panel-strong mx-auto max-w-2xl px-6 py-16 text-center">
@@ -127,14 +135,6 @@ export default function ArchiveBrowser({
         </section>
       ) : (
         <section id="archive">
-          <ArchiveToolbar
-            filters={filters}
-            onFilterChange={updateFilters}
-            onQueryChange={setQueryDraft}
-            onToggleTag={toggleTag}
-            options={options}
-            queryDraft={queryDraft}
-          />
           <ActiveFilters
             filters={filters}
             onClear={clearFilters}

@@ -13,6 +13,10 @@ import {
   DEFAULT_ARCHIVE_FILTERS,
   getArchiveStats,
 } from "@/lib/archive/filter";
+import {
+  ArchiveSearchProvider,
+  useArchiveSearch,
+} from "./archive-search-context";
 import ArchiveBrowser from "./archive-browser";
 
 const navigation = vi.hoisted(() => ({
@@ -69,11 +73,23 @@ function renderArchive(
   initialFilters = DEFAULT_ARCHIVE_FILTERS,
 ) {
   return render(
-    <ArchiveBrowser
-      records={records}
-      initialFilters={initialFilters}
-      stats={getArchiveStats(records)}
-    />,
+    <ArchiveSearchProvider>
+      <SearchLauncher />
+      <ArchiveBrowser
+        records={records}
+        initialFilters={initialFilters}
+        stats={getArchiveStats(records)}
+      />
+    </ArchiveSearchProvider>,
+  );
+}
+
+function SearchLauncher() {
+  const { openSearch } = useArchiveSearch();
+  return (
+    <button onClick={openSearch} type="button">
+      打开搜索
+    </button>
   );
 }
 
@@ -86,26 +102,35 @@ describe("ArchiveBrowser filtering", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    document.body.style.overflow = "";
   });
 
-  it("renders initial filters and the matching result count", () => {
+  it("keeps the search form hidden until the launcher opens it", async () => {
+    const user = userEvent.setup();
     renderArchive({
       ...DEFAULT_ARCHIVE_FILTERS,
       year: "2024",
       tags: ["治愈"],
     });
 
-    expect(screen.getByLabelText("年份")).toHaveValue("2024");
-    expect(screen.getByRole("checkbox", { name: "治愈" })).toBeChecked();
+    expect(
+      screen.queryByRole("dialog", { name: "搜索与筛选" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("找到 1 部")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "打开搜索" }));
+
+    expect(
+      screen.getByRole("dialog", { name: "搜索与筛选" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("年份")).toHaveValue("2024");
+    expect(screen.getByLabelText("关键词")).toHaveFocus();
+    expect(screen.getByRole("checkbox", { name: "治愈" })).toBeChecked();
     expect(
       screen.getByRole("button", { name: "移除年份 2024" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "移除标签 治愈" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("search", { name: "档案筛选" }),
     ).toBeInTheDocument();
   });
 
@@ -114,6 +139,7 @@ describe("ArchiveBrowser filtering", () => {
     const fetchSpy = vi.fn();
     vi.stubGlobal("fetch", fetchSpy);
     renderArchive();
+    await user.click(screen.getByRole("button", { name: "打开搜索" }));
 
     await user.selectOptions(screen.getByLabelText("年份"), "2024");
     await user.selectOptions(screen.getByLabelText("最低评分"), "9");
@@ -130,6 +156,7 @@ describe("ArchiveBrowser filtering", () => {
     vi.useFakeTimers();
     renderArchive();
     navigation.replace.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "打开搜索" }));
 
     fireEvent.change(screen.getByLabelText("关键词"), {
       target: { value: "音乐" },
@@ -147,39 +174,53 @@ describe("ArchiveBrowser filtering", () => {
     expect(screen.getByText("找到 1 部")).toBeInTheDocument();
   });
 
-  it("opens and closes the mobile filter panel", async () => {
+  it("closes the search panel with Escape and restores focus", async () => {
     const user = userEvent.setup();
     renderArchive();
 
-    const filterButton = screen.getByRole("button", { name: "筛选" });
-    expect(filterButton).toHaveAttribute("aria-expanded", "false");
-    await user.click(filterButton);
-    expect(filterButton).toHaveAttribute("aria-expanded", "true");
-    expect(
-      screen.getByRole("dialog", { name: "筛选条件" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("dialog", { name: "筛选条件" }).parentElement,
-    ).toBe(document.body);
+    const launcher = screen.getByRole("button", { name: "打开搜索" });
+    await user.click(launcher);
+    expect(screen.getByRole("dialog").parentElement).toBe(document.body);
 
-    await user.click(
-      screen.getByRole("button", { name: "关闭筛选条件" }),
-    );
+    await user.keyboard("{Escape}");
+
     expect(
-      screen.queryByRole("dialog", { name: "筛选条件" }),
+      screen.queryByRole("dialog", { name: "搜索与筛选" }),
     ).not.toBeInTheDocument();
+    expect(launcher).toHaveFocus();
   });
 
-  it("closes the mobile filter panel from its backdrop", async () => {
+  it("closes from the backdrop but keeps selected filters when reopened", async () => {
     const user = userEvent.setup();
     renderArchive();
 
-    await user.click(screen.getByRole("button", { name: "筛选" }));
-    fireEvent.click(screen.getByRole("dialog", { name: "筛选条件" }));
+    const launcher = screen.getByRole("button", { name: "打开搜索" });
+    await user.click(launcher);
+    await user.selectOptions(screen.getByLabelText("年份"), "2024");
+    fireEvent.click(
+      screen.getByRole("dialog", { name: "搜索与筛选" }),
+    );
 
     expect(
-      screen.queryByRole("dialog", { name: "筛选条件" }),
+      screen.queryByRole("dialog", { name: "搜索与筛选" }),
     ).not.toBeInTheDocument();
+
+    await user.click(launcher);
+    expect(screen.getByLabelText("年份")).toHaveValue("2024");
+  });
+
+  it("locks background scrolling until the close button is used", async () => {
+    const user = userEvent.setup();
+    document.body.style.overflow = "clip";
+    renderArchive();
+
+    await user.click(screen.getByRole("button", { name: "打开搜索" }));
+    expect(document.body.style.overflow).toBe("hidden");
+
+    await user.click(
+      screen.getByRole("button", { name: "关闭搜索与筛选" }),
+    );
+    expect(document.body.style.overflow).toBe("clip");
   });
 
   it("restores filters from the URL during browser history navigation", () => {
@@ -188,7 +229,9 @@ describe("ArchiveBrowser filtering", () => {
     window.history.replaceState(null, "", "/?year=2024");
     fireEvent.popState(window);
 
-    expect(screen.getByLabelText("年份")).toHaveValue("2024");
+    expect(
+      screen.getByRole("button", { name: "移除年份 2024" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("找到 2 部")).toBeInTheDocument();
   });
 });
