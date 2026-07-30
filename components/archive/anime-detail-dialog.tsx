@@ -20,6 +20,8 @@ export default function AnimeDetailDialog({
   useEffect(() => {
     if (!anime) return;
     previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -29,6 +31,7 @@ export default function AnimeDetailDialog({
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
       previousFocusRef.current?.focus();
     };
   }, [anime, onClose]);
@@ -43,12 +46,12 @@ export default function AnimeDetailDialog({
     <div
       aria-labelledby="anime-detail-title"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-end justify-end bg-gray-950/45 backdrop-blur-sm sm:items-stretch"
+      className="fixed inset-0 z-50 flex items-end justify-end bg-[#211d35]/48 backdrop-blur-sm sm:items-stretch"
       onClick={closeFromBackdrop}
       role="dialog"
     >
-      <article className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-h-none sm:max-w-xl sm:rounded-none sm:rounded-l-3xl">
-        <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-pink-100 to-blue-100">
+      <article className="max-h-[92vh] w-full overflow-y-auto rounded-t-[2rem] border border-white/80 bg-[var(--canvas)] shadow-[var(--shadow-lg)] sm:max-h-none sm:max-w-xl sm:rounded-none sm:rounded-l-[2rem]">
+        <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-pink-100 to-blue-100">
           {anime.cover ? (
             <Image
               alt=""
@@ -63,18 +66,21 @@ export default function AnimeDetailDialog({
               ◌
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#211d35]/78 via-[#211d35]/8 to-transparent" />
           <button
             aria-label="关闭详情"
-            className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow"
+            className="ui-icon-button absolute right-4 top-4 border border-white/80 bg-white/88 text-xl font-normal text-[var(--ink-muted)] shadow-sm backdrop-blur"
             onClick={onClose}
             ref={closeButtonRef}
             type="button"
           >
-            关闭
+            <span aria-hidden="true">×</span>
           </button>
-          <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-            <h2 className="text-2xl font-bold" id="anime-detail-title">
+          <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+            <p className="mb-2 text-[10px] font-bold tracking-[0.18em] text-white/70">
+              {anime.season} · MY ARCHIVE
+            </p>
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl" id="anime-detail-title">
               {anime.title}
             </h2>
             {anime.originalTitle && (
@@ -85,32 +91,32 @@ export default function AnimeDetailDialog({
           </div>
         </div>
 
-        <div className="space-y-6 p-6">
+        <div className="space-y-7 p-6 sm:p-8">
           <dl className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-2xl bg-gray-50 p-3">
-              <dt className="text-xs text-gray-500">季度</dt>
-              <dd className="mt-1 font-medium text-gray-900">
+            <div className="rounded-2xl border border-white/80 bg-white/72 p-3.5">
+              <dt className="text-xs text-[var(--ink-subtle)]">季度</dt>
+              <dd className="mt-1 font-bold text-[var(--ink)]">
                 {anime.season}
               </dd>
             </div>
-            <div className="rounded-2xl bg-amber-50 p-3">
-              <dt className="text-xs text-amber-600">评分</dt>
-              <dd className="mt-1 font-semibold text-amber-800">
+            <div className="rounded-2xl border border-amber-100 bg-[var(--warning-soft)] p-3.5">
+              <dt className="text-xs text-[var(--warning)]">评分</dt>
+              <dd className="mt-1 font-black text-[var(--warning)]">
                 ★ {anime.rating}
               </dd>
             </div>
             {anime.episodes > 0 && (
-              <div className="rounded-2xl bg-gray-50 p-3">
-                <dt className="text-xs text-gray-500">集数</dt>
-                <dd className="mt-1 font-medium text-gray-900">
+              <div className="rounded-2xl border border-white/80 bg-white/72 p-3.5">
+                <dt className="text-xs text-[var(--ink-subtle)]">集数</dt>
+                <dd className="mt-1 font-bold text-[var(--ink)]">
                   {anime.episodes} 话
                 </dd>
               </div>
             )}
             {anime.airDate && (
-              <div className="rounded-2xl bg-gray-50 p-3">
-                <dt className="text-xs text-gray-500">首播</dt>
-                <dd className="mt-1 font-medium text-gray-900">
+              <div className="rounded-2xl border border-white/80 bg-white/72 p-3.5">
+                <dt className="text-xs text-[var(--ink-subtle)]">首播</dt>
+                <dd className="mt-1 font-bold text-[var(--ink)]">
                   {anime.airDate}
                 </dd>
               </div>
@@ -121,7 +127,7 @@ export default function AnimeDetailDialog({
             <div className="flex flex-wrap gap-2">
               {anime.tags.map((tag) => (
                 <span
-                  className="rounded-full bg-pink-50 px-3 py-1.5 text-xs font-medium text-pink-700"
+                  className="ui-chip ui-chip-active min-h-8 px-3 text-xs"
                   key={tag}
                 >
                   {tag}
@@ -132,10 +138,10 @@ export default function AnimeDetailDialog({
 
           {anime.comment && (
             <section>
-              <h3 className="text-xs font-semibold tracking-wider text-gray-500">
+              <h3 className="ui-kicker">
                 我的感想
               </h3>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-gray-700">
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--ink-muted)]">
                 {anime.comment}
               </p>
             </section>
@@ -143,7 +149,7 @@ export default function AnimeDetailDialog({
 
           {anime.bangumiUrl && (
             <a
-              className="inline-flex rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-white"
+              className="ui-button ui-button-primary"
               href={anime.bangumiUrl}
               rel="noreferrer"
               target="_blank"

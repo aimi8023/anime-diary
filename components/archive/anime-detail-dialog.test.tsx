@@ -43,6 +43,23 @@ function DialogHarness({
 }
 
 describe("AnimeDetailDialog", () => {
+  it("locks background scrolling while open and restores the previous value", () => {
+    document.body.style.overflow = "clip";
+    const onClose = () => {};
+    const { rerender, unmount } = render(
+      <AnimeDetailDialog anime={completeAnime} onClose={onClose} />,
+    );
+
+    try {
+      expect(document.body.style.overflow).toBe("hidden");
+      rerender(<AnimeDetailDialog anime={null} onClose={onClose} />);
+      expect(document.body.style.overflow).toBe("clip");
+    } finally {
+      unmount();
+      document.body.style.overflow = "";
+    }
+  });
+
   it("shows complete metadata, closes with Escape, and restores focus", async () => {
     const user = userEvent.setup();
     render(<DialogHarness />);

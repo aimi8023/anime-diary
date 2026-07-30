@@ -172,7 +172,7 @@ git commit -m "style: refine public archive browsing"
 - Consumes: 现有 `AnimeDetailDialogProps` 和 Task 1 按钮/表面类。
 - Produces: 打开期间锁定背景滚动、关闭后恢复原值的详情抽屉。
 
-- [ ] **Step 1: 写失败测试，固定滚动锁定和恢复**
+- [x] **Step 1: 写失败测试，固定滚动锁定和恢复**
 
 增加测试：
 
@@ -186,23 +186,23 @@ expect(document.body.style.overflow).toBe("clip");
 
 并断言关闭控件名称仍为“关闭详情”。
 
-- [ ] **Step 2: 运行测试并确认失败**
+- [x] **Step 2: 运行测试并确认失败**
 
 Run: `npm test -- components/archive/anime-detail-dialog.test.tsx`
 
 Expected: FAIL，因为当前组件不修改 `document.body.style.overflow`。
 
-- [ ] **Step 3: 实现滚动锁定与视觉层级**
+- [x] **Step 3: 实现滚动锁定与视觉层级**
 
 在现有 focus 恢复 effect 中保存 `document.body.style.overflow`，打开时设为 `hidden`，cleanup 时恢复。关闭按钮使用 `.ui-icon-button` 和 × 图形；元数据、标签与 Bangumi 外链迁移到语义表面/按钮类。遮罩与面板加入短促进入样式，不引入新状态。
 
-- [ ] **Step 4: 运行详情测试**
+- [x] **Step 4: 运行详情测试**
 
 Run: `npm test -- components/archive/anime-detail-dialog.test.tsx`
 
 Expected: 全部 PASS，且每个测试清理后 body overflow 恢复。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```powershell
 git add components/archive/anime-detail-dialog.tsx components/archive/anime-detail-dialog.test.tsx
