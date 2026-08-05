@@ -1,69 +1,61 @@
-# 📺 追番记录
+# 📺 Anime Diary · 追番记录
 
-一个个人追番记录网站，按季度记录和浏览追过的番剧。采用“水光档案”视觉系统，在保留粉蓝插画氛围的同时提供稳定清晰的阅读体验。
+个人追番档案网站。公开页面按年份和季度展示看过的动画，只有管理员可以添加、编辑、删除、导入和恢复记录。
 
-线上地址：[https://anime.zhanghome.qzz.io/](https://anime.zhanghome.qzz.io/)
+- 线上地址：[https://anime.zhanghome.qzz.io/](https://anime.zhanghome.qzz.io/)
+- 当前分支：`main`
+- 部署方式：GitHub 推送后由 Vercel 自动部署
 
-## ✨ 功能特性
+## 主要功能
 
-- **公开档案**：首页由服务端一次读取记录，首屏直接展示，不再等待客户端二次请求
-- **高密度档案浏览**：按年份和季度折叠浏览，桌面端每行最多展示 7 张紧凑海报卡片
-- **导航搜索**：从导航栏按需打开组合筛选；桌面端为居中浮层，手机端为底部抽屉
-- **组合筛选**：支持关键词、年份、季度、标签、最低评分和排序，筛选条件可通过 URL 分享
-- **沉浸式详情**：桌面端使用居中双栏详情层，手机端使用近全屏详情抽屉
-- **实时计时**：显示本站运行时间
-- **标签系统**：番剧支持自定义标签，公开详情中集中展示，管理页可增删
-- **管理后台**：密码保护的“记录、添加记录、备份恢复”三个独立工作区
-- **Bangumi 辅助录入**：按需搜索动画条目，选择后预填资料和候选标签
-- **备份与恢复**：每次修改前自动保存历史版本，支持差异预览、JSON 导入导出和一键恢复
-- **安全边界**：所有管理写操作要求同源请求，番剧输入统一校验，登录失败自动限流
-- **统一体验**：公开档案、登录和后台共享同一套控件、状态、焦点与响应式规则
-- **数据存储**：本地 JSON 文件（开发）/ Upstash Redis（生产）
+- **公开档案**：服务端读取记录并直接生成首屏，不再由浏览器重复请求数据。
+- **高密度浏览**：按年份、季度折叠；海报网格在不同宽度使用 2/3/4/6/7 列。
+- **导航搜索**：搜索和筛选由导航栏按需打开，桌面端为居中浮层，手机端为底部抽屉。
+- **组合筛选**：支持关键词、年份、季度、标签、最低评分和排序，并同步到可分享 URL。
+- **沉浸式详情**：桌面端为居中双栏，手机端为近全屏抽屉；展示标签、感想和完整元数据。
+- **管理后台**：记录、添加/编辑、备份恢复三个独立工作区，使用密码保护。
+- **Bangumi 辅助录入**：搜索条目后预填标题、封面、季度、话数和候选标签，最终由管理员确认。
+- **版本化备份**：修改前自动快照，支持差异预览、JSON 导入导出和历史恢复。
+- **安全边界**：统一输入校验、管理写接口同源检查、认证 Cookie 和登录失败限流。
+- **双存储实现**：本地开发使用 JSON，生产环境使用 Upstash Redis。
 
-## 📌 当前开发状态
+## 当前开发状态
 
-截至 2026-07-30，当前版本已完成并合入 `main`：
+截至 2026-08-05，以下阶段均已完成并进入 `main`：
 
-1. **公开首页数据流与浏览结构**：首页改为服务端一次读取记录，完成 URL 筛选、年份/季度折叠、空状态与读取错误边界。
-2. **管理后台信息架构**：记录、添加/编辑、备份恢复拆为三个互斥工作区，备份数据改为按需读取。
-3. **组件与安全边界**：新增/编辑共享输入校验；所有管理写接口执行同源检查；登录具备 Redis/内存限流。
-4. **Bangumi 辅助录入**：按需搜索并预填标题、封面、季度、话数和候选标签，由管理者确认后保存。
-5. **版本化备份恢复**：修改前自动快照，支持差异预览、JSON 导入导出、历史恢复和空数据保护。
-6. **水光档案视觉系统**：公开首页、登录页和后台统一配色、表面、按钮、焦点与减少动态规则。
-7. **紧凑公开档案**：搜索移入导航栏，海报网格提升至 2/3/4/6/7 列，详情改为桌面双栏和手机近全屏抽屉。
+1. Bangumi 辅助录入；
+2. 服务端优先的公开档案与 URL 筛选；
+3. 版本化备份、导入导出与恢复；
+4. 管理后台信息架构；
+5. 共享校验、错误反馈、同源保护和登录限流；
+6. “水光档案”视觉系统；
+7. 导航搜索、紧凑海报网格和沉浸式详情。
 
-本轮公开档案改造最终代码为 `82470bb`，已推送并部署。当前没有遗留的本轮功能任务；后续可独立规划站外备份副本、更多回顾视图或性能监控。
+这些阶段的关键决策与代表提交见 [开发历程](./docs/DEVELOPMENT-HISTORY.md)。未来可独立考虑站外备份副本、更丰富的回顾视图和运行监控；它们不是当前版本的遗留任务。
 
-## 🎨 设计风格
+## 技术栈
 
-- **水光档案**：粉蓝插画作为氛围层，瓷白表面保证内容对比度
-- **语义配色**：樱粉主操作、湖蓝辅助信息、琥珀评分、红色危险状态
-- **海报优先**：公开作品卡片使用 2:3 封面比例，减少竖版封面裁切
-- **浏览优先**：卡片只保留封面、评分、季度和标题，完整信息进入详情层
-- **一致控件**：按钮、输入框、标签、面板和反馈共享全局设计令牌
-- **可访问动效**：键盘焦点清晰，所有动效遵守 `prefers-reduced-motion`
+- Next.js 16（App Router）
+- React 19 + TypeScript
+- Tailwind CSS 4
+- Framer Motion
+- Upstash Redis / 本地 JSON
+- Vitest + Testing Library
+- Vercel
 
-详细配置请参考 [THEME-CONFIG.md](./THEME-CONFIG.md)
+## 本地开发
 
-## 🛠️ 技术栈
-
-- **框架**：Next.js 16 + TypeScript
-- **样式**：Tailwind CSS 4
-- **动画**：framer-motion
-- **数据存储**：本地 JSON / Upstash Redis
-
-## 🚀 本地开发
-
-```bash
+```powershell
 npm install
+Copy-Item .env.local.example .env.local
 npm run dev
 ```
 
-打开 http://localhost:3000 即可访问。
+打开 [http://localhost:3000](http://localhost:3000)。
 
 ### 环境变量
 
-复制 `.env.local.example` 为 `.env.local`，并填写：
+在 `.env.local` 中配置：
 
 ```dotenv
 ADMIN_PASSWORD=你的管理密码
@@ -71,123 +63,165 @@ BANGUMI_USER_AGENT=你的Bangumi用户ID/anime-diary
 BANGUMI_ACCESS_TOKEN=可选的Bangumi访问令牌
 ```
 
-- `BANGUMI_USER_AGENT` 应能识别项目所有者，遵循 [Bangumi User-Agent 规范](https://github.com/bangumi/api/blob/master/docs-raw/user%20agent.md)。
-- 可在 [Bangumi Access Token 页面](https://next.bgm.tv/demo/access-token)生成令牌。
-- Token 只由服务端读取，不会发送到浏览器；生产部署建议配置。
-- `.env.local` 包含私密信息，已经被 Git 忽略，不要提交。
+生产环境的数据存储还需要 Vercel/Upstash 提供下列任一组变量：
 
-### 页面路由
+- `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`；
+- `KV_REST_API_URL` + `KV_REST_API_TOKEN`；
+- 兼容的 `REDIS_URL` 配置。
 
-- **首页 `/`** — 服务端加载的公开追番档案、导航搜索、组合筛选、详情回顾和实时计时
-- **管理页 `/admin`** — 查找维护、添加编辑和备份恢复三个工作区（需密码登录）
-- **登录页 `/login`** — 管理后台密码验证
+注意：
 
-### 功能说明
+- `.env.local` 已被 Git 忽略，禁止提交密码、Token、Redis 地址或 Cookie。
+- `BANGUMI_ACCESS_TOKEN` 只在服务端使用，不会发送到浏览器。
+- 未配置 Redis 时会使用 `data/anime.json`，适合本地开发，不适合作为 Vercel 持久存储。
 
-#### 首页功能
-- **实时计时器**：显示"本站已运行 XX天 XX时 XX分 XX秒"
-- **服务端首屏**：服务端直接读取一次存储并生成首页；读取失败会显示可重试错误，不会伪装成空档案
-- **按需搜索**：首页默认不显示筛选表单；导航按钮打开桌面居中搜索卡片或手机底部抽屉
-- **组合筛选**：关键词、年份、季度、标签、最低评分和排序使用 AND 语义，可逐项或全部清除
-- **可分享 URL**：使用 `q`、`year`、`season`、`tag`、`rating`、`sort` 参数保存当前浏览条件
-- **年份/季度折叠**：年份由新到旧展示，最新年份默认展开，季度和旧年份均可独立展开
-- **紧凑海报墙**：卡片只显示封面、评分、季度和标题；网格按屏幕宽度使用 2/3/4/6/7 列
-- **记录详情**：桌面端打开居中双栏详情层，手机端打开近全屏抽屉；支持关闭按钮、点击遮罩和 Escape 键
-- **公开 API 兼容**：`GET /api/anime` 仍可公开读取，但首页不再通过它二次获取数据
+## 页面与接口
 
-#### 管理页功能
-- **专注工作区**：记录、添加记录、备份恢复互斥展示，减少日常操作中的信息干扰
-- **按需备份**：首次进入后台只读取番剧记录，打开备份工作区后才请求历史版本
-- **Bangumi 辅助录入**：输入中日文标题搜索，选择正确条目后预填标题、封面、季度和话数
-- **候选标签**：Bangumi 标签不会自动加入，点击需要的标签后才保存
-- **手动兜底**：Bangumi 不可用时可以随时切换到手动填写
-- **本地快照**：保存后公开页面只读取本站数据，不实时依赖 Bangumi
-- **重复保护**：相同 Bangumi 条目会提示并打开已有记录
-- **搜索栏**：在记录工作区快速查找番剧，长列表使用页面自然滚动
-- **标签管理**：输入框添加标签，支持回车快捷添加，点击删除标签
-- **年份输入**：数字输入框
-- **季度选择**：春季-1月、夏季-4月、秋季-7月、冬季-10月
-- **评分滑块**：1.0-10.0 范围，实时显示星星预览
-- **自动快照**：添加、编辑、删除、导入和恢复前自动保存当前数据，保留最近 30 个版本
-- **差异预览**：恢复或导入前显示将新增、移除和修改的记录数量
-- **可逆恢复**：恢复历史版本前会再次备份当前数据，选错版本后仍能恢复回来
-- **JSON 导入导出**：服务端导出最新数据；导入兼容旧版数组文件和新版带版本信息的备份文件
-- **空数据保护**：导入空备份需要额外确认，非法或重复记录不会写入
-- **统一输入校验**：新增与编辑共享服务端规则，错误类型、评分、话数、标签和外部链接不会被静默写入
-- **同源写保护**：登录、退出、番剧增删改、备份导入和恢复均拒绝外域或缺失来源的请求
-- **登录限流**：同一客户端 15 分钟内连续失败 5 次后暂时限制；成功登录会清除失败记录
-- **一致错误反馈**：API 使用兼容错误结构，管理页以可访问的行内提示显示读取、保存和删除错误
+| 路径 | 权限 | 说明 |
+|---|---|---|
+| `/` | 公开 | 追番档案、筛选、年份浏览和详情 |
+| `/login` | 公开 | 管理员登录 |
+| `/admin` | 管理员 | 记录、添加/编辑、备份恢复 |
+| `GET /api/anime` | 公开 | 读取全部记录；首页本身不依赖此接口 |
+| `/api/anime/*` 写操作 | 管理员 | 新增、编辑和删除记录 |
+| `/api/bangumi/*` | 管理员 | Bangumi 搜索和条目预填 |
+| `/api/backups/*` | 管理员 | 备份列表、预览、导入、导出和恢复 |
 
-## ☁️ 部署到 Vercel
+## 数据与备份注意事项
 
-1. 把项目推到 GitHub 仓库
-2. 在 [Vercel](https://vercel.com) 用 GitHub 登录，导入该项目
-3. 如果想在线编辑数据，需要在 Vercel Marketplace 添加 Upstash Redis 集成
-4. Vercel 会自动设置 `UPSTASH_REDIS_REST_URL` 和 `UPSTASH_REDIS_REST_TOKEN` 环境变量
-5. 部署完成后，得到一个 `xxx.vercel.app` 公网地址
+- 每次添加、编辑、删除、导入或恢复前都会创建快照，默认保留最近 30 个。
+- 恢复历史版本前会备份当前数据，因此恢复操作本身仍可撤回。
+- JSON 导入支持旧版数组和新版 `anime-diary-backup` 格式；文件上限为 5 MB。
+- 自动快照与生产数据默认存放在同一 Redis 中，可以防止误操作，但不能代替站外备份。
+- 重要改动后建议在后台下载一次当前数据，保存到自己的设备或其他受控位置。
 
-> ⚠️ **注意**：如果不配置 Upstash Redis，数据将存在本地 JSON 文件中，每次部署后重置为仓库中的数据。适合只读展示。
+## 自己修改后如何提交和部署
 
-### 备份注意事项
+当前仓库的 `main` 分支连接 Vercel。正常情况下，只要把提交推送到 GitHub 的 `main`，Vercel 就会自动构建和发布，不需要手动上传文件。
 
-- 自动快照与当前数据默认保存在同一个 Upstash Redis 数据库中，可以防止误删、错误编辑和导入失误，但不能抵御整个数据库或账号不可用。
-- 新版本部署完成后，建议先在管理页点击“下载当前数据”，保存一份站外基线备份。
-- 此功能不需要新增环境变量。将来可以在现有备份格式和存储接口上增加对象存储等外部副本。
+### 1. 修改前同步主分支
 
-### 登录限流注意事项
+```powershell
+git switch main
+git pull --rebase origin main
+git status
+```
 
-- 配置现有 Upstash Redis 时，失败次数会在 Vercel 多实例间共享。
-- 未配置 Redis 时使用单进程内存限流，适合本地开发，但生产部署的不同实例不会共享计数。
-- Redis 中只保存客户端 IP 的 SHA-256 摘要片段，不保存明文 IP。
+如果 `git status` 已经显示本地修改，先确认这些修改是不是你想保留的，不要直接覆盖或删除。
 
-## 📝 配置文件
+### 2. 修改并检查内容
 
-- **[THEME-CONFIG.md](./THEME-CONFIG.md)** - 水光档案令牌与主题调整指南
-- **[app/globals.css](./app/globals.css)** - 全局样式定义
-- **[components/timer.tsx](./components/timer.tsx)** - 实时计时器组件
+```powershell
+git status --short
+git diff
+```
 
-## 🎯 主要组件
+只查看某个文件：
 
-- `components/site-header.tsx` - 客户端站点导航、搜索入口与筛选数量徽标
-- `components/archive/archive-browser.tsx` - 公开档案筛选、URL 同步和详情状态
-- `components/archive/archive-search-context.tsx` - 导航与搜索层共享的打开/关闭状态
-- `components/archive/archive-search-panel.tsx` - 桌面浮层与手机底部抽屉组合筛选
-- `components/archive/archive-results.tsx` - 年份/季度档案浏览
-- `components/archive/anime-detail-dialog.tsx` - 响应式沉浸式记录详情层
-- `components/admin/admin-section-nav.tsx` - 后台工作区导航
-- `components/anime-form.tsx` - 表单组件（标签管理、评分滑块）
-- `components/anime-list.tsx` - 后台记录列表
-- `components/backup-manager.tsx` - 备份导入、导出、差异预览与恢复
-- `components/feedback/inline-feedback.tsx` - 统一错误与成功反馈语义
-- `components/star-rating.tsx` - 星级评分
-- `components/timer.tsx` - 实时计时器
+```powershell
+git diff -- app/page.tsx
+```
 
-公开档案的解析、筛选、排序、分组和统计纯函数位于 `lib/archive/`。
-番剧输入校验位于 `lib/anime/validation.ts`，HTTP/客户端错误边界位于 `lib/http/`，登录限流位于 `lib/auth/rate-limit.ts`。
+如果改了代码，建议在提交前运行：
 
-## 🔧 自定义配置
+```powershell
+npm test
+npx tsc --noEmit
+npm run lint
+npm run build
+```
 
-颜色、表面透明度、阴影、圆角和动效时长统一由 `app/globals.css` 的 `:root` 令牌控制。调整方式与语义类清单见 [THEME-CONFIG.md](./THEME-CONFIG.md)。
+只改 Markdown 时，可以只检查文档内容和链接，不必运行完整产品测试。
 
-## ✅ 测试与检查
+### 3. 只暂存本次修改
 
-```bash
-npm test             # 运行全部自动化测试
+按文件添加，避免把其他尚未完成的工作一起提交：
+
+```powershell
+git add README.md
+git add app\page.tsx components\some-component.tsx
+git status --short
+```
+
+不建议在存在其他修改时直接使用 `git add .`。如果误暂存了文件，可撤销暂存但保留文件内容：
+
+```powershell
+git restore --staged path\to\file
+```
+
+### 4. 创建提交
+
+```powershell
+git commit -m "feat: 简短说明新增功能"
+```
+
+常用提交前缀：
+
+- `feat:` 新功能；
+- `fix:` 修复问题；
+- `style:` 视觉和样式调整；
+- `refactor:` 不改变功能的重构；
+- `docs:` 文档修改；
+- `test:` 测试修改；
+- `chore:` 工具或维护工作。
+
+一个提交尽量只包含一类相关修改，说明要写清楚“改了什么”。
+
+### 5. 再同步并推送
+
+```powershell
+git pull --rebase origin main
+git push origin main
+```
+
+如果 rebase 提示冲突：
+
+1. 打开冲突文件，保留正确内容并删除冲突标记；
+2. 执行 `git add 冲突文件`；
+3. 执行 `git rebase --continue`；
+4. 确认无误后再 `git push origin main`。
+
+不要为了绕过冲突对 `main` 使用强制推送。
+
+### 6. 等待 Vercel 自动部署
+
+推送成功后：
+
+1. 在 GitHub 确认 `main` 已出现刚才的提交；
+2. 打开 Vercel 项目，等待 Production Deployment 显示成功；
+3. 访问 [https://anime.zhanghome.qzz.io/](https://anime.zhanghome.qzz.io/)；
+4. 强制刷新页面并检查刚修改的功能。
+
+如果部署失败，先看 Vercel 的构建日志，不要反复创建空提交。修复后正常提交并再次推送即可。
+
+### 7. 已推送版本需要撤回时
+
+优先创建一个反向提交，不改写 `main` 历史：
+
+```powershell
+git log --oneline -10
+git revert <需要撤回的提交ID>
+git push origin main
+```
+
+`git revert` 会产生新提交，Vercel 随后自动部署撤回后的版本。
+
+## 常用检查命令
+
+```powershell
+npm test             # 全部自动化测试
 npm run test:watch   # 开发时监听测试
 npm run lint         # ESLint
 npx tsc --noEmit     # TypeScript 类型检查
 npm run build        # 生产构建
 ```
 
-当前验证基线（2026-07-30）：
+## 项目文档
 
-- Vitest：41 个测试文件、256 项测试全部通过
-- TypeScript：`npx tsc --noEmit` 通过
-- ESLint：`npm run lint` 通过
-- Next.js：`npm run build` 生产构建通过
-- 响应式验收：桌面和 `390 × 844` 手机视口通过，浏览器控制台无错误
+- [系统架构](./docs/ARCHITECTURE.md)：当前组件、数据、存储、安全、备份与视觉边界。
+- [开发历程](./docs/DEVELOPMENT-HISTORY.md)：已完成阶段、关键决策和代表提交。
 
-## 📄 许可证
+## 许可证
 
 MIT License
 
