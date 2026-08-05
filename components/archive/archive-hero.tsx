@@ -32,7 +32,7 @@ export default function ArchiveHero({ stats }: ArchiveHeroProps) {
         <p className="px-2 pb-3 text-xs font-semibold tracking-[0.16em] text-[var(--ink-subtle)]">
           ARCHIVE SNAPSHOT
         </p>
-        <dl className="grid grid-cols-3 divide-x divide-[rgba(91,83,112,0.12)] overflow-hidden rounded-2xl bg-white/58">
+        <dl className="grid divide-x divide-[rgba(91,83,112,0.12)] overflow-hidden rounded-2xl bg-white/58" style={{ gridTemplateColumns: '1fr 1.2fr 1fr' }} >
           <div className="px-3 py-4 sm:px-4">
             <dd className="text-xl font-black tabular-nums text-[var(--ink)] sm:text-2xl">
               <span aria-hidden="true">{stats.total}</span>
@@ -43,7 +43,7 @@ export default function ArchiveHero({ stats }: ArchiveHeroProps) {
             </dt>
           </div>
           <div className="px-3 py-4 sm:px-4">
-            <dd className="truncate text-base font-black tabular-nums text-[var(--ink)] sm:text-xl">
+            <dd className="truncate text-base font-black tabular-nums text-[var(--ink)] sm:text-2xl">
               {yearRange}
             </dd>
             <dt className="mt-1 text-[11px] text-[var(--ink-subtle)] sm:text-xs">
