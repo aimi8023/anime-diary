@@ -53,25 +53,11 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    loadAnimeList()
-      .then((data) => {
-        if (active) setAnimeList(data);
-      })
-      .catch((error) => {
-        if (active) {
-          setOperationError(
-            error instanceof Error ? error.message : "读取记录失败",
-          );
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+    // 初始加载复用 fetchList；setState 均发生在 await 之后，
+    // 不存在同步级联渲染。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchList();
+  }, [fetchList]);
 
   // Filter by search query
   const filteredList = searchQuery.trim()
@@ -81,54 +67,33 @@ export default function AdminPage() {
     : animeList;
 
   const handleSave = async (data: AnimeInput) => {
-    if (editing) {
-      const res = await fetch(`/api/anime/${editing.id}`, {
-        method: "PUT",
+    const res = await fetch(
+      editing ? `/api/anime/${editing.id}` : "/api/anime",
+      {
+        method: editing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const details = await res
-          .clone()
-          .json()
-          .catch(() => null) as { existingId?: string } | null;
-        if (res.status === 409 && details?.existingId) {
-          const existing = animeList.find(
-            (anime) => anime.id === details.existingId,
-          );
-          if (existing) {
-            setEditing(existing);
-            setPrefill(null);
-            setEntryMode("manual");
-            setSection("entry");
-          }
+      },
+    );
+    if (!res.ok) {
+      const details = await res
+        .clone()
+        .json()
+        .catch(() => null) as { existingId?: string } | null;
+      if (res.status === 409 && details?.existingId) {
+        const existing = animeList.find(
+          (anime) => anime.id === details.existingId,
+        );
+        if (existing) {
+          setEditing(existing);
+          setPrefill(null);
+          setEntryMode("manual");
+          setSection("entry");
         }
-        throw new Error(await readApiError(res, "更新失败"));
       }
-    } else {
-      const res = await fetch("/api/anime", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const details = await res
-          .clone()
-          .json()
-          .catch(() => null) as { existingId?: string } | null;
-        if (res.status === 409 && details?.existingId) {
-          const existing = animeList.find(
-            (anime) => anime.id === details.existingId,
-          );
-          if (existing) {
-            setEditing(existing);
-            setPrefill(null);
-            setEntryMode("manual");
-            setSection("entry");
-          }
-        }
-        throw new Error(await readApiError(res, "添加失败"));
-      }
+      throw new Error(
+        await readApiError(res, editing ? "更新失败" : "添加失败"),
+      );
     }
     setEditing(null);
     setPrefill(null);

@@ -121,7 +121,10 @@ export default function AnimeForm({
 
       {/* Title */}
       <div>
-        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">
+        <label
+          className="mb-2 block text-sm font-bold text-[var(--ink)]"
+          htmlFor="anime-form-title"
+        >
           标题 <span className="text-[var(--danger)]">*</span>
         </label>
         <input
@@ -130,13 +133,19 @@ export default function AnimeForm({
           onChange={(e) => setTitle(e.target.value)}
           className={inputClass}
           placeholder="例如：葬送的芙莉莲"
+          id="anime-form-title"
         />
       </div>
 
       {/* Year + Season + Episodes */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
-          <label className="mb-2 block text-sm font-bold text-[var(--ink)]">年份</label>
+          <label
+            className="mb-2 block text-sm font-bold text-[var(--ink)]"
+            htmlFor="anime-form-year"
+          >
+            年份
+          </label>
           <input
             type="number"
             value={year}
@@ -145,14 +154,21 @@ export default function AnimeForm({
             placeholder="例如：2024"
             min={0}
             max={9999}
+            id="anime-form-year"
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-bold text-[var(--ink)]">季度</label>
+          <label
+            className="mb-2 block text-sm font-bold text-[var(--ink)]"
+            htmlFor="anime-form-season"
+          >
+            季度
+          </label>
           <select
             value={season}
             onChange={(e) => setSeason(e.target.value)}
             className={`${inputClass} appearance-none`}
+            id="anime-form-season"
           >
             {SEASONS.map((s) => (
               <option key={s.value} value={s.value} className="bg-white text-gray-900">
@@ -162,26 +178,38 @@ export default function AnimeForm({
           </select>
         </div>
         <div>
-          <label className="mb-2 block text-sm font-bold text-[var(--ink)]">话数</label>
+          <label
+            className="mb-2 block text-sm font-bold text-[var(--ink)]"
+            htmlFor="anime-form-episodes"
+          >
+            话数
+          </label>
           <input
             type="number"
             value={episodes}
             onChange={(e) => setEpisodes(Math.max(0, parseInt(e.target.value) || 0))}
             className={inputClass}
             min={0}
+            id="anime-form-episodes"
           />
         </div>
       </div>
 
       {/* Cover URL */}
       <div>
-        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">封面图片链接</label>
+        <label
+          className="mb-2 block text-sm font-bold text-[var(--ink)]"
+          htmlFor="anime-form-cover"
+        >
+          封面图片链接
+        </label>
         <input
           type="url"
           value={cover}
           onChange={(e) => setCover(e.target.value)}
           className={inputClass}
           placeholder="https://..."
+          id="anime-form-cover"
         />
         {cover && (
           <div className="relative mt-3 aspect-[2/3] w-20 overflow-hidden rounded-xl border border-white/70 bg-white/40 shadow-sm">
@@ -202,7 +230,10 @@ export default function AnimeForm({
 
       {/* Rating Slider */}
       <div>
-        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">
+        <label
+          className="mb-2 block text-sm font-bold text-[var(--ink)]"
+          htmlFor="anime-form-rating"
+        >
           评分：<span className="text-base font-black text-[var(--warning)]">{rating.toFixed(1)}</span>
         </label>
         <div className="flex items-center gap-3">
@@ -214,6 +245,7 @@ export default function AnimeForm({
             value={rating}
             onChange={(e) => setRating(parseFloat(e.target.value))}
             className="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gradient-to-r from-pink-300 to-blue-300 accent-[var(--accent)]"
+            id="anime-form-rating"
           />
           <div className="flex items-center gap-1 text-xs text-[var(--ink-subtle)]">
             <span>1</span>
@@ -245,7 +277,12 @@ export default function AnimeForm({
 
       {/* Tags */}
       <div>
-        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">标签</label>
+        <label
+          className="mb-2 block text-sm font-bold text-[var(--ink)]"
+          htmlFor="anime-form-tag-input"
+        >
+          标签
+        </label>
         {availableSuggestedTags.length > 0 && (
           <div className="mb-3">
             <p className="mb-2 text-xs text-[var(--ink-muted)]">Bangumi 推荐标签（点击选择）</p>
@@ -271,6 +308,7 @@ export default function AnimeForm({
             onKeyDown={handleTagInputKeyDown}
             className={`${inputClass} flex-1`}
             placeholder="输入标签后按回车或点击添加"
+            id="anime-form-tag-input"
           />
           <button
             type="button"
@@ -306,13 +344,19 @@ export default function AnimeForm({
 
       {/* Comment */}
       <div>
-        <label className="mb-2 block text-sm font-bold text-[var(--ink)]">短评</label>
+        <label
+          className="mb-2 block text-sm font-bold text-[var(--ink)]"
+          htmlFor="anime-form-comment"
+        >
+          短评
+        </label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={3}
           className={`${inputClass} resize-none`}
           placeholder="写下你的感受..."
+          id="anime-form-comment"
         />
       </div>
 

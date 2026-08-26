@@ -110,40 +110,11 @@ export default function BackupManager({
   }, []);
 
   useEffect(() => {
-    let active = true;
-    fetch("/api/backups", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(
-            await readApiError(
-              response,
-              `请求失败（${response.status}）`,
-            ),
-          );
-        }
-        return response.json();
-      })
-      .then((body) => {
-        if (active) {
-          setBackups(Array.isArray(body.backups) ? body.backups : []);
-        }
-      })
-      .catch((loadError) => {
-        if (active) {
-          setError(
-            loadError instanceof Error
-              ? loadError.message
-              : "读取备份列表失败",
-          );
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+    // 复用与手动刷新相同的加载函数；setState 均发生在 await 之后，
+    // 不存在同步级联渲染。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadBackups();
+  }, [loadBackups]);
 
   const openRestore = async (backup: BackupMetadata) => {
     setError("");
