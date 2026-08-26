@@ -34,6 +34,10 @@ export default function AdminPage() {
   const [section, setSection] = useState<AdminSection>("records");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Anime | null>(null);
+  const [formDirty, setFormDirty] = useState(false);
+  const [pendingDiscard, setPendingDiscard] = useState<(() => void) | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [entryMode, setEntryMode] = useState<EntryMode>("bangumi");
@@ -100,6 +104,7 @@ export default function AdminPage() {
     setEditing(null);
     setPrefill(null);
     setEntryMode("bangumi");
+    setFormDirty(false);
     setSection("records");
     fetchList();
   };
@@ -131,26 +136,33 @@ export default function AdminPage() {
     }
   };
 
-  const handleEdit = (anime: Anime) => {
-    setEditing(anime);
-    setPrefill(null);
-    setEntryMode("manual");
-    setSection("entry");
-  };
-
-  const handleCancel = () => {
+  const resetEntryAndGo = (nextSection: AdminSection) => {
     setEditing(null);
     setPrefill(null);
     setEntryMode("bangumi");
-    setSection("records");
+    setSection(nextSection);
   };
 
-  const handleStartAdd = () => {
-    setEditing(null);
-    setPrefill(null);
-    setEntryMode("bangumi");
-    setSection("entry");
+  // 表单有未保存修改时，先经确认再执行目标跳转。
+  const requestDiscard = (action: () => void) => {
+    if (formDirty) {
+      setPendingDiscard(() => action);
+      return;
+    }
+    action();
   };
+
+  const handleCancel = () => requestDiscard(() => resetEntryAndGo("records"));
+
+  const handleStartAdd = () => requestDiscard(() => resetEntryAndGo("entry"));
+
+  const handleEdit = (anime: Anime) =>
+    requestDiscard(() => {
+      setEditing(anime);
+      setPrefill(null);
+      setEntryMode("manual");
+      setSection("entry");
+    });
 
   const handleEditExisting = (localAnimeId: string) => {
     const existing = animeList.find((anime) => anime.id === localAnimeId);
@@ -167,11 +179,20 @@ export default function AdminPage() {
       handleStartAdd();
       return;
     }
-    setEditing(null);
-    setPrefill(null);
-    setEntryMode("bangumi");
-    setSection(nextSection);
+    requestDiscard(() => resetEntryAndGo(nextSection));
   };
+
+  // 有未保存修改时，拦截关闭/刷新页面。
+  useEffect(() => {
+    if (!formDirty) return;
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () =>
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [formDirty]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
@@ -325,8 +346,9 @@ export default function AdminPage() {
               key={editing.id}
               initial={editing}
               submitLabel="更新记录"
-              onSave={handleSave}
               onCancel={handleCancel}
+              onDirtyChange={setFormDirty}
+              onSave={handleSave}
             />
           ) : (
             <>
@@ -397,8 +419,9 @@ export default function AdminPage() {
                     initial={prefill}
                     suggestedTags={prefill?.suggestedTags ?? []}
                     submitLabel="添加记录"
-                    onSave={handleSave}
                     onCancel={handleCancel}
+                    onDirtyChange={setFormDirty}
+                    onSave={handleSave}
                   />
                 </>
               )}
@@ -434,6 +457,21 @@ export default function AdminPage() {
         }}
         open={pendingDelete !== null}
         title={`删除《${pendingDelete?.title ?? ""}》？`}
+      />
+
+      <ConfirmDialog
+        confirmLabel="放弃修改"
+        danger
+        description="表单里有未保存的修改，离开后将无法恢复。"
+        onCancel={() => setPendingDiscard(null)}
+        onConfirm={() => {
+          const action = pendingDiscard;
+          setPendingDiscard(null);
+          setFormDirty(false);
+          action?.();
+        }}
+        open={pendingDiscard !== null}
+        title="放弃未保存的修改？"
       />
     </div>
   );

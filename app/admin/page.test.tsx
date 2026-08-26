@@ -49,6 +49,48 @@ function jsonResponse(body: unknown, status = 200): Response {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("AdminPage Bangumi entry", () => {
+  it("asks for confirmation before discarding unsaved form edits", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url === "/api/anime") return jsonResponse([existingAnime]);
+        if (url === "/api/backups") return jsonResponse({ backups: [] });
+        throw new Error(`Unexpected fetch: ${url}`);
+      }),
+    );
+
+    render(<AdminPage />);
+    expect(await screen.findByText("葬送的芙莉莲")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "+ 添加番剧" }));
+    await user.click(screen.getByRole("button", { name: "手动填写" }));
+    await user.type(screen.getByLabelText("标题 *"), "未保存的新记录");
+
+    // 直接切换工作区会被确认对话框拦截。
+    await user.click(screen.getByRole("tab", { name: "备份恢复" }));
+    const dialog = screen.getByRole("dialog", {
+      name: "放弃未保存的修改？",
+    });
+    expect(dialog).toBeInTheDocument();
+
+    // 取消则停留在原工作区。
+    await user.click(
+      within(dialog).getByRole("button", { name: "取消" }),
+    );
+    expect(
+      screen.getByLabelText("标题 *"),
+    ).toBeInTheDocument();
+
+    // 确认后才真正离开。
+    await user.click(screen.getByRole("tab", { name: "备份恢复" }));
+    await user.click(screen.getByRole("button", { name: "放弃修改" }));
+    expect(
+      await screen.findByRole("heading", { name: "备份与恢复" }),
+    ).toBeInTheDocument();
+  });
+
   it("shows a safe inline error when the record list cannot load", async () => {
     vi.stubGlobal(
       "fetch",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { AnimeInput } from "@/lib/types";
 import InlineFeedback from "@/components/feedback/inline-feedback";
@@ -25,6 +25,8 @@ interface AnimeFormProps {
   submitLabel?: string;
   onSave: (data: AnimeInput) => Promise<void>;
   onCancel: () => void;
+  /** 字段相对初始值发生变化时上报，供外层做离开确认。 */
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
 export default function AnimeForm({
@@ -33,6 +35,7 @@ export default function AnimeForm({
   submitLabel,
   onSave,
   onCancel,
+  onDirtyChange,
 }: AnimeFormProps) {
   const [title, setTitle] = useState(initial?.title || "");
   const [year, setYear] = useState(
@@ -49,6 +52,24 @@ export default function AnimeForm({
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // 相对初始值是否有改动，供外层在切换工作区前做确认。
+  const isDirty =
+    title !== (initial?.title || "") ||
+    seasonValue(year, season) !==
+      (initial?.season ?? seasonValue(CURRENT_YEAR, SEASONS[0].value)) ||
+    cover !== (initial?.cover || "") ||
+    rating !== (initial?.rating ?? 5) ||
+    comment !== (initial?.comment || "") ||
+    episodes !== (initial?.episodes ?? 0) ||
+    JSON.stringify(tags) !== JSON.stringify(initial?.tags ?? []);
+
+  const dirtyReportedRef = useRef(false);
+  useEffect(() => {
+    if (dirtyReportedRef.current === isDirty) return;
+    dirtyReportedRef.current = isDirty;
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
