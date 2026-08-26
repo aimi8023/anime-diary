@@ -7,6 +7,7 @@ import type {
   ArchiveSort,
   ArchiveStats,
   ArchiveYearGroup,
+  YearRecap,
 } from "./types";
 
 export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
@@ -214,4 +215,64 @@ export function getArchiveStats(data: Anime[]): ArchiveStats {
     earliestYear: years.length > 0 ? years[years.length - 1] : null,
     latestYear: years[0] ?? null,
   };
+}
+
+/**
+ * 年度回顾：按年聚合部数、平均分、最高分作品与高频标签。
+ * 季度缺失（“其他”）的记录不参与年度聚合；不修改调用方数组。
+ */
+export function getYearlyRecap(data: Anime[]): YearRecap[] {
+  const byYear = new Map<string, Anime[]>();
+  for (const anime of data) {
+    const { year } = seasonParts(anime.season);
+    if (year === "其他") continue;
+    const records = byYear.get(year) ?? [];
+    records.push(anime);
+    byYear.set(year, records);
+  }
+
+  return Array.from(byYear.entries())
+    .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
+    .map(([year, records]) => {
+      const total = records.length;
+      const ratingSum = records.reduce(
+        (sum, anime) => sum + (Number.isFinite(anime.rating) ? anime.rating : 0),
+        0,
+      );
+      const averageRating = Math.round((ratingSum / total) * 10) / 10;
+
+      const topAnime = records.reduce<Anime | null>((best, anime) => {
+        if (!best) return anime;
+        if (anime.rating > best.rating) return anime;
+        if (
+          anime.rating === best.rating &&
+          anime.title.localeCompare(best.title, "zh-CN") < 0
+        ) {
+          return anime;
+        }
+        return best;
+      }, null);
+
+      const tagCounts = new Map<string, number>();
+      for (const anime of records) {
+        for (const tag of anime.tags ?? []) {
+          tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+        }
+      }
+      const topTags = Array.from(tagCounts.entries())
+        .sort(([tagA, countA], [tagB, countB]) =>
+          countB - countA || tagA.localeCompare(tagB, "zh-CN"))
+        .slice(0, 3)
+        .map(([tag]) => tag);
+
+      return {
+        year,
+        total,
+        averageRating,
+        topAnime: topAnime
+          ? { title: topAnime.title, rating: topAnime.rating }
+          : null,
+        topTags,
+      };
+    });
 }

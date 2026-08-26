@@ -6,6 +6,7 @@ import {
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
   getArchiveOptions,
+  getYearlyRecap,
   parseArchiveFilters,
   serializeArchiveFilters,
 } from "@/lib/archive/filter";
@@ -18,6 +19,7 @@ import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
 import ArchiveSearchPanel from "./archive-search-panel";
+import YearRecapPanel from "./year-recap";
 
 interface ArchiveBrowserProps {
   records: Anime[];
@@ -39,6 +41,7 @@ export default function ArchiveBrowser({
     () => filterAnime(records, filters),
     [filters, records],
   );
+  const recaps = useMemo(() => getYearlyRecap(records), [records]);
   const selectedIndex = filteredRecords.findIndex(
     (anime) => anime.id === selectedId,
   );
@@ -160,6 +163,23 @@ export default function ArchiveBrowser({
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
       <ArchiveHero stats={stats} />
+      <div className="mb-6">
+        <YearRecapPanel
+          recaps={recaps}
+          onSelectYear={(year) => {
+            updateFilters({ year });
+            document
+              .getElementById("archive")
+              ?.scrollIntoView({
+                behavior: window.matchMedia(
+                  "(prefers-reduced-motion: reduce)",
+                ).matches
+                  ? "auto"
+                  : "smooth",
+              });
+          }}
+        />
+      </div>
       <ArchiveSearchPanel
         filters={filters}
         onFilterChange={updateFilters}

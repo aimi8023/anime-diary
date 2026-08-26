@@ -6,6 +6,7 @@ import {
   filterAnime,
   getArchiveOptions,
   getArchiveStats,
+  getYearlyRecap,
   groupAnimeByYear,
   parseArchiveFilters,
   serializeArchiveFilters,
@@ -231,5 +232,109 @@ describe("archive filtering and grouping", () => {
       earliestYear: null,
       latestYear: null,
     });
+  });
+});
+
+describe("getYearlyRecap", () => {
+  const recapRecords: Anime[] = [
+    {
+      id: "a",
+      title: "甲",
+      season: "2024夏",
+      cover: "",
+      rating: 9,
+      comment: "",
+      episodes: 12,
+      tags: ["日常", "治愈"],
+      createdAt: "2024-07-01T00:00:00.000Z",
+    },
+    {
+      id: "b",
+      title: "乙",
+      season: "2024冬",
+      cover: "",
+      rating: 8,
+      comment: "",
+      episodes: 12,
+      tags: ["日常"],
+      createdAt: "2024-01-01T00:00:00.000Z",
+    },
+    {
+      id: "c",
+      title: "丙",
+      season: "2023秋",
+      cover: "",
+      rating: 9,
+      comment: "",
+      episodes: 24,
+      tags: ["奇幻"],
+      createdAt: "2023-10-01T00:00:00.000Z",
+    },
+    {
+      id: "d",
+      title: "缺季度",
+      season: "其他",
+      cover: "",
+      rating: 10,
+      comment: "",
+      episodes: 1,
+      tags: [],
+      createdAt: "2024-02-01T00:00:00.000Z",
+    },
+  ];
+
+  it("aggregates per year and excludes records without a season year", () => {
+    expect(getYearlyRecap(recapRecords)).toEqual([
+      {
+        year: "2024",
+        total: 2,
+        averageRating: 8.5,
+        topAnime: { title: "甲", rating: 9 },
+        topTags: ["日常", "治愈"],
+      },
+      {
+        year: "2023",
+        total: 1,
+        averageRating: 9,
+        topAnime: { title: "丙", rating: 9 },
+        topTags: ["奇幻"],
+      },
+    ]);
+  });
+
+  it("breaks rating ties by title order and caps tags at three", () => {
+    const tied: Anime[] = [
+      {
+        id: "t2",
+        title: "乙",
+        season: "2025春",
+        cover: "",
+        rating: 9,
+        comment: "",
+        episodes: 1,
+        tags: ["A", "B", "C", "D"],
+        createdAt: "2025-04-01T00:00:00.000Z",
+      },
+      {
+        id: "t1",
+        title: "甲",
+        season: "2025夏",
+        cover: "",
+        rating: 9,
+        comment: "",
+        episodes: 1,
+        tags: ["A"],
+        createdAt: "2025-07-01T00:00:00.000Z",
+      },
+    ];
+
+    const recap = getYearlyRecap(tied);
+    // 平分时取标题顺序靠前的作品。
+    expect(recap[0].topAnime).toEqual({ title: "甲", rating: 9 });
+    expect(recap[0].topTags).toEqual(["A", "B", "C"]);
+  });
+
+  it("returns an empty recap for empty data", () => {
+    expect(getYearlyRecap([])).toEqual([]);
   });
 });
