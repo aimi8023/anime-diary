@@ -11,9 +11,10 @@ export async function GET() {
     const list = await storage.getAll();
     return NextResponse.json(list);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "获取数据失败";
     console.error("GET /api/anime error:", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return errorResponse(500, "获取数据失败", {
+      code: "internal_error",
+    });
   }
 }
 

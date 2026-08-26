@@ -10,7 +10,7 @@ const storageMock = vi.hoisted(() => ({
 
 vi.mock("@/lib/storage-factory", () => ({ storage: storageMock }));
 
-import { POST } from "./route";
+import { POST, GET } from "./route";
 
 const input = {
   title: " 孤独摇滚！ ",
@@ -36,6 +36,40 @@ function postRequest(body = input): Request {
     body: JSON.stringify(body),
   });
 }
+
+describe("GET /api/anime", () => {
+  beforeEach(() => {
+    storageMock.getAll.mockReset();
+  });
+
+  it("returns the full record list", async () => {
+    storageMock.getAll.mockResolvedValueOnce([{ id: "anime-1" }]);
+
+    const response = await GET();
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual([{ id: "anime-1" }]);
+  });
+
+  it("hides storage failure details behind a generic error", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    storageMock.getAll.mockRejectedValueOnce(
+      new Error("Redis 当前数据损坏: https://internal-host"),
+    );
+
+    const response = await GET();
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({
+      error: "获取数据失败",
+      code: "internal_error",
+    });
+    expect(consoleError).toHaveBeenCalledOnce();
+    consoleError.mockRestore();
+  });
+});
 
 describe("POST /api/anime", () => {
   beforeEach(() => {
