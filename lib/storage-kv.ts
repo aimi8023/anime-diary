@@ -214,14 +214,16 @@ class RedisStorageAdapter implements VersionedStorageAdapter {
     );
     if (ids.length === 0) return [];
     // 用一次 hmget 批量读取元数据，避免逐条 hget 的 N+1 网络往返。
-    // 元数据损坏时保持与逐条读取相同的行为：整体报错，不静默跳过。
-    const entries = await this.redis.hmget<unknown[]>(
+    // Upstash 客户端返回以备份 id 为键的对象；哈希整体缺失时为 null，
+    // 单个字段缺失时对应键不存在。元数据损坏时保持原有契约：整体报错。
+    const entries = await this.redis.hmget<Record<string, unknown>>(
       BACKUP_METADATA_KEY,
       ...ids,
     );
-    return entries.filter(
-      (item): item is BackupMetadata => parseMetadata(item) !== null,
-    );
+    if (!entries) return [];
+    return ids
+      .map((id) => parseMetadata(entries[id] ?? null))
+      .filter((item): item is BackupMetadata => item !== null);
   }
 
   async getBackup(id: string): Promise<BackupSnapshot | null> {

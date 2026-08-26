@@ -141,7 +141,10 @@ describe("createKvStorage", () => {
       newest.id,
       oldest.id,
     ]);
-    vi.mocked(redis.hmget).mockResolvedValueOnce([newest, oldest]);
+    vi.mocked(redis.hmget).mockResolvedValueOnce({
+      [newest.id]: newest,
+      [oldest.id]: oldest,
+    });
 
     await expect(createKvStorage(redis).listBackups()).resolves.toEqual([
       newest,
@@ -166,7 +169,7 @@ describe("createKvStorage", () => {
       schemaVersion: 1,
     };
     vi.mocked(redis.zrange).mockResolvedValueOnce(["gone", metadata.id]);
-    vi.mocked(redis.hmget).mockResolvedValueOnce([null, metadata]);
+    vi.mocked(redis.hmget).mockResolvedValueOnce({ [metadata.id]: metadata });
 
     await expect(createKvStorage(redis).listBackups()).resolves.toEqual([
       metadata,
@@ -176,7 +179,7 @@ describe("createKvStorage", () => {
   it("rejects the whole listing when one metadata entry is corrupted", async () => {
     const redis = redisDouble();
     vi.mocked(redis.zrange).mockResolvedValueOnce(["backup-1"]);
-    vi.mocked(redis.hmget).mockResolvedValueOnce([{ id: 42 }]);
+    vi.mocked(redis.hmget).mockResolvedValueOnce({ "backup-1": { id: 42 } });
 
     await expect(createKvStorage(redis).listBackups()).rejects.toThrow(
       "Redis 备份元数据损坏",
