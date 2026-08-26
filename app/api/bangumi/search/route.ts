@@ -33,16 +33,26 @@ export async function GET(request: Request) {
 
   try {
     const results = await searchBangumiSubjects(query);
-    const decorated = await Promise.all(
-      results.map(async (result) => {
-        const existing = await storage.findByBangumiId(result.bangumiId);
-        return {
-          ...result,
-          alreadyAdded: Boolean(existing),
-          ...(existing ? { localAnimeId: existing.id } : {}),
-        };
-      }),
-    );
+    // 只读一次本站数据，在内存内完成重复检测，
+    // 避免对每条搜索结果各触发一次全量状态读取。
+    const { data } = await storage.getState();
+    const localIdByBangumiId = new Map<number, string>();
+    for (const anime of data) {
+      if (
+        anime.bangumiId !== undefined &&
+        !localIdByBangumiId.has(anime.bangumiId)
+      ) {
+        localIdByBangumiId.set(anime.bangumiId, anime.id);
+      }
+    }
+    const decorated = results.map((result) => {
+      const localId = localIdByBangumiId.get(result.bangumiId);
+      return {
+        ...result,
+        alreadyAdded: localId !== undefined,
+        ...(localId !== undefined ? { localAnimeId: localId } : {}),
+      };
+    });
     return NextResponse.json(decorated);
   } catch (error) {
     return upstreamErrorResponse(error);

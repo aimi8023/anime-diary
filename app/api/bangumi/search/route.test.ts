@@ -5,7 +5,7 @@ const clientMock = vi.hoisted(() => ({
   searchBangumiSubjects: vi.fn(),
 }));
 const storageMock = vi.hoisted(() => ({
-  findByBangumiId: vi.fn(),
+  getState: vi.fn(),
 }));
 
 vi.mock("@/lib/bangumi/client", async (importOriginal) => {
@@ -33,7 +33,7 @@ function request(query: string): Request {
 describe("GET /api/bangumi/search", () => {
   beforeEach(() => {
     clientMock.searchBangumiSubjects.mockReset();
-    storageMock.findByBangumiId.mockReset();
+    storageMock.getState.mockReset();
   });
 
   it.each(["", "?q=", "?q=%20%20"])(
@@ -50,19 +50,25 @@ describe("GET /api/bangumi/search", () => {
     expect(response.status).toBe(400);
   });
 
-  it("trims the query and decorates exact local duplicates", async () => {
+  it("trims the query and decorates exact local duplicates with one state read", async () => {
     clientMock.searchBangumiSubjects.mockResolvedValue([
       result,
       { ...result, bangumiId: 999, title: "未收录" },
     ]);
-    storageMock.findByBangumiId
-      .mockResolvedValueOnce({ id: "local-id", bangumiId: 352821 })
-      .mockResolvedValueOnce(null);
+    storageMock.getState.mockResolvedValue({
+      revision: 3,
+      data: [
+        { id: "local-id", bangumiId: 352821 },
+        { id: "no-bangumi" },
+        { id: "another", bangumiId: 42 },
+      ],
+    });
 
     const response = await GET(request("?q=%20孤独摇滚%20"));
 
     expect(response.status).toBe(200);
     expect(clientMock.searchBangumiSubjects).toHaveBeenCalledWith("孤独摇滚");
+    expect(storageMock.getState).toHaveBeenCalledTimes(1);
     expect(await response.json()).toEqual([
       {
         ...result,
