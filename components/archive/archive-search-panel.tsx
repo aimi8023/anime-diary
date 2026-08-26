@@ -16,6 +16,8 @@ interface ArchiveToolbarProps {
   filters: ArchiveFilters;
   options: ArchiveOptions;
   queryDraft: string;
+  /** 当前条件下的命中数量；提供时在面板头部实时展示。 */
+  resultCount?: number;
   onQueryChange: (value: string) => void;
   onFilterChange: (patch: Partial<ArchiveFilters>) => void;
   onToggleTag: (tag: string) => void;
@@ -230,6 +232,14 @@ export default function ArchiveSearchPanel(props: ArchiveToolbarProps) {
             <h2 className="text-lg font-bold text-[var(--ink)]">
               搜索与筛选
             </h2>
+            {typeof props.resultCount === "number" && (
+              <p
+                aria-live="polite"
+                className="mt-1 text-xs font-semibold text-[var(--ink-muted)]"
+              >
+                当前条件：找到 {props.resultCount} 部
+              </p>
+            )}
           </div>
           <button
             aria-label="关闭搜索与筛选"

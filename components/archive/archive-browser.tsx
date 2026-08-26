@@ -167,6 +167,7 @@ export default function ArchiveBrowser({
         onToggleTag={toggleTag}
         options={options}
         queryDraft={queryDraft}
+        resultCount={filteredRecords.length}
       />
 
       {records.length === 0 ? (

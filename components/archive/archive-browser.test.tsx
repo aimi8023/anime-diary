@@ -260,4 +260,18 @@ describe("ArchiveBrowser filtering", () => {
       await screen.findByRole("dialog", { name: "摇曳露营" }),
     ).toBeInTheDocument();
   });
+
+  it("shows the live result count inside the search panel", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+
+    await user.click(screen.getByRole("button", { name: "打开搜索" }));
+    const panel = screen.getByRole("dialog", { name: "搜索与筛选" });
+
+    expect(panel).toHaveTextContent("当前条件：找到 3 部");
+
+    await user.selectOptions(screen.getByLabelText("年份"), "2024");
+
+    expect(panel).toHaveTextContent("当前条件：找到 2 部");
+  });
 });
