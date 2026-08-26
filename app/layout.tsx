@@ -14,9 +14,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://anime.zhanghome.qzz.io";
+const SITE_DESCRIPTION =
+  "记录每个季度追过的番剧：评分、感想与标签，按年份和季度随时回顾。";
+
 export const metadata: Metadata = {
-  title: "追番记录",
-  description: "记录每个季度追过的番剧",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "追番记录 · 我的追番档案",
+    template: "%s · 追番记录",
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: "追番记录 · 我的追番档案",
+    description: SITE_DESCRIPTION,
+    type: "website",
+    locale: "zh_CN",
+    siteName: "追番记录",
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "追番记录 · 我的追番档案",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
