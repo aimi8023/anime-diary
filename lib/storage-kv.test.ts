@@ -30,6 +30,7 @@ function redisDouble() {
     eval: vi.fn(),
     zrange: vi.fn(),
     hget: vi.fn(),
+    hmget: vi.fn(),
   } as unknown as Redis;
 }
 
@@ -140,15 +141,46 @@ describe("createKvStorage", () => {
       newest.id,
       oldest.id,
     ]);
-    vi.mocked(redis.hget)
-      .mockResolvedValueOnce(newest)
-      .mockResolvedValueOnce(oldest);
+    vi.mocked(redis.hmget).mockResolvedValueOnce([newest, oldest]);
 
     await expect(createKvStorage(redis).listBackups()).resolves.toEqual([
       newest,
       oldest,
     ]);
     expect(redis.get).not.toHaveBeenCalled();
+    expect(redis.hget).not.toHaveBeenCalled();
+    expect(redis.hmget).toHaveBeenCalledExactlyOnceWith(
+      "anime:backup:metadata",
+      "backup-2",
+      "backup-1",
+    );
+  });
+
+  it("skips index entries whose metadata is missing", async () => {
+    const redis = redisDouble();
+    const metadata: BackupMetadata = {
+      id: "backup-1",
+      createdAt: "2026-07-29T00:00:01.000Z",
+      reason: "add",
+      recordCount: 1,
+      schemaVersion: 1,
+    };
+    vi.mocked(redis.zrange).mockResolvedValueOnce(["gone", metadata.id]);
+    vi.mocked(redis.hmget).mockResolvedValueOnce([null, metadata]);
+
+    await expect(createKvStorage(redis).listBackups()).resolves.toEqual([
+      metadata,
+    ]);
+  });
+
+  it("rejects the whole listing when one metadata entry is corrupted", async () => {
+    const redis = redisDouble();
+    vi.mocked(redis.zrange).mockResolvedValueOnce(["backup-1"]);
+    vi.mocked(redis.hmget).mockResolvedValueOnce([{ id: 42 }]);
+
+    await expect(createKvStorage(redis).listBackups()).rejects.toThrow(
+      "Redis 备份元数据损坏",
+    );
   });
 
   it("loads a requested snapshot body by safe id", async () => {

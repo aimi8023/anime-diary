@@ -212,15 +212,15 @@ class RedisStorageAdapter implements VersionedStorageAdapter {
       -1,
       { rev: true },
     );
-    const metadata = await Promise.all(
-      ids.map((id) =>
-        this.redis
-          .hget<unknown>(BACKUP_METADATA_KEY, id)
-          .then(parseMetadata),
-      ),
+    if (ids.length === 0) return [];
+    // 用一次 hmget 批量读取元数据，避免逐条 hget 的 N+1 网络往返。
+    // 元数据损坏时保持与逐条读取相同的行为：整体报错，不静默跳过。
+    const entries = await this.redis.hmget<unknown[]>(
+      BACKUP_METADATA_KEY,
+      ...ids,
     );
-    return metadata.filter(
-      (item): item is BackupMetadata => item !== null,
+    return entries.filter(
+      (item): item is BackupMetadata => parseMetadata(item) !== null,
     );
   }
 
