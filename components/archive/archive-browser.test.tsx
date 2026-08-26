@@ -275,21 +275,27 @@ describe("ArchiveBrowser filtering", () => {
     expect(panel).toHaveTextContent("当前条件：找到 2 部");
   });
 
-  it("switches sort from the toolbar without opening the search panel", async () => {
+  it("switches grouping and direction from the toolbar", async () => {
     const user = userEvent.setup();
     renderArchive();
     replaceStateSpy.mockClear();
 
-    const addedButton = screen.getByRole("button", { name: "最新" });
-    expect(addedButton).toHaveAttribute("aria-pressed", "false");
+    const ratingButton = screen.getByRole("button", { name: "评分" });
+    expect(ratingButton).toHaveAttribute("aria-pressed", "false");
 
-    await user.click(addedButton);
-
-    expect(addedButton).toHaveAttribute("aria-pressed", "true");
+    await user.click(ratingButton);
+    expect(ratingButton).toHaveAttribute("aria-pressed", "true");
     expect(replaceStateSpy).toHaveBeenLastCalledWith(
       null,
       "",
-      "/?sort=added",
+      "/?group=rating",
+    );
+
+    await user.click(screen.getByRole("button", { name: "改为升序排列" }));
+    expect(replaceStateSpy).toHaveBeenLastCalledWith(
+      null,
+      "",
+      "/?group=rating&dir=asc",
     );
   });
 });

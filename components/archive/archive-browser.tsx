@@ -6,7 +6,6 @@ import {
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
   getArchiveOptions,
-  getYearlyRecap,
   parseArchiveFilters,
   serializeArchiveFilters,
 } from "@/lib/archive/filter";
@@ -19,7 +18,7 @@ import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
 import ArchiveSearchPanel from "./archive-search-panel";
-import YearRecapPanel from "./year-recap";
+import YearDrawer from "./year-drawer";
 
 interface ArchiveBrowserProps {
   records: Anime[];
@@ -41,7 +40,7 @@ export default function ArchiveBrowser({
     () => filterAnime(records, filters),
     [filters, records],
   );
-  const recaps = useMemo(() => getYearlyRecap(records), [records]);
+  const [yearDrawerOpen, setYearDrawerOpen] = useState(false);
   const selectedIndex = filteredRecords.findIndex(
     (anime) => anime.id === selectedId,
   );
@@ -143,10 +142,11 @@ export default function ArchiveBrowser({
 
   function clearFilters() {
     setQueryDraft("");
-    // 排序是浏览偏好，清除筛选时保持不变。
+    // 排列维度与方向是浏览偏好，清除筛选时保持不变。
     setFilters((current) => ({
       ...DEFAULT_ARCHIVE_FILTERS,
-      sort: current.sort,
+      direction: current.direction,
+      group: current.group,
     }));
   }
 
@@ -167,23 +167,15 @@ export default function ArchiveBrowser({
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
       <ArchiveHero stats={stats} />
-      <div className="mb-6">
-        <YearRecapPanel
-          recaps={recaps}
-          onSelectYear={(year) => {
-            updateFilters({ year });
-            document
-              .getElementById("archive")
-              ?.scrollIntoView({
-                behavior: window.matchMedia(
-                  "(prefers-reduced-motion: reduce)",
-                ).matches
-                  ? "auto"
-                  : "smooth",
-              });
-          }}
-        />
-      </div>
+      <ActiveFilters
+        filters={filters}
+        onClear={clearFilters}
+        onDirectionChange={(direction) => updateFilters({ direction })}
+        onGroupChange={(group) => updateFilters({ group })}
+        onOpenYearArchive={() => setYearDrawerOpen(true)}
+        onRemove={removeFilter}
+        resultCount={filteredRecords.length}
+      />
       <ArchiveSearchPanel
         filters={filters}
         onFilterChange={updateFilters}
@@ -211,18 +203,11 @@ export default function ArchiveBrowser({
         </section>
       ) : (
         <section id="archive">
-          <ActiveFilters
-            filters={filters}
-            onClear={clearFilters}
-            onRemove={removeFilter}
-            onSortChange={(sort) => updateFilters({ sort })}
-            resultCount={filteredRecords.length}
-          />
           <ArchiveResults
+            filters={filters}
             onClearFilters={clearFilters}
             onSelect={(anime) => setSelectedId(anime.id)}
             records={filteredRecords}
-            sort={filters.sort}
           />
         </section>
       )}
@@ -238,6 +223,22 @@ export default function ArchiveBrowser({
             : null
         }
         sharePath={selectedAnime ? `/?anime=${selectedAnime.id}` : null}
+      />
+      <YearDrawer
+        onClose={() => setYearDrawerOpen(false)}
+        onSelect={(anime) => {
+          // 抽屉里的作品可能不在当前筛选结果中，先还原筛选再打开详情。
+          setQueryDraft("");
+          setFilters((current) => ({
+            ...DEFAULT_ARCHIVE_FILTERS,
+            group: current.group,
+            direction: current.direction,
+          }));
+          setYearDrawerOpen(false);
+          setSelectedId(anime.id);
+        }}
+        open={yearDrawerOpen}
+        records={records}
       />
     </div>
   );

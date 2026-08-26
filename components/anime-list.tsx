@@ -2,6 +2,7 @@
 
 import type { Anime } from "@/lib/types";
 import CoverImage from "@/components/cover-image";
+import { formatSeasonLabel } from "@/lib/season-label";
 
 interface AnimeListProps {
   animeList: Anime[];
@@ -61,7 +62,7 @@ export default function AnimeList({
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--ink-muted)]">
               <span className="font-semibold text-[var(--accent-strong)]">
-                {anime.season}
+                {formatSeasonLabel(anime.season)}
               </span>
               {anime.episodes > 0 && <span>{anime.episodes}话</span>}
               <span className="rounded-full bg-[var(--warning-soft)] px-2 py-1 font-bold text-[var(--warning)]">

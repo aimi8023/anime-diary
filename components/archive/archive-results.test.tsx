@@ -4,6 +4,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { Anime } from "@/lib/types";
+import type { ArchiveFilters } from "@/lib/archive/types";
+import { DEFAULT_ARCHIVE_FILTERS } from "@/lib/archive/filter";
 import ArchiveResults from "./archive-results";
 
 const records: Anime[] = [
@@ -31,96 +33,72 @@ const records: Anime[] = [
   },
 ];
 
+function renderResults(
+  overrides: {
+    filters?: Partial<ArchiveFilters>;
+    records?: Anime[];
+    onSelect?: (anime: Anime) => void;
+  } = {},
+) {
+  const onSelect = overrides.onSelect ?? vi.fn();
+  const { container } = render(
+    <ArchiveResults
+      filters={{ ...DEFAULT_ARCHIVE_FILTERS, ...overrides.filters }}
+      onClearFilters={vi.fn()}
+      onSelect={onSelect}
+      records={overrides.records ?? records}
+    />,
+  );
+  return { container, onSelect };
+}
+
 describe("ArchiveResults", () => {
-  it("uses compact poster cards in a dense responsive grid", () => {
-    render(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={vi.fn()}
-        records={records}
-        sort="rating"
-      />,
-    );
+  it("renders one horizontal poster row per year in the year dimension", () => {
+    const { container } = renderResults();
 
-    const seasonButton = screen.getByRole("button", { name: "2025春" });
-    expect(seasonButton).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "2025 年" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "2024 年" })).toBeInTheDocument();
     expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
-    expect(screen.queryByText("时间与记忆")).not.toBeInTheDocument();
-    expect(screen.queryByText("奇幻")).not.toBeInTheDocument();
+    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
 
-    const grid = document.getElementById(
-      seasonButton.getAttribute("aria-controls") ?? "",
-    );
-    expect(grid).toHaveClass("lg:grid-cols-6", "xl:grid-cols-7");
+    // 卡片行：横向滚动 + 紧凑卡片。
+    const row = container.querySelector("div.overflow-x-auto");
+    expect(row).not.toBeNull();
+    expect(row?.firstElementChild).toHaveClass("w-[104px]");
   });
 
-  it("loads the first visible poster eagerly for the page LCP", () => {
-    const { container } = render(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={vi.fn()}
-        records={records}
-        sort="rating"
-      />,
-    );
+  it("groups by rating buckets without year dividers", () => {
+    renderResults({ filters: { group: "rating" } });
 
-    expect(container.querySelector("img")).toHaveAttribute(
-      "loading",
-      "eager",
-    );
+    expect(screen.getByRole("heading", { name: "★ 9.5" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "★ 9.0" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /年$/ })).not.toBeInTheDocument();
   });
 
-  it("renders years newest first and keeps only the newest open initially", () => {
-    render(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={vi.fn()}
-        records={records}
-        sort="rating"
-      />,
-    );
-
-    const yearButtons = screen.getAllByRole("button", {
-      name: /20\d{2} 年/,
+  it("reverses group order in ascending direction", () => {
+    renderResults({
+      filters: { group: "year", direction: "asc" },
     });
-    expect(
-      yearButtons.map((button) => button.getAttribute("aria-label")),
-    ).toEqual([
-      "2025 年",
+
+    const headings = screen.getAllByRole("heading", { name: /年$/ });
+    expect(headings.map((heading) => heading.textContent)).toEqual([
       "2024 年",
+      "2025 年",
     ]);
-    expect(yearButtons[0]).toHaveAttribute("aria-expanded", "true");
-    expect(yearButtons[1]).toHaveAttribute("aria-expanded", "false");
-    expect(
-      screen.getByRole("button", { name: "查看《葬送的芙莉莲》详情" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "查看《孤独摇滚！》详情" }),
-    ).not.toBeInTheDocument();
   });
 
-  it("allows an older year and its season to expand and selects a card", async () => {
+  it("renders a flat grid without section headers in the time dimension", () => {
+    renderResults({ filters: { group: "time" } });
+
+    expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
+    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
+    // 卡片标题是 h4；分组标题（h3）不应存在。
+    expect(screen.queryByRole("heading", { level: 3 })).not.toBeInTheDocument();
+  });
+
+  it("opens detail dialogs from row cards", async () => {
     const user = userEvent.setup();
-    const onSelect = vi.fn();
-    render(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={onSelect}
-        records={records}
-        sort="rating"
-      />,
-    );
-
-    await user.click(screen.getByRole("button", { name: "2024 年" }));
-    expect(
-      screen.getByRole("button", { name: "2024 年" }),
-    ).toHaveAttribute("aria-expanded", "true");
-
-    const seasonButton = screen.getByRole("button", { name: "2024夏" });
-    expect(seasonButton).toHaveAttribute("aria-expanded", "true");
-    await user.click(seasonButton);
-    expect(seasonButton).toHaveAttribute("aria-expanded", "false");
-    await user.click(seasonButton);
+    const { onSelect } = renderResults();
 
     await user.click(
       screen.getByRole("button", { name: "查看《孤独摇滚！》详情" }),
@@ -128,27 +106,15 @@ describe("ArchiveResults", () => {
     expect(onSelect).toHaveBeenCalledWith(records[0]);
   });
 
-  it("keeps an older year usable when a legacy record has nullable tags", async () => {
-    const user = userEvent.setup();
+  it("keeps legacy records with nullable tags renderable", () => {
     const legacyRecord = {
       ...records[0],
       tags: null,
     } as unknown as Anime;
 
-    render(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={vi.fn()}
-        records={[records[1], legacyRecord]}
-        sort="rating"
-      />,
-    );
+    renderResults({ records: [records[1], legacyRecord] });
 
-    await user.click(screen.getByRole("button", { name: "2024 年" }));
-
-    expect(
-      screen.getByRole("button", { name: "查看《孤独摇滚！》详情" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
   });
 
   it("renders a recoverable no-result state", async () => {
@@ -156,43 +122,15 @@ describe("ArchiveResults", () => {
     const onClearFilters = vi.fn();
     render(
       <ArchiveResults
+        filters={DEFAULT_ARCHIVE_FILTERS}
         onClearFilters={onClearFilters}
         onSelect={vi.fn()}
         records={[]}
-        sort="rating"
       />,
     );
 
     expect(screen.getByText("没有匹配的记录")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "清除筛选" }));
     expect(onClearFilters).toHaveBeenCalledOnce();
-  });
-
-  it("opens the first remaining year after filtering removes newer years", () => {
-    const { rerender } = render(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={vi.fn()}
-        records={records}
-        sort="rating"
-      />,
-    );
-
-    expect(
-      screen.getByRole("button", { name: "2024 年" }),
-    ).toHaveAttribute("aria-expanded", "false");
-
-    rerender(
-      <ArchiveResults
-        onClearFilters={vi.fn()}
-        onSelect={vi.fn()}
-        records={[records[0]]}
-        sort="rating"
-      />,
-    );
-
-    expect(
-      screen.getByRole("button", { name: "2024 年" }),
-    ).toHaveAttribute("aria-expanded", "true");
   });
 });

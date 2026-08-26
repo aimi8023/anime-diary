@@ -1,7 +1,10 @@
 import type { Anime } from "@/lib/types";
 
-export type ArchiveSort = "rating" | "title" | "added";
-export type ArchiveSeason = "" | "春" | "夏" | "秋" | "冬";
+/** 档案的排列维度：按播出年份、按评分分段、按收录时间。 */
+export type ArchiveGroup = "year" | "rating" | "time";
+/** 组间与组内的排列方向。 */
+export type ArchiveDirection = "asc" | "desc";
+
 export type ArchiveSearchParams = Record<
   string,
   string | string[] | undefined
@@ -10,20 +13,18 @@ export type ArchiveSearchParams = Record<
 export interface ArchiveFilters {
   q: string;
   year: string;
-  season: ArchiveSeason;
+  season: "" | "春" | "夏" | "秋" | "冬";
   tags: string[];
   rating: number | null;
-  sort: ArchiveSort;
+  group: ArchiveGroup;
+  direction: ArchiveDirection;
 }
 
-export interface ArchiveSeasonGroup {
-  season: string;
+/** 排列后的一个横向卡片行。 */
+export interface ArchiveCardGroup {
+  key: string;
+  label: string;
   records: Anime[];
-}
-
-export interface ArchiveYearGroup {
-  year: string;
-  seasons: ArchiveSeasonGroup[];
 }
 
 export interface ArchiveStats {

@@ -6,10 +6,10 @@ import type { AnimeInput } from "@/lib/types";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 
 const SEASONS = [
-  { value: "春", label: "春季-1月" },
-  { value: "夏", label: "夏季-4月" },
-  { value: "秋", label: "秋季-7月" },
-  { value: "冬", label: "冬季-10月" },
+  { value: "春", label: "1月" },
+  { value: "夏", label: "4月" },
+  { value: "秋", label: "7月" },
+  { value: "冬", label: "10月" },
 ];
 
 // 校验层要求季度为四位年份（如 2026春），这里保持同一来源。

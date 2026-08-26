@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Anime } from "@/lib/types";
 import CoverImage from "@/components/cover-image";
+import { formatSeasonLabel } from "@/lib/season-label";
 import { useFocusTrap } from "@/components/use-focus-trap";
 
 interface AnimeDetailDialogProps {
@@ -252,7 +253,9 @@ export default function AnimeDetailDialog({
           >
             <div className="space-y-7 px-6 pb-8 pt-7 sm:px-8 md:px-10 md:pb-10 md:pt-16">
               <header aria-live="polite">
-                <p className="ui-kicker">{anime.season} · MY ARCHIVE</p>
+                <p className="ui-kicker">
+                  {formatSeasonLabel(anime.season)} · MY ARCHIVE
+                </p>
                 <h2
                   className="mt-3 text-3xl font-black tracking-[-0.035em] text-[var(--ink)] sm:text-4xl"
                   id="anime-detail-title"

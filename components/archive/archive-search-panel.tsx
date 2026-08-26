@@ -6,9 +6,8 @@ import { createPortal } from "react-dom";
 import type {
   ArchiveFilters,
   ArchiveOptions,
-  ArchiveSeason,
-  ArchiveSort,
 } from "@/lib/archive/types";
+import { seasonMonthLabel } from "@/lib/season-label";
 import { useArchiveSearch } from "./archive-search-context";
 import { useFocusTrap } from "@/components/use-focus-trap";
 
@@ -28,7 +27,7 @@ interface FilterFieldsProps extends ArchiveToolbarProps {
   queryInputRef: RefObject<HTMLInputElement | null>;
 }
 
-const seasons: ArchiveSeason[] = ["", "春", "夏", "秋", "冬"];
+const seasons: Array<ArchiveFilters["season"]> = ["", "春", "夏", "秋", "冬"];
 const ratings = Array.from({ length: 19 }, (_, index) => 10 - index / 2);
 
 function FilterFields({
@@ -91,14 +90,14 @@ function FilterFields({
           id={`${idPrefix}-season`}
           onChange={(event) =>
             onFilterChange({
-              season: event.target.value as ArchiveSeason,
+              season: event.target.value as ArchiveFilters["season"],
             })
           }
           value={filters.season}
         >
           {seasons.map((season) => (
             <option key={season || "all"} value={season}>
-              {season ? `${season}季` : "全部季度"}
+              {season ? seasonMonthLabel(season) : "全部季度"}
             </option>
           ))}
         </select>
@@ -126,24 +125,6 @@ function FilterFields({
               {rating} 分及以上
             </option>
           ))}
-        </select>
-      </div>
-
-      <div>
-        <label className={labelClassName} htmlFor={`${idPrefix}-sort`}>
-          排序方式
-        </label>
-        <select
-          className={fieldClassName}
-          id={`${idPrefix}-sort`}
-          onChange={(event) =>
-            onFilterChange({ sort: event.target.value as ArchiveSort })
-          }
-          value={filters.sort}
-        >
-          <option value="rating">评分优先</option>
-          <option value="added">最近添加</option>
-          <option value="title">标题顺序</option>
         </select>
       </div>
 
