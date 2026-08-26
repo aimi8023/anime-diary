@@ -51,7 +51,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-color: var(--canvas);
-  background-image: url("/bg.png");
+  background-image: url("/bg.webp");
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
