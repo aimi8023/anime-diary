@@ -251,4 +251,13 @@ describe("ArchiveBrowser filtering", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("2 / 3")).toBeInTheDocument();
   });
+
+  it("opens the linked record directly from an ?anime deep link", async () => {
+    window.history.replaceState(null, "", "/?anime=anime-2");
+    renderArchive();
+
+    expect(
+      await screen.findByRole("dialog", { name: "摇曳露营" }),
+    ).toBeInTheDocument();
+  });
 });

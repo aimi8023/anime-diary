@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
@@ -15,6 +15,8 @@ interface AnimeDetailDialogProps {
   onNavigate?: (delta: 1 | -1) => void;
   /** 当前记录在结果序列中的位置，用于边界判断与计数展示。 */
   position?: { index: number; total: number } | null;
+  /** 单条记录分享路径（如 /?anime=id）；提供时显示复制链接按钮。 */
+  sharePath?: string | null;
 }
 
 export default function AnimeDetailDialog({
@@ -22,6 +24,7 @@ export default function AnimeDetailDialog({
   onClose,
   onNavigate,
   position,
+  sharePath,
 }: AnimeDetailDialogProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -29,6 +32,7 @@ export default function AnimeDetailDialog({
   const paneScrollRef = useRef<HTMLElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [copied, setCopied] = useState(false);
 
   // 用 ref 读取最新回调，让开关生命周期只依赖“是否打开”，
   // 切换相邻记录时不会重新锁定滚动或打断焦点。
@@ -59,10 +63,12 @@ export default function AnimeDetailDialog({
       if (!onNavigateRef.current) return;
       if (event.key === "ArrowLeft") {
         event.preventDefault();
+        setCopied(false);
         onNavigateRef.current(-1);
       }
       if (event.key === "ArrowRight") {
         event.preventDefault();
+        setCopied(false);
         onNavigateRef.current(1);
       }
     }
@@ -80,6 +86,29 @@ export default function AnimeDetailDialog({
     if (mobileScrollRef.current) mobileScrollRef.current.scrollTop = 0;
     if (paneScrollRef.current) paneScrollRef.current.scrollTop = 0;
   }, [anime?.id]);
+
+  async function copyShareLink() {
+    if (!sharePath) return;
+    const url = `${window.location.origin}${sharePath}`;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // 剪贴板 API 不可用时的兜底（http 环境或旧浏览器）。
+        const textarea = document.createElement("textarea");
+        textarea.value = url;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   if (!anime) return null;
   if (typeof document === "undefined") return null;
@@ -121,7 +150,10 @@ export default function AnimeDetailDialog({
                 aria-label="上一部"
                 className="ui-icon-button border border-white/80 bg-white/90 shadow-sm backdrop-blur"
                 disabled={!hasPrev}
-                onClick={() => onNavigate?.(-1)}
+                onClick={() => {
+                  setCopied(false);
+                  onNavigate?.(-1);
+                }}
                 type="button"
               >
                 <svg
@@ -139,7 +171,10 @@ export default function AnimeDetailDialog({
                 aria-label="下一部"
                 className="ui-icon-button border border-white/80 bg-white/90 shadow-sm backdrop-blur"
                 disabled={!hasNext}
-                onClick={() => onNavigate?.(1)}
+                onClick={() => {
+                  setCopied(false);
+                  onNavigate?.(1);
+                }}
                 type="button"
               >
                 <svg
@@ -279,15 +314,30 @@ export default function AnimeDetailDialog({
                 </section>
               )}
 
-              {anime.bangumiUrl && (
-                <a
-                  className="ui-button ui-button-primary"
-                  href={anime.bangumiUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  在 Bangumi 查看
-                </a>
+              {(anime.bangumiUrl || sharePath) && (
+                <div className="flex flex-wrap gap-3">
+                  {anime.bangumiUrl && (
+                    <a
+                      className="ui-button ui-button-primary"
+                      href={anime.bangumiUrl}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      在 Bangumi 查看
+                    </a>
+                  )}
+                  {sharePath && (
+                    <button
+                      className="ui-button ui-button-secondary"
+                      onClick={() => {
+                        void copyShareLink();
+                      }}
+                      type="button"
+                    >
+                      {copied ? "链接已复制 ✓" : "复制分享链接"}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </section>

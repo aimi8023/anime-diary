@@ -72,29 +72,58 @@ export default function ArchiveBrowser({
 
   useEffect(() => {
     function restoreFromHistory() {
-      const restored = parseArchiveFilters(
-        new URLSearchParams(window.location.search),
-      );
+      const params = new URLSearchParams(window.location.search);
+      const restored = parseArchiveFilters(params);
       setFilters(restored);
       setQueryDraft(restored.q);
+      const deepLinkId = params.get("anime");
+      setSelectedId(
+        deepLinkId && records.some((anime) => anime.id === deepLinkId)
+          ? deepLinkId
+          : null,
+      );
     }
 
     window.addEventListener("popstate", restoreFromHistory);
     return () => window.removeEventListener("popstate", restoreFromHistory);
-  }, []);
+  }, [records]);
 
-  // 筛选条件只写入浏览器历史，不触发服务端重新渲染：
+  // 筛选条件与选中记录只写入浏览器历史，不触发服务端重新渲染：
   // 全部记录已随首屏下发，Next.js 会同步 useSearchParams 消费方（导航徽标）。
   useEffect(() => {
-    const nextSearch = serializeArchiveFilters(filters).toString();
-    const target = nextSearch ? `/?${nextSearch}` : "/";
+    const params = serializeArchiveFilters(filters);
+    if (selectedId) params.set("anime", selectedId);
+    const search = params.toString();
+    const target = search ? `/?${search}` : "/";
     if (
       `${window.location.pathname}${window.location.search}` === target
     ) {
       return;
     }
     window.history.replaceState(null, "", target);
-  }, [filters]);
+  }, [filters, selectedId]);
+
+  // 支持 /?anime=id 深链：参数在首次渲染时捕获，避免与 URL 同步竞争，
+  // 放进宏任务应用以满足“不在 effect 体内同步 setState”的约束。
+  const [initialDeepLinkId] = useState(() =>
+    typeof window === "undefined"
+      ? null
+      : new URLSearchParams(window.location.search).get("anime"),
+  );
+
+  useEffect(() => {
+    if (!initialDeepLinkId) return;
+    const timer = window.setTimeout(() => {
+      setSelectedId(
+        (current) =>
+          current ??
+          (records.some((anime) => anime.id === initialDeepLinkId)
+            ? initialDeepLinkId
+            : null),
+      );
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [initialDeepLinkId, records]);
 
   function updateFilters(patch: Partial<ArchiveFilters>) {
     setFilters((current) => ({ ...current, ...patch }));
@@ -182,6 +211,7 @@ export default function ArchiveBrowser({
             ? { index: selectedIndex, total: filteredRecords.length }
             : null
         }
+        sharePath={selectedAnime ? `/?anime=${selectedAnime.id}` : null}
       />
     </div>
   );

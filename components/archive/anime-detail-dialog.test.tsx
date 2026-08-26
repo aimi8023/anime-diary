@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Anime } from "@/lib/types";
 import AnimeDetailDialog from "./anime-detail-dialog";
 
@@ -147,7 +147,13 @@ describe("AnimeDetailDialog", () => {
   });
 });
 
-function NavigationHarness({ total = 3 }: { total?: number }) {
+function NavigationHarness({
+  total = 3,
+  sharePath = null,
+}: {
+  total?: number;
+  sharePath?: string | null;
+}) {
   const list = Array.from({ length: total }, (_, i) => ({
     ...completeAnime,
     id: `anime-${i + 1}`,
@@ -165,6 +171,7 @@ function NavigationHarness({ total = 3 }: { total?: number }) {
         )
       }
       position={{ index, total }}
+      sharePath={sharePath}
     />
   );
 }
@@ -237,5 +244,25 @@ describe("AnimeDetailDialog navigation", () => {
     // 从第一个元素向前 Shift+Tab，应跳到最后一个。
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
     expect(link).toHaveFocus();
+  });
+
+  it("copies the absolute share link and confirms on the button", async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+
+    render(<NavigationHarness sharePath="/?anime=anime-1" />);
+
+    await user.click(screen.getByRole("button", { name: "复制分享链接" }));
+
+    expect(writeText).toHaveBeenCalledWith(
+      `${window.location.origin}/?anime=anime-1`,
+    );
+    expect(
+      screen.getByRole("button", { name: "链接已复制 ✓" }),
+    ).toBeInTheDocument();
   });
 });
