@@ -10,6 +10,7 @@ import type {
   ArchiveSort,
 } from "@/lib/archive/types";
 import { useArchiveSearch } from "./archive-search-context";
+import { useFocusTrap } from "./use-focus-trap";
 
 interface ArchiveToolbarProps {
   filters: ArchiveFilters;
@@ -178,6 +179,8 @@ export default function ArchiveSearchPanel(props: ArchiveToolbarProps) {
   const { isSearchOpen, closeSearch } = useArchiveSearch();
   const queryInputRef = useRef<HTMLInputElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const panelRef = useRef<HTMLFormElement>(null);
+  useFocusTrap(panelRef, isSearchOpen);
 
   useEffect(() => {
     if (!isSearchOpen) return;
@@ -218,6 +221,7 @@ export default function ArchiveSearchPanel(props: ArchiveToolbarProps) {
         aria-label="档案筛选"
         className="max-h-[88vh] w-full overflow-y-auto rounded-t-[2rem] border border-white/90 bg-[rgba(249,247,251,0.98)] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-lg)] md:max-w-3xl md:rounded-[1.75rem] md:p-6"
         onSubmit={(event) => event.preventDefault()}
+        ref={panelRef}
         role="search"
       >
         <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-5 flex items-center justify-between border-b border-white/80 bg-[rgba(249,247,251,0.94)] px-5 py-4 backdrop-blur-xl md:-mx-6 md:-mt-6 md:px-6">

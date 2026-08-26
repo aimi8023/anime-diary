@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import type { Anime } from "@/lib/types";
@@ -220,5 +220,22 @@ describe("AnimeDetailDialog navigation", () => {
     expect(
       screen.getByRole("dialog", { name: "作品1" }),
     ).toBeInTheDocument();
+  });
+
+  it("keeps Tab focus cycling inside the panel", () => {
+    render(<NavigationHarness />);
+
+    // 初始位置“上一部”被禁用；可聚焦顺序为 下一部 → 关闭 → Bangumi 链接。
+    const next = screen.getByRole("button", { name: "下一部" });
+    const link = screen.getByRole("link", { name: "在 Bangumi 查看" });
+
+    // 从最后一个可聚焦元素向后 Tab，应回到第一个。
+    link.focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(next).toHaveFocus();
+
+    // 从第一个元素向前 Shift+Tab，应跳到最后一个。
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(link).toHaveFocus();
   });
 });

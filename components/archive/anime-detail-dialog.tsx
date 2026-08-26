@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import type { Anime } from "@/lib/types";
+import { useFocusTrap } from "./use-focus-trap";
 
 interface AnimeDetailDialogProps {
   anime: Anime | null;
@@ -26,6 +27,7 @@ export default function AnimeDetailDialog({
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const paneScrollRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
   // 用 ref 读取最新回调，让开关生命周期只依赖“是否打开”，
@@ -38,6 +40,7 @@ export default function AnimeDetailDialog({
   });
 
   const isOpen = Boolean(anime);
+  useFocusTrap(panelRef, isOpen);
   const canNavigate = Boolean(onNavigate && position && position.total > 1);
   const navIndex = canNavigate && position ? position.index : 0;
   const navTotal = canNavigate && position ? position.total : 0;
@@ -102,6 +105,7 @@ export default function AnimeDetailDialog({
           scale: shouldReduceMotion ? 1 : 0.985,
           y: shouldReduceMotion ? 0 : 18,
         }}
+        ref={panelRef}
         transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
       >
         <div className="absolute right-4 top-4 z-20 flex items-center gap-1.5">
