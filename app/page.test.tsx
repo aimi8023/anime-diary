@@ -50,9 +50,9 @@ describe("HomePage", () => {
 
     expect(getAll).toHaveBeenCalledTimes(1);
     expect(
-      screen.getByRole("heading", { name: "我的追番档案" }),
+      screen.getByRole("heading", { name: "追番档案" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("共 1 部")).toBeInTheDocument();
+    expect(screen.getByText(/个季度/)).toHaveTextContent("1 部");
     expect(screen.queryByText("加载中...")).not.toBeInTheDocument();
   });
 
