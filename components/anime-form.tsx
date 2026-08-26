@@ -12,6 +12,13 @@ const SEASONS = [
   { value: "冬", label: "冬季-10月" },
 ];
 
+// 校验层要求季度为四位年份（如 2026春），这里保持同一来源。
+const CURRENT_YEAR = new Date().getFullYear();
+
+function seasonValue(year: number, season: string): string {
+  return `${String(year).padStart(4, "0")}${season}`;
+}
+
 interface AnimeFormProps {
   initial?: Partial<AnimeInput> | null;
   suggestedTags?: string[];
@@ -28,7 +35,11 @@ export default function AnimeForm({
   onCancel,
 }: AnimeFormProps) {
   const [title, setTitle] = useState(initial?.title || "");
-  const [year, setYear] = useState(initial?.season ? parseInt(initial.season.substring(0, 4)) : 2026);
+  const [year, setYear] = useState(
+    initial?.season && /^\d{4}/.test(initial.season)
+      ? parseInt(initial.season.substring(0, 4), 10)
+      : CURRENT_YEAR,
+  );
   const [season, setSeason] = useState(initial?.season ? initial.season.substring(4, 5) : SEASONS[0].value);
   const [cover, setCover] = useState(initial?.cover || "");
   const [rating, setRating] = useState(initial?.rating ?? 5);
@@ -52,7 +63,7 @@ export default function AnimeForm({
     try {
       await onSave({
         title: title.trim(),
-        season: `${year}${season}`,
+        season: seasonValue(year, season),
         cover: cover.trim(),
         rating,
         comment: comment.trim(),
@@ -129,7 +140,7 @@ export default function AnimeForm({
           <input
             type="number"
             value={year}
-            onChange={(e) => setYear(Math.min(9999, Math.max(0, parseInt(e.target.value) || 2026)))}
+            onChange={(e) => setYear(Math.min(9999, Math.max(0, parseInt(e.target.value) || CURRENT_YEAR)))}
             className={inputClass}
             placeholder="例如：2024"
             min={0}
