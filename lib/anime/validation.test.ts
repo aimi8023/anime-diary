@@ -60,6 +60,15 @@ describe("parseAnimeCreateInput", () => {
     });
   });
 
+  it.each(["2024春", "2024夏", "2024秋", "2024冬"])(
+    "accepts the season format %s",
+    (season) => {
+      expect(
+        parseAnimeCreateInput({ title: "测试", season }),
+      ).toMatchObject({ ok: true, data: { season } });
+    },
+  );
+
   it.each([
     ["non-object body", null, "$"],
     ["empty title", { ...validInput, title: " " }, "title"],
@@ -79,6 +88,9 @@ describe("parseAnimeCreateInput", () => {
     ["empty tag", { ...validInput, tags: [" "] }, "tags.0"],
     ["invalid Bangumi ID", { ...validInput, bangumiId: 0 }, "bangumiId"],
     ["invalid air date", { ...validInput, airDate: "2022-02-31" }, "airDate"],
+    ["season without year", { ...validInput, season: "冬" }, "season"],
+    ["season with prose text", { ...validInput, season: "2023年秋" }, "season"],
+    ["season with short year", { ...validInput, season: "23秋" }, "season"],
   ])("rejects %s", (_label, input, path) => {
     const result = parseAnimeCreateInput(input);
 

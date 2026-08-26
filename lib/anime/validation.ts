@@ -82,7 +82,7 @@ function validateInput(
   const issues: InputIssue[] = [];
 
   const validateRequiredString = (
-    field: "title" | "season",
+    field: "title",
     label: string,
     maxLength: number,
   ) => {
@@ -104,7 +104,25 @@ function validateInput(
   };
 
   validateRequiredString("title", "标题", 120);
-  validateRequiredString("season", "季度", 20);
+
+  if (mode === "create" || hasOwn(value, "season")) {
+    const raw = value.season;
+    if (typeof raw !== "string" || raw.trim().length === 0) {
+      issues.push({ path: "season", message: "季度不能为空" });
+    } else {
+      const normalized = raw.trim();
+      // 年份分组、表单预填和归档展示都依赖 `YYYY春夏秋冬` 格式，
+      // 因此在这里强制，而不是由各消费方自行容错。
+      if (!/^\d{4}[春夏秋冬]$/.test(normalized)) {
+        issues.push({
+          path: "season",
+          message: "季度格式必须是四位年份加春/夏/秋/冬，例如 2024春",
+        });
+      } else {
+        data.season = normalized;
+      }
+    }
+  }
 
   if (mode === "create" || hasOwn(value, "cover")) {
     const raw = value.cover;
