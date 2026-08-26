@@ -1,11 +1,18 @@
-import type { ArchiveFilters } from "@/lib/archive/types";
+import type { ArchiveFilters, ArchiveSort } from "@/lib/archive/types";
 
 interface ActiveFiltersProps {
   filters: ArchiveFilters;
   resultCount: number;
   onClear: () => void;
   onRemove: (key: keyof ArchiveFilters, value?: string) => void;
+  onSortChange: (sort: ArchiveSort) => void;
 }
+
+const sortOptions: Array<{ value: ArchiveSort; label: string }> = [
+  { value: "rating", label: "评分" },
+  { value: "added", label: "最新" },
+  { value: "title", label: "标题" },
+];
 
 function hasActiveFilters(filters: ArchiveFilters) {
   return (
@@ -13,8 +20,7 @@ function hasActiveFilters(filters: ArchiveFilters) {
     filters.year !== "" ||
     filters.season !== "" ||
     filters.tags.length > 0 ||
-    filters.rating !== null ||
-    filters.sort !== "rating"
+    filters.rating !== null
   );
 }
 
@@ -23,6 +29,7 @@ export default function ActiveFilters({
   resultCount,
   onClear,
   onRemove,
+  onSortChange,
 }: ActiveFiltersProps) {
   const chips: Array<{
     key: keyof ArchiveFilters;
@@ -43,13 +50,6 @@ export default function ActiveFilters({
     chips.push({
       key: "rating",
       label: `评分 ${filters.rating} 分以上`,
-    });
-  }
-  if (filters.sort !== "rating") {
-    const sortLabels = { added: "最近添加", title: "标题顺序" };
-    chips.push({
-      key: "sort",
-      label: `排序 ${sortLabels[filters.sort]}`,
     });
   }
 
@@ -75,9 +75,38 @@ export default function ActiveFilters({
           </span>
         </button>
       ))}
+      <div
+        aria-label="排序方式"
+        className="ml-auto flex items-center gap-1.5"
+        role="group"
+      >
+        <span className="text-xs font-semibold text-[var(--ink-subtle)]">
+          排序
+        </span>
+        <div className="flex gap-1 rounded-full border border-white/80 bg-white/55 p-1">
+          {sortOptions.map((option) => {
+            const active = filters.sort === option.value;
+            return (
+              <button
+                aria-pressed={active}
+                className={`min-h-8 rounded-full px-3 text-xs font-bold transition-colors ${
+                  active
+                    ? "bg-white text-[var(--accent-strong)] shadow-sm"
+                    : "text-[var(--ink-muted)] hover:bg-white/70"
+                }`}
+                key={option.value}
+                onClick={() => onSortChange(option.value)}
+                type="button"
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
       {hasActiveFilters(filters) && (
         <button
-          className="ui-button ui-button-secondary ml-auto min-h-9 px-3 py-2 text-xs"
+          className="ui-button ui-button-secondary min-h-9 px-3 py-2 text-xs"
           onClick={onClear}
           type="button"
         >

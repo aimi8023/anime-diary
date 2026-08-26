@@ -143,7 +143,11 @@ export default function ArchiveBrowser({
 
   function clearFilters() {
     setQueryDraft("");
-    setFilters(DEFAULT_ARCHIVE_FILTERS);
+    // 排序是浏览偏好，清除筛选时保持不变。
+    setFilters((current) => ({
+      ...DEFAULT_ARCHIVE_FILTERS,
+      sort: current.sort,
+    }));
   }
 
   function removeFilter(key: keyof ArchiveFilters, value?: string) {
@@ -211,6 +215,7 @@ export default function ArchiveBrowser({
             filters={filters}
             onClear={clearFilters}
             onRemove={removeFilter}
+            onSortChange={(sort) => updateFilters({ sort })}
             resultCount={filteredRecords.length}
           />
           <ArchiveResults

@@ -61,7 +61,7 @@ const records: Anime[] = [
 ];
 
 describe("archive active filter count", () => {
-  it("counts every effective filter including individual tags", () => {
+  it("counts every effective filter including individual tags, excluding sort preference", () => {
     expect(countActiveArchiveFilters(DEFAULT_ARCHIVE_FILTERS)).toBe(0);
     expect(
       countActiveArchiveFilters({
@@ -71,7 +71,7 @@ describe("archive active filter count", () => {
         tags: ["日常", "治愈"],
         sort: "title",
       }),
-    ).toBe(5);
+    ).toBe(4);
   });
 });
 

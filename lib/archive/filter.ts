@@ -19,6 +19,8 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   sort: "rating",
 };
 
+// 排序是浏览偏好而非筛选条件：不写入活动筛选数，
+// 也不在工具栏生成可移除的 chip（它有常驻的快切控件）。
 export function countActiveArchiveFilters(
   filters: ArchiveFilters,
 ): number {
@@ -27,8 +29,7 @@ export function countActiveArchiveFilters(
     Number(Boolean(filters.year)) +
     Number(Boolean(filters.season)) +
     filters.tags.length +
-    Number(filters.rating !== null) +
-    Number(filters.sort !== "rating")
+    Number(filters.rating !== null)
   );
 }
 
