@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import type { Anime } from "@/lib/types";
 import {
   DEFAULT_ARCHIVE_FILTERS,
@@ -31,9 +30,6 @@ export default function ArchiveBrowser({
   initialFilters,
   stats,
 }: ArchiveBrowserProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentSearch = searchParams.toString();
   const [filters, setFilters] = useState(initialFilters);
   const [queryDraft, setQueryDraft] = useState(initialFilters.q);
   const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
@@ -66,13 +62,18 @@ export default function ArchiveBrowser({
     return () => window.removeEventListener("popstate", restoreFromHistory);
   }, []);
 
+  // 筛选条件只写入浏览器历史，不触发服务端重新渲染：
+  // 全部记录已随首屏下发，Next.js 会同步 useSearchParams 消费方（导航徽标）。
   useEffect(() => {
     const nextSearch = serializeArchiveFilters(filters).toString();
-    if (nextSearch === currentSearch) return;
-    router.replace(nextSearch ? `/?${nextSearch}` : "/", {
-      scroll: false,
-    });
-  }, [currentSearch, filters, router]);
+    const target = nextSearch ? `/?${nextSearch}` : "/";
+    if (
+      `${window.location.pathname}${window.location.search}` === target
+    ) {
+      return;
+    }
+    window.history.replaceState(null, "", target);
+  }, [filters]);
 
   function updateFilters(patch: Partial<ArchiveFilters>) {
     setFilters((current) => ({ ...current, ...patch }));

@@ -19,16 +19,6 @@ import {
 } from "./archive-search-context";
 import ArchiveBrowser from "./archive-browser";
 
-const navigation = vi.hoisted(() => ({
-  replace: vi.fn(),
-  search: "",
-}));
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: navigation.replace }),
-  useSearchParams: () => new URLSearchParams(navigation.search),
-}));
-
 vi.mock("@/components/timer", () => ({
   default: () => null,
 }));
@@ -94,15 +84,18 @@ function SearchLauncher() {
 }
 
 describe("ArchiveBrowser filtering", () => {
+  let replaceStateSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
-    navigation.replace.mockReset();
-    navigation.search = "";
+    replaceStateSpy = vi.spyOn(window.history, "replaceState");
+    window.history.replaceState(null, "", "/");
   });
 
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
     document.body.style.overflow = "";
+    replaceStateSpy.mockRestore();
   });
 
   it("keeps the search form hidden until the launcher opens it", async () => {
@@ -152,26 +145,30 @@ describe("ArchiveBrowser filtering", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("debounces keyword URL updates and replaces without scrolling", async () => {
+  it("debounces keyword URL updates through browser history without navigation", async () => {
     vi.useFakeTimers();
     renderArchive();
-    navigation.replace.mockClear();
+    replaceStateSpy.mockClear();
     fireEvent.click(screen.getByRole("button", { name: "打开搜索" }));
 
     fireEvent.change(screen.getByLabelText("关键词"), {
       target: { value: "音乐" },
     });
-    expect(navigation.replace).not.toHaveBeenCalled();
+    expect(replaceStateSpy).not.toHaveBeenCalled();
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(250);
     });
 
-    expect(navigation.replace).toHaveBeenLastCalledWith(
+    expect(replaceStateSpy).toHaveBeenLastCalledWith(
+      null,
+      "",
       "/?q=%E9%9F%B3%E4%B9%90",
-      { scroll: false },
     );
     expect(screen.getByText("找到 1 部")).toBeInTheDocument();
+
+    // URL 已与筛选一致时不再重复写入。
+    expect(replaceStateSpy).toHaveBeenCalledTimes(1);
   });
 
   it("closes the search panel with Escape and restores focus", async () => {
