@@ -35,21 +35,31 @@ function makeChildren() {
 
 interface RowHandle {
   scroller: HTMLElement;
+  copy1: HTMLElement;
   getScrollLeft: () => number;
 }
 
-// 覆盖布局属性后必须 rerender 一次触发重新测量：
-// 挂载时的测量发生在 defineProperty 之前，读到的是 jsdom 默认值 0。
+// jsdom 没有真实布局：宽度全部通过 defineProperty 模拟。
+// 覆盖后 rerender 一次触发重新测量（挂载时读到的是默认值 0）。
 function renderRow(
-  opts: { scrollWidth?: number; clientWidth?: number } = {},
+  opts: {
+    copyWidth?: number;
+    scrollWidth?: number;
+    clientWidth?: number;
+  } = {},
 ): RowHandle {
   const utils = render(<ScrollRow>{makeChildren()}</ScrollRow>);
   const scroller = utils.container.querySelector(
     ".overflow-x-auto",
   ) as HTMLElement;
+  const copy1 = scroller.firstElementChild as HTMLElement;
   let left = 0;
+  Object.defineProperty(copy1, "offsetWidth", {
+    value: opts.copyWidth ?? 740, // 单份内容宽度（不含接缝 gap）
+    configurable: true,
+  });
   Object.defineProperty(scroller, "scrollWidth", {
-    value: opts.scrollWidth ?? 1500,
+    value: opts.scrollWidth ?? 740,
     configurable: true,
   });
   Object.defineProperty(scroller, "clientWidth", {
@@ -64,7 +74,7 @@ function renderRow(
     },
   });
   utils.rerender(<ScrollRow>{makeChildren()}</ScrollRow>);
-  return { scroller, getScrollLeft: () => left };
+  return { scroller, copy1, getScrollLeft: () => left };
 }
 
 describe("ScrollRow", () => {
@@ -79,7 +89,6 @@ describe("ScrollRow", () => {
 
   it("renders the row content in two copies for seamless looping", () => {
     renderRow();
-    // 副本对读屏不可见但仍渲染，保证首尾相接。
     expect(screen.getAllByText("A")).toHaveLength(2);
     expect(screen.getAllByText("D")).toHaveLength(2);
   });
@@ -91,7 +100,7 @@ describe("ScrollRow", () => {
   });
 
   it("hides arrows and the duplicate copy when content fits", () => {
-    const { scroller } = renderRow({ scrollWidth: 700 });
+    const { scroller } = renderRow({ copyWidth: 300, scrollWidth: 300 });
     expect(
       screen.queryByRole("button", { name: "向右滚动" }),
     ).not.toBeInTheDocument();
@@ -99,6 +108,41 @@ describe("ScrollRow", () => {
     const duplicate = scroller.children[1] as HTMLElement;
     expect(duplicate.getAttribute("aria-hidden")).toBe("true");
     expect(duplicate.style.display).toBe("none");
+    expect(screen.getAllByText("A")).toHaveLength(2); // DOM 中仍在，但不可见
+  });
+
+  it("clamps instead of looping when content barely overflows", () => {
+    // 单份 420，视口 400：只超出 20px，进入钳制模式。
+    const { scroller, getScrollLeft } = renderRow({
+      copyWidth: 420,
+      scrollWidth: 420,
+      clientWidth: 400,
+    });
+    const duplicate = scroller.children[1] as HTMLElement;
+    expect(duplicate.style.display).toBe("none");
+
+    // 滚轮仍被捕获，但位置被钳制在 maxScroll = 20。
+    fireEvent.wheel(scroller, { deltaY: 500 });
+    flushFrames(80);
+    expect(getScrollLeft()).toBe(20);
+
+    // 到边后滚轮放行，页面可以继续滚动。
+    const notPrevented = fireEvent.wheel(scroller, { deltaY: 100 });
+    expect(notPrevented).toBe(true);
+  });
+
+  it("enables clamp-mode arrows by scroll position", () => {
+    // 溢出 120 < 160 → 钳制模式。
+    renderRow({
+      copyWidth: 520,
+      scrollWidth: 520,
+      clientWidth: 400,
+    });
+    const left = screen.getByRole("button", { name: "向左滚动" });
+    const right = screen.getByRole("button", { name: "向右滚动" });
+    // 初始在最左：左箭头禁用，右箭头可用。
+    expect(left).toBeDisabled();
+    expect(right).toBeEnabled();
   });
 
   it("captures the wheel fully and glides to the target smoothly", () => {
@@ -120,13 +164,13 @@ describe("ScrollRow", () => {
 
   it("wraps scroll position seamlessly past the end of the row", () => {
     const { scroller, getScrollLeft } = renderRow();
-    // 单份宽度 = 1500 / 2 = 750。
+    // 单份宽度 = 740。
     for (let i = 0; i < 20; i += 1) {
       fireEvent.wheel(scroller, { deltaY: 120 });
     }
     flushFrames(120);
-    // 总位移 2400，对 750 取模后落在 150。
-    expect(getScrollLeft()).toBe(150);
+    // 总位移 2400，对 740 取模后落在 180。
+    expect(getScrollLeft()).toBe(180);
   });
 
   it("scrolls backward across the loop seam to the tail cards", () => {
@@ -135,8 +179,8 @@ describe("ScrollRow", () => {
       fireEvent.wheel(scroller, { deltaY: -120 });
     }
     flushFrames(120);
-    // -480 mod 750 = 270。
-    expect(getScrollLeft()).toBe(270);
+    // -480 mod 740 = 260。
+    expect(getScrollLeft()).toBe(260);
   });
 
   it("glides a chunk on click and keeps gliding while the arrow is held", () => {
@@ -151,7 +195,6 @@ describe("ScrollRow", () => {
     // 按住 300ms 后进入连续滚动。
     vi.useFakeTimers();
     fireEvent.pointerDown(right);
-    // pointerDown 立即追加一段。
     flushFrames(80);
     const beforeHold = getScrollLeft();
     vi.advanceTimersByTime(400);
@@ -168,19 +211,23 @@ describe("ScrollRow", () => {
 
   it("supports pointer dragging and suppresses card clicks after a drag", () => {
     const onSelect = vi.fn();
-    const utils = render(
-      <ScrollRow>
-        <button onClick={onSelect} type="button">
-          A
-        </button>
-      </ScrollRow>,
+    const children = (
+      <button onClick={onSelect} type="button">
+        A
+      </button>
     );
+    const utils = render(<ScrollRow>{children}</ScrollRow>);
     const scroller = utils.container.querySelector(
       ".overflow-x-auto",
     ) as HTMLElement;
+    const copy1 = scroller.firstElementChild as HTMLElement;
     let left = 0;
+    Object.defineProperty(copy1, "offsetWidth", {
+      value: 740,
+      configurable: true,
+    });
     Object.defineProperty(scroller, "scrollWidth", {
-      value: 1500,
+      value: 740,
       configurable: true,
     });
     Object.defineProperty(scroller, "clientWidth", {
@@ -194,13 +241,7 @@ describe("ScrollRow", () => {
         left = value;
       },
     });
-    utils.rerender(
-      <ScrollRow>
-        <button onClick={onSelect} type="button">
-          A
-        </button>
-      </ScrollRow>,
-    );
+    utils.rerender(<ScrollRow>{children}</ScrollRow>);
 
     // 未拖拽的普通点击正常生效。
     const card = scroller.querySelector("button") as HTMLButtonElement;

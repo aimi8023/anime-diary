@@ -19,11 +19,14 @@ const FLING_FACTOR = 0.22; // 松手后的惯性滑行时长（秒）
 const FLING_MAX_PX_PER_S = 2600;
 const SETTLE_EPSILON_PX = 0.05;
 
+type RowMode = "static" | "clamp" | "loop";
+
 const useIsoLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 interface ArrowButtonProps {
   direction: 1 | -1;
+  disabled?: boolean;
   onHoldStart: (
     direction: 1 | -1,
     event: ReactPointerEvent<HTMLButtonElement>,
@@ -33,6 +36,7 @@ interface ArrowButtonProps {
 
 function ArrowButton({
   direction,
+  disabled = false,
   onHoldStart,
   onHoldEnd,
 }: ArrowButtonProps) {
@@ -41,7 +45,8 @@ function ArrowButton({
       aria-label={direction === -1 ? "向左滚动" : "向右滚动"}
       className={`absolute top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/80 bg-white/92 text-[var(--ink)] shadow-[var(--shadow-md)] backdrop-blur transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 ${
         direction === -1 ? "left-2" : "right-2"
-      } opacity-0`}
+      } ${disabled ? "pointer-events-none opacity-0" : "opacity-0"}`}
+      disabled={disabled}
       onPointerCancel={onHoldEnd}
       onPointerDown={(event) => onHoldStart(direction, event)}
       onPointerLeave={onHoldEnd}
@@ -67,29 +72,35 @@ function ArrowButton({
 }
 
 /**
- * 无缝循环横向海报行：
- * - 内容渲染两份，滚动位置按单份宽度取模，尾首相接、永无尽头；
- * - 滚轮 / 拖拽 / 箭头全部走同一个 requestAnimationFrame 平滑滚动循环，
- *   滚轮事件在可循环时被完全捕获，页面不会跟着上下滚动；
- * - 单击箭头平滑滑过一段，按住后连续滚动；支持鼠标拖拽与松手惯性。
+ * 横向海报行，按内容多少自动选择三种模式：
+ * - static：单份内容放得下，静态展示，不捕获任何输入；
+ * - clamp：内容略超出视口，钳制滚动（到边即停），滚轮到边后交还页面；
+ * - loop：内容充足，渲染两份、按单份宽度取模，首尾无缝循环，
+ *   滚轮被完全捕获，页面不随之滚动。
+ * 所有滚动都经过同一个 requestAnimationFrame 缓动循环；
+ * 宽度用副本盒子的 offsetWidth 测量——scrollWidth 会被浏览器
+ * 抬到 clientWidth，用它测短内容会得到错误结果。
  */
 export default function ScrollRow({ children }: ScrollRowProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const copy1Ref = useRef<HTMLDivElement>(null);
   const copy2Ref = useRef<HTMLDivElement>(null);
-  const [loop, setLoop] = useState(true);
+  const [mode, setMode] = useState<RowMode>("loop");
+  const [edges, setEdges] = useState({ left: false, right: false });
   const [pointerDown, setPointerDown] = useState(false);
 
-  const loopRef = useRef(true);
+  const modeRef = useRef<RowMode>("loop");
   const reduceMotionRef = useRef(false);
-  const posRef = useRef(0); // 当前逻辑位置（未取模）
+  const posRef = useRef(0); // 当前逻辑位置
   const targetRef = useRef(0); // 目标位置
-  const widthRef = useRef(0); // 单份内容宽度
+  const widthRef = useRef(0); // 单份内容宽度（含接缝 gap）
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef(0);
   const lastAppliedRef = useRef(-1);
   const holdDirRef = useRef<1 | -1 | null>(null);
   const holdTimeoutRef = useRef<number | null>(null);
   const suppressClickRef = useRef(false);
+  const edgesRef = useRef({ left: false, right: false });
 
   const dragRef = useRef<{
     pointerId: number;
@@ -104,26 +115,59 @@ export default function ScrollRow({ children }: ScrollRowProps) {
   const reduceMotion = useReducedMotion();
 
   useIsoLayoutEffect(() => {
-    loopRef.current = loop;
+    modeRef.current = mode;
     reduceMotionRef.current = Boolean(reduceMotion);
   });
+
+  /** 视口内可滚动的最大位移（loop 模式下为无限，用 Infinity 表示）。 */
+  function maxScroll(): number {
+    const el = scrollerRef.current;
+    if (!el) return 0;
+    if (modeRef.current === "loop") return Number.POSITIVE_INFINITY;
+    // clamp/static：真实内容边界（scrollWidth 此时可信）。
+    return Math.max(0, el.scrollWidth - el.clientWidth);
+  }
 
   function applyScroll() {
     const el = scrollerRef.current;
     if (!el) return;
-    const width = widthRef.current;
-    if (width > 0) {
-      const pos = posRef.current;
-      if (pos >= width || pos < 0) {
-        // 归一化到 [0, width)，target 同步平移以保持相对距离
-        const shift = width * Math.floor(pos / width);
-        posRef.current -= shift;
-        targetRef.current -= shift;
+    if (modeRef.current === "loop") {
+      const width = widthRef.current;
+      if (width > 0) {
+        const pos = posRef.current;
+        if (pos >= width || pos < 0) {
+          // 归一化到 [0, width)，target 同步平移以保持相对距离。
+          const shift = width * Math.floor(pos / width);
+          posRef.current -= shift;
+          targetRef.current -= shift;
+        }
       }
+    } else {
+      // clamp：到边即停。
+      const max = maxScroll();
+      if (posRef.current > max) posRef.current = max;
+      if (posRef.current < 0) posRef.current = 0;
+      if (targetRef.current > max) targetRef.current = max;
+      if (targetRef.current < 0) targetRef.current = 0;
+      updateEdges(posRef.current);
     }
     const next = posRef.current;
     lastAppliedRef.current = next;
     el.scrollLeft = next;
+  }
+
+  /** clamp 模式下更新两侧箭头的可用状态（仅在变化时触发渲染）。 */
+  function updateEdges(pos: number) {
+    const max = maxScroll();
+    const next = {
+      left: pos > 1,
+      right: pos < max - 1,
+    };
+    const prev = edgesRef.current;
+    if (prev.left !== next.left || prev.right !== next.right) {
+      edgesRef.current = next;
+      setEdges(next);
+    }
   }
 
   function tick(now: number) {
@@ -168,7 +212,7 @@ export default function ScrollRow({ children }: ScrollRowProps) {
   ) {
     // 阻止按住时选中文字。
     event.preventDefault();
-    if (!loopRef.current) return;
+    if (modeRef.current === "static") return;
     const el = scrollerRef.current;
     if (!el) return;
     const step = Math.max(
@@ -184,25 +228,32 @@ export default function ScrollRow({ children }: ScrollRowProps) {
     }, HOLD_DELAY_MS);
   }
 
-  // —— 测量单份内容宽度并决定是否循环 ——
-  // 只在内容或容器尺寸变化时执行，避免与 loop 切换互相触发。
+  // —— 测量单份内容宽度并决定滚动模式 ——
+  // 宽度读第一份副本盒子的 offsetWidth（真实布局盒，不受 clientWidth 抬升影响），
+  // 与第二份是否可见无关，因此反复测量结果稳定，不会来回翻转。
   function measure() {
     const el = scrollerRef.current;
-    if (!el) return;
+    const copy1 = copy1Ref.current;
+    if (!el || !copy1) return;
     const gap = Number.parseFloat(getComputedStyle(el).columnGap) || 0;
-    // 两份可见时 scrollWidth = 2W - gap；只显示一份时 = W - gap。
-    const width = loopRef.current
-      ? (el.scrollWidth + gap) / 2
-      : el.scrollWidth + gap;
+    // 一份周期 = 副本内容 + 接缝 gap。
+    const width = copy1.offsetWidth + gap;
     if (!(width > 0)) return;
     widthRef.current = width;
-    const shouldLoop = width > el.clientWidth + 1;
-    setLoop(shouldLoop);
-    if (!shouldLoop) {
-      posRef.current = 0;
-      targetRef.current = 0;
-      lastAppliedRef.current = 0;
-      el.scrollLeft = 0;
+    const overflow = width - el.clientWidth;
+    // 内容明显超出视口才循环；只多一点的走钳制模式，避免"刚滑一点就绕回来"。
+    const loopMin = Math.max(160, el.clientWidth * 0.12);
+    const nextMode: RowMode =
+      overflow >= loopMin ? "loop" : overflow > 1 ? "clamp" : "static";
+    setMode(nextMode);
+    if (nextMode !== "loop") {
+      const max = Math.max(0, el.scrollWidth - el.clientWidth);
+      if (posRef.current > max) posRef.current = max;
+      if (targetRef.current > max) targetRef.current = max;
+      if (posRef.current < 0) posRef.current = 0;
+      if (targetRef.current < 0) targetRef.current = 0;
+      updateEdges(posRef.current);
+      el.scrollLeft = posRef.current;
     }
   }
 
@@ -229,15 +280,16 @@ export default function ScrollRow({ children }: ScrollRowProps) {
     const observer = new ResizeObserver(() => measure());
     observer.observe(el);
     return () => observer.disconnect();
+    // measure 通过 ref 通信，闭包过期无副作用。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 滚轮完全捕获：可循环时页面不随之滚动。
+  // 滚轮：loop 模式完全捕获；clamp 模式捕获到边为止，到边交还页面。
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
     const onWheel = (event: WheelEvent) => {
-      if (!loopRef.current) return;
-      event.preventDefault();
+      if (modeRef.current === "static") return;
       let delta =
         Math.abs(event.deltaY) >= Math.abs(event.deltaX)
           ? event.deltaY
@@ -245,11 +297,20 @@ export default function ScrollRow({ children }: ScrollRowProps) {
       if (event.deltaMode === 1) delta *= 40;
       else if (event.deltaMode === 2) delta *= el.clientWidth;
       if (!delta) return;
+      if (modeRef.current === "clamp") {
+        // 到边后放行，页面可以继续滚动。
+        const max = Math.max(0, el.scrollWidth - el.clientWidth);
+        const canContinue =
+          delta > 0 ? el.scrollLeft < max - 1 : el.scrollLeft > 1;
+        if (!canContinue) return;
+      }
+      event.preventDefault();
       targetRef.current += delta;
       startRaf();
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
+    // startRaf/applyScroll 等内部函数通过 ref 通信，闭包过期无副作用。
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -267,7 +328,7 @@ export default function ScrollRow({ children }: ScrollRowProps) {
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
-  // 拖拽期间点击会被吞掉，这里在捕获阶段拦截。
+  // 拖拽期间误触的点击在捕获阶段拦截。
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
@@ -291,7 +352,7 @@ export default function ScrollRow({ children }: ScrollRowProps) {
   }, []);
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!loopRef.current) return;
+    if (modeRef.current === "static") return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!event.isPrimary) return;
     dragRef.current = {
@@ -374,8 +435,11 @@ export default function ScrollRow({ children }: ScrollRowProps) {
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onCancel);
     };
+    // 内部函数通过 ref 通信，闭包过期无副作用。
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pointerDown]);
+
+  const scrollable = mode !== "static";
 
   return (
     <div className="group relative">
@@ -386,25 +450,29 @@ export default function ScrollRow({ children }: ScrollRowProps) {
         onDragStart={(event) => event.preventDefault()}
         onPointerDown={handlePointerDown}
       >
-        <div className="contents">{children}</div>
+        <div className="flex shrink-0 gap-2.5 sm:gap-3" ref={copy1Ref}>
+          {children}
+        </div>
         <div
           aria-hidden="true"
-          className="contents"
+          className="flex shrink-0 gap-2.5 sm:gap-3"
           ref={copy2Ref}
-          style={loop ? undefined : { display: "none" }}
+          style={mode === "loop" ? undefined : { display: "none" }}
         >
           {children}
         </div>
       </div>
-      {loop && (
+      {scrollable && (
         <>
           <ArrowButton
             direction={-1}
+            disabled={mode === "clamp" && !edges.left}
             onHoldEnd={stopHold}
             onHoldStart={handleHoldStart}
           />
           <ArrowButton
             direction={1}
+            disabled={mode === "clamp" && !edges.right}
             onHoldEnd={stopHold}
             onHoldStart={handleHoldStart}
           />
