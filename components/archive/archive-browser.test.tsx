@@ -274,4 +274,22 @@ describe("ArchiveBrowser filtering", () => {
 
     expect(panel).toHaveTextContent("当前条件：找到 2 部");
   });
+
+  it("switches sort from the toolbar without opening the search panel", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+    replaceStateSpy.mockClear();
+
+    const addedButton = screen.getByRole("button", { name: "最新" });
+    expect(addedButton).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(addedButton);
+
+    expect(addedButton).toHaveAttribute("aria-pressed", "true");
+    expect(replaceStateSpy).toHaveBeenLastCalledWith(
+      null,
+      "",
+      "/?sort=added",
+    );
+  });
 });
