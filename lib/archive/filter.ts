@@ -1,4 +1,5 @@
 import type { Anime } from "@/lib/types";
+import { formatSeasonLabel } from "@/lib/season-label";
 import type {
   ArchiveCardGroup,
   ArchiveDirection,
@@ -16,7 +17,7 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   season: "",
   tags: [],
   rating: null,
-  group: "year",
+  group: "season",
   direction: "desc",
 };
 
@@ -60,7 +61,6 @@ export function parseArchiveFilters(
   const seasonValue = readParam(params, "season")?.trim() ?? "";
   const groupValue = readParam(params, "group")?.trim() ?? "";
   const dirValue = readParam(params, "dir")?.trim() ?? "";
-  const legacySort = readParam(params, "sort")?.trim() ?? "";
   const tags = Array.from(
     new Set(
       (readParam(params, "tag") ?? "")
@@ -78,12 +78,8 @@ export function parseArchiveFilters(
       : "",
     tags,
     rating: parseRating(readParam(params, "rating")),
-    // 兼容旧版 sort 参数：added → 时间维度，其余按年份维度。
-    group: (["year", "rating", "time"].includes(groupValue)
-      ? groupValue
-      : legacySort === "added"
-        ? "time"
-        : "year") as ArchiveGroup,
+    // 兼容旧版参数：group=year 与旧 sort 值都归入季度维度。
+    group: groupValue === "rating" ? "rating" : "season",
     direction: dirValue === "asc" ? "asc" : "desc",
   };
 }
@@ -97,7 +93,7 @@ export function serializeArchiveFilters(
   if (filters.season) params.set("season", filters.season);
   if (filters.tags.length > 0) params.set("tag", filters.tags.join(","));
   if (filters.rating !== null) params.set("rating", String(filters.rating));
-  if (filters.group !== "year") params.set("group", filters.group);
+  if (filters.group !== "season") params.set("group", filters.group);
   if (filters.direction !== "desc") params.set("dir", filters.direction);
   return params;
 }
@@ -109,13 +105,16 @@ const SEASON_RANK: Record<string, number> = {
   冬: 10,
 };
 
-function seasonRank(season: string): number {
-  const match = season.match(/^\d{4}([春夏秋冬])$/);
-  return match ? SEASON_RANK[match[1]] ?? 0 : 0;
-}
-
 const byTitle = (a: Anime, b: Anime) =>
   a.title.localeCompare(b.title, "zh-CN");
+
+// 季度排序键：年份×100 + 季节序号（春=1/夏=4/秋=7/冬=10），
+// 使“2025年1月”整体大于“2024年10月”。
+function seasonSortKey(season: string): number {
+  const parts = seasonParts(season);
+  if (parts.year === "其他") return 0;
+  return Number(parts.year) * 100 + parts.rank;
+}
 
 function compareByGroup(
   a: Anime,
@@ -127,23 +126,12 @@ function compareByGroup(
   if (group === "rating") {
     return (a.rating - b.rating) * flip || byTitle(a, b);
   }
-  if (group === "time") {
-    const diff =
-      (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) *
-      flip;
-    return diff || byTitle(a, b);
-  }
-  // 年份维度：先比年份，再比季节；无年份的“其他”固定垫底。
-  const yearA = seasonParts(a.season);
-  const yearB = seasonParts(b.season);
-  if (yearA.year !== yearB.year) {
-    if (yearA.year === "其他") return 1;
-    if (yearB.year === "其他") return -1;
-    const yearDiff =
-      (Number(yearA.year) - Number(yearB.year)) * flip;
-    if (yearDiff) return yearDiff;
-  }
-  return (seasonRank(a.season) - seasonRank(b.season)) * flip || byTitle(a, b);
+  // 季度维度：按播出档期整体排序；缺失季度的“其他”固定垫底。
+  const keyA = seasonSortKey(a.season);
+  const keyB = seasonSortKey(b.season);
+  if (keyA === 0 && keyB !== 0) return 1;
+  if (keyB === 0 && keyA !== 0) return -1;
+  return (keyA - keyB) * flip || byTitle(a, b);
 }
 
 function seasonParts(season: string): {
@@ -196,44 +184,48 @@ export function filterAnime(
 
 /**
  * 把筛选结果切成横向卡片行：
- * - 年份维度：一行一个播出年份（“其他”始终排在最后）；
- * - 评分维度：一行一个评分档（10.0、9.5、9.0…），不按年份分割；
- * - 时间维度：不分组，由调用方渲染为连续网格。
+ * - 季度维度：一行一个播出档期（“2024年4月”“2024年1月”…，“其他”始终最后）；
+ * - 评分维度：一行一个评分档（10.0、9.5、9.0…），不按档期分割。
  * 不修改调用方数组。
  */
 export function groupArchive(
   data: Anime[],
   filters: Pick<ArchiveFilters, "group" | "direction">,
 ): ArchiveCardGroup[] {
-  if (filters.group === "time") return [];
-
   const flip = filters.direction === "asc" ? 1 : -1;
-  const buckets = new Map<string, Anime[]>();
+  const buckets = new Map<string, { sortKey: number; records: Anime[] }>();
+
   for (const anime of data) {
     const key =
-      filters.group === "year"
-        ? seasonParts(anime.season).year
+      filters.group === "season"
+        ? /^\d{4}[春夏秋冬]$/.test(anime.season)
+          ? anime.season
+          : "其他"
         : String(anime.rating);
-    const records = buckets.get(key) ?? [];
-    records.push(anime);
-    buckets.set(key, records);
+    const sortKey =
+      filters.group === "season"
+        ? seasonSortKey(anime.season)
+        : Number(anime.rating);
+    const bucket = buckets.get(key) ?? { sortKey, records: [] };
+    bucket.records.push(anime);
+    buckets.set(key, bucket);
   }
 
   return Array.from(buckets.entries())
-    .sort(([keyA], [keyB]) => {
-      if (keyA === "其他") return 1;
-      if (keyB === "其他") return -1;
-      return (Number(keyA) - Number(keyB)) * flip;
+    .sort(([, a], [, b]) => {
+      if (a.sortKey === 0) return 1;
+      if (b.sortKey === 0) return -1;
+      return (a.sortKey - b.sortKey) * flip;
     })
-    .map(([key, records]) => ({
+    .map(([key, bucket]) => ({
       key,
       label:
-        filters.group === "year"
+        filters.group === "season"
           ? key === "其他"
             ? "其他"
-            : `${key} 年`
+            : formatSeasonLabel(key)
           : `★ ${Number(key).toFixed(1)}`,
-      records: [...records].sort((a, b) =>
+      records: [...bucket.records].sort((a, b) =>
         compareByGroup(a, b, filters.group, filters.direction),
       ),
     }));

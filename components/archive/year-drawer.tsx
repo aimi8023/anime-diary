@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { Anime } from "@/lib/types";
 import { getYearlyRecap } from "@/lib/archive/filter";
 import CoverImage from "@/components/cover-image";
+import ScrollRow from "./scroll-row";
 import { useFocusTrap } from "@/components/use-focus-trap";
 
 interface YearDrawerProps {
@@ -138,11 +139,11 @@ export default function YearDrawer({
                   </span>
                 </span>
               </div>
-              <div className="flex snap-x gap-2.5 overflow-x-auto pb-2">
+              <ScrollRow>
                 {(recordsByYear.get(recap.year) ?? []).map((anime) => (
                   <button
                     aria-label={`查看《${anime.title}》详情`}
-                    className="ui-focus group w-[96px] shrink-0 snap-start text-left"
+                    className="ui-focus group w-[108px] shrink-0 snap-start text-left"
                     key={anime.id}
                     onClick={() => onSelect(anime)}
                     type="button"
@@ -153,7 +154,7 @@ export default function YearDrawer({
                           alt=""
                           className="object-cover"
                           fallbackLabel={anime.title}
-                          sizes="96px"
+                          sizes="108px"
                           src={anime.cover}
                         />
                       ) : (
@@ -170,7 +171,7 @@ export default function YearDrawer({
                     </p>
                   </button>
                 ))}
-              </div>
+              </ScrollRow>
             </section>
           ))}
         </div>

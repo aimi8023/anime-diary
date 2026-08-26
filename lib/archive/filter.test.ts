@@ -91,7 +91,7 @@ describe("archive filter URL state", () => {
       season: "夏",
       tags: ["治愈", "日常"],
       rating: 8.5,
-      group: "year",
+      group: "season",
       direction: "desc",
     });
   });
@@ -102,13 +102,12 @@ describe("archive filter URL state", () => {
     ).toMatchObject({ group: "rating", direction: "asc" });
   });
 
-  it("maps the legacy sort parameter to a grouping dimension", () => {
-    expect(parseArchiveFilters({ sort: "added" })).toMatchObject({
-      group: "time",
-      direction: "desc",
+  it("maps legacy grouping parameters onto the season dimension", () => {
+    expect(parseArchiveFilters({ group: "year" })).toMatchObject({
+      group: "season",
     });
-    expect(parseArchiveFilters({ sort: "rating" })).toMatchObject({
-      group: "year",
+    expect(parseArchiveFilters({ sort: "added" })).toMatchObject({
+      group: "season",
     });
   });
 
@@ -138,14 +137,14 @@ describe("archive filter URL state", () => {
 
   it("parses URLSearchParams with the same rules", () => {
     const params = new URLSearchParams(
-      "q=%E4%B9%90%E9%98%9F&year=2023&rating=10&group=time&dir=asc",
+      "q=%E4%B9%90%E9%98%9F&year=2023&rating=10&group=rating&dir=asc",
     );
 
     expect(parseArchiveFilters(params)).toMatchObject({
       q: "乐队",
       year: "2023",
       rating: 10,
-      group: "time",
+      group: "rating",
       direction: "asc",
     });
   });
@@ -192,21 +191,22 @@ describe("archive filtering and grouping", () => {
         season: "夏",
         tags: ["日常", "治愈"],
         rating: 8,
-        group: "year",
+        group: "season",
         direction: "desc",
       }).map((anime) => anime.id),
     ).toEqual(["anime-2"]);
   });
 
-  it("sorts filtered records without mutating the caller array", () => {
+  it("orders the season dimension by broadcast season without mutating input", () => {
     const original = structuredClone(records);
 
     expect(
       filterAnime(records, {
         ...DEFAULT_ARCHIVE_FILTERS,
-        group: "time",
+        group: "season",
+        direction: "desc",
       }).map((anime) => anime.id),
-    ).toEqual(["anime-3", "anime-4", "anime-2", "anime-1"]);
+    ).toEqual(["anime-3", "anime-4", "anime-1", "anime-2"]);
     expect(records).toEqual(original);
   });
 
@@ -220,24 +220,24 @@ describe("archive filtering and grouping", () => {
     ).toEqual(["anime-2", "anime-1", "anime-3", "anime-4"]);
   });
 
-  it("groups years newest first with season-ordered rows", () => {
+  it("groups one row per broadcast season with month labels", () => {
     const groups = groupArchive(records, {
-      group: "year",
+      group: "season",
       direction: "desc",
     });
 
     expect(groups.map((group) => group.label)).toEqual([
-      "2025 年",
-      "2024 年",
+      "2025年1月",
+      "2024年10月",
+      "2024年4月",
     ]);
-    expect(groups[1].records.map((anime) => anime.id)).toEqual([
-      "anime-4",
+    expect(groups[2].records.map((anime) => anime.id)).toEqual([
       "anime-1",
       "anime-2",
     ]);
   });
 
-  it("groups by rating buckets without year dividers and supports ascending order", () => {
+  it("groups by rating buckets without season dividers and supports ascending order", () => {
     const desc = groupArchive(records, {
       group: "rating",
       direction: "desc",
@@ -261,12 +261,6 @@ describe("archive filtering and grouping", () => {
       "★ 9.5",
       "★ 10.0",
     ]);
-  });
-
-  it("returns no card groups for the time dimension (flat layout)", () => {
-    expect(
-      groupArchive(records, { group: "time", direction: "desc" }),
-    ).toEqual([]);
   });
 
   it("returns unique browse options and archive statistics", () => {

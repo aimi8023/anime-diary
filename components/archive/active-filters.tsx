@@ -15,9 +15,8 @@ interface ActiveFiltersProps {
 }
 
 const groupOptions: Array<{ value: ArchiveGroup; label: string }> = [
-  { value: "year", label: "年份" },
+  { value: "season", label: "季度" },
   { value: "rating", label: "评分" },
-  { value: "time", label: "时间" },
 ];
 
 function hasActiveFilters(filters: ArchiveFilters) {

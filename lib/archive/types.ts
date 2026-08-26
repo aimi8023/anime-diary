@@ -1,7 +1,7 @@
 import type { Anime } from "@/lib/types";
 
-/** 档案的排列维度：按播出年份、按评分分段、按收录时间。 */
-export type ArchiveGroup = "year" | "rating" | "time";
+/** 档案的排列维度：按播出季度（1/4/7/10 月档期）、按评分分段。 */
+export type ArchiveGroup = "season" | "rating";
 /** 组间与组内的排列方向。 */
 export type ArchiveDirection = "asc" | "desc";
 

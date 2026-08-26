@@ -16,4 +16,9 @@ if (typeof window !== "undefined" && !window.matchMedia) {
   })) as unknown as typeof window.matchMedia;
 }
 
+// jsdom 未实现元素的平滑滚动方法，测试中可用 spy 覆盖。
+if (typeof Element !== "undefined" && !Element.prototype.scrollBy) {
+  Element.prototype.scrollBy = () => undefined;
+}
+
 afterEach(() => cleanup());

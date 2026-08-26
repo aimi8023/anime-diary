@@ -4,6 +4,7 @@ import type { Anime } from "@/lib/types";
 import type { ArchiveCardGroup, ArchiveFilters } from "@/lib/archive/types";
 import { groupArchive } from "@/lib/archive/filter";
 import ArchiveAnimeCard from "./archive-anime-card";
+import ScrollRow from "./scroll-row";
 
 interface ArchiveResultsProps {
   records: Anime[];
@@ -13,7 +14,7 @@ interface ArchiveResultsProps {
 }
 
 const ROW_CARD_CLASS =
-  "w-[104px] shrink-0 snap-start sm:w-[118px]";
+  "w-[122px] shrink-0 snap-start sm:w-[140px]";
 
 function PosterRow({
   cards,
@@ -23,7 +24,7 @@ function PosterRow({
   onSelect: (anime: Anime) => void;
 }) {
   return (
-    <div className="flex snap-x gap-2.5 overflow-x-auto pb-2 sm:gap-3">
+    <ScrollRow>
       {cards.map((anime, index) => (
         <ArchiveAnimeCard
           anime={anime}
@@ -34,7 +35,7 @@ function PosterRow({
           className={ROW_CARD_CLASS}
         />
       ))}
-    </div>
+    </ScrollRow>
   );
 }
 
@@ -66,22 +67,6 @@ export default function ArchiveResults({
         >
           清除筛选
         </button>
-      </div>
-    );
-  }
-
-  // 时间维度：不分组，渲染为连续网格，按收录时间排开。
-  if (filters.group === "time") {
-    return (
-      <div className="grid grid-cols-2 gap-2.5 min-[420px]:grid-cols-3 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6 xl:grid-cols-7">
-        {records.map((anime, index) => (
-          <ArchiveAnimeCard
-            anime={anime}
-            index={index}
-            key={anime.id}
-            onSelect={onSelect}
-          />
-        ))}
       </div>
     );
   }

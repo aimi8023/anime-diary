@@ -53,47 +53,44 @@ function renderResults(
 }
 
 describe("ArchiveResults", () => {
-  it("renders one horizontal poster row per year in the year dimension", () => {
+  it("renders one horizontal poster row per broadcast season", () => {
     const { container } = renderResults();
 
-    expect(screen.getByRole("heading", { name: "2025 年" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "2024 年" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "2025年1月" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "2024年4月" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
     expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
 
     // 卡片行：横向滚动 + 紧凑卡片。
     const row = container.querySelector("div.overflow-x-auto");
     expect(row).not.toBeNull();
-    expect(row?.firstElementChild).toHaveClass("w-[104px]");
+    expect(row?.firstElementChild).toHaveClass("w-[122px]");
   });
 
-  it("groups by rating buckets without year dividers", () => {
+  it("groups by rating buckets without season dividers", () => {
     renderResults({ filters: { group: "rating" } });
 
     expect(screen.getByRole("heading", { name: "★ 9.5" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "★ 9.0" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /年$/ })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /月$/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("reverses group order in ascending direction", () => {
     renderResults({
-      filters: { group: "year", direction: "asc" },
+      filters: { group: "season", direction: "asc" },
     });
 
-    const headings = screen.getAllByRole("heading", { name: /年$/ });
+    const headings = screen.getAllByRole("heading", { name: /月$/ });
     expect(headings.map((heading) => heading.textContent)).toEqual([
-      "2024 年",
-      "2025 年",
+      "2024年4月",
+      "2025年1月",
     ]);
-  });
-
-  it("renders a flat grid without section headers in the time dimension", () => {
-    renderResults({ filters: { group: "time" } });
-
-    expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
-    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
-    // 卡片标题是 h4；分组标题（h3）不应存在。
-    expect(screen.queryByRole("heading", { level: 3 })).not.toBeInTheDocument();
   });
 
   it("opens detail dialogs from row cards", async () => {
