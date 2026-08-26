@@ -1,8 +1,5 @@
 import type { ArchiveStats } from "@/lib/archive/types";
-import SiteRunningDays from "@/components/site-running-days";
-
-// 站点启用时间，用于计算运行天数。
-const SITE_LAUNCHED_AT = "2026-06-08T21:45:00";
+import RunningTimer from "@/components/running-timer";
 
 interface ArchiveHeroProps {
   stats: ArchiveStats;
@@ -21,7 +18,7 @@ export default function ArchiveHero({ stats }: ArchiveHeroProps) {
       : "等待记录";
 
   return (
-    <section className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <section className="mb-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h1 className="text-lg font-black tracking-tight text-[var(--ink)]">
           追番档案
@@ -38,7 +35,7 @@ export default function ArchiveHero({ stats }: ArchiveHeroProps) {
           {stats.seasonCount} 个季度
         </p>
       </div>
-      <SiteRunningDays launchedAt={SITE_LAUNCHED_AT} />
+      <RunningTimer />
     </section>
   );
 }
