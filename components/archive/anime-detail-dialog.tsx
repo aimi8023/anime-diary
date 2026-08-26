@@ -207,7 +207,7 @@ export default function AnimeDetailDialog({
         >
           <section
             aria-label="作品封面"
-            className="relative flex min-h-[290px] items-center justify-center overflow-hidden bg-gradient-to-br from-[#eee5f5] to-[#dce8f4] px-8 py-5 md:min-h-[580px] md:p-8"
+            className="relative flex min-h-[220px] items-center justify-center overflow-hidden bg-gradient-to-br from-[#eee5f5] to-[#dce8f4] px-8 py-5 md:min-h-[580px] md:p-8"
           >
             {anime.cover && (
               <>

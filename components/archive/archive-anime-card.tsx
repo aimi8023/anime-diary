@@ -62,11 +62,8 @@ export default function ArchiveAnimeCard({
           </span>
         </div>
         <div className="p-2.5 sm:p-3">
-          <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--accent-strong)]">
-            {anime.season}
-          </p>
           <h4
-            className="mt-1 line-clamp-2 min-h-10 text-sm font-bold leading-5 text-[var(--ink)]"
+            className="line-clamp-2 min-h-10 text-sm font-bold leading-5 text-[var(--ink)]"
             title={anime.title}
           >
             {anime.title}
