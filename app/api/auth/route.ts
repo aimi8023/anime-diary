@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
-import { createHash } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import {
   loginClientKey,
   loginRateLimiter,
 } from "@/lib/auth/rate-limit";
 import { errorResponse, readJsonBody } from "@/lib/http/response";
 import { sameOriginError } from "@/lib/http/security";
+
+// 先对两侧做摘要再比较：长度恒定，且不因字节差异提前返回，
+// 避免登录接口暴露时序侧信道。
+function passwordMatches(provided: string, expected: string): boolean {
+  const providedDigest = createHash("sha256").update(provided).digest();
+  const expectedDigest = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(providedDigest, expectedDigest);
+}
 
 export async function POST(request: Request) {
   const originError = sameOriginError(request);
@@ -57,7 +65,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (password !== adminPassword) {
+    if (!passwordMatches(password, adminPassword)) {
       await loginRateLimiter.recordFailure(clientKey);
       return errorResponse(
         401,
