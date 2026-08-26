@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 import type { MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 import type { Anime } from "@/lib/types";
+import CoverImage from "@/components/cover-image";
 import { useFocusTrap } from "./use-focus-trap";
 
 interface AnimeDetailDialogProps {
@@ -176,28 +176,25 @@ export default function AnimeDetailDialog({
           >
             {anime.cover && (
               <>
-                <Image
+                <CoverImage
                   alt=""
-                  aria-hidden="true"
                   className="scale-110 object-cover opacity-35 blur-2xl"
-                  fill
+                  fallbackMode="hidden"
                   sizes="360px"
                   src={anime.cover}
-                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-white/8 via-[var(--canvas)]/12 to-[#211d35]/25" />
               </>
             )}
             <div className="relative aspect-[2/3] w-[42vw] max-w-[180px] overflow-hidden rounded-[1.25rem] border border-white/70 bg-white/45 shadow-[0_24px_70px_rgba(33,29,53,0.28)] md:w-full md:max-w-[280px] md:rounded-[1.5rem]">
               {anime.cover ? (
-                <Image
+                <CoverImage
                   alt={`${anime.title}封面`}
                   className="object-cover"
-                  fill
+                  fallbackLabel={anime.title}
                   priority
                   sizes="280px"
                   src={anime.cover}
-                  unoptimized
                 />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-[var(--ink-subtle)]">

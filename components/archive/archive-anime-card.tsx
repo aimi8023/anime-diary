@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 import type { Anime } from "@/lib/types";
+import CoverImage from "@/components/cover-image";
 
 interface ArchiveAnimeCardProps {
   anime: Anime;
@@ -35,14 +35,13 @@ export default function ArchiveAnimeCard({
       >
         <div className="relative aspect-[2/3] overflow-hidden bg-gradient-to-br from-pink-50 to-blue-50">
           {anime.cover ? (
-            <Image
+            <CoverImage
               alt=""
               className="object-cover transition duration-500 group-hover:scale-105"
-              fill
-              loading={index === 0 ? "eager" : "lazy"}
+              fallbackLabel={anime.title}
+              loading={index === 0 ? "eager" : undefined}
               sizes="(max-width: 419px) 50vw, (max-width: 639px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 16.67vw, 14.3vw"
               src={anime.cover}
-              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center text-4xl text-gray-300">

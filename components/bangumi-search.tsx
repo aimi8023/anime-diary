@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import type {
   BangumiPrefill,
   BangumiSearchResult,
 } from "@/lib/bangumi/types";
+import CoverImage from "@/components/cover-image";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 import { readApiError } from "@/lib/http/client";
 
@@ -142,15 +142,14 @@ export default function BangumiSearch({
                 onClick={() => handleSelect(result)}
                 className="ui-focus flex w-full items-center gap-3 rounded-2xl border border-white/70 bg-white/42 p-3 text-left transition-colors hover:bg-white/72 disabled:opacity-60"
               >
-                <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-white/70 bg-white/35 shadow-sm">
+                <div className="relative h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-white/70 bg-white/35 shadow-sm">
                   {result.cover ? (
-                    <Image
-                      src={result.cover}
+                    <CoverImage
                       alt=""
-                      width={48}
-                      height={64}
-                      className="h-full w-full object-cover"
-                      unoptimized
+                      className="object-cover"
+                      fallbackLabel={result.title}
+                      sizes="56px"
+                      src={result.cover}
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs text-[var(--ink-subtle)]">

@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import type { Anime } from "@/lib/types";
+import CoverImage from "@/components/cover-image";
 
 interface AnimeListProps {
   animeList: Anime[];
@@ -41,13 +41,12 @@ export default function AnimeList({
         >
           <div className="relative h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-white/70 bg-white/40 shadow-sm">
             {anime.cover ? (
-              <Image
-                src={anime.cover}
+              <CoverImage
                 alt={`${anime.title}封面`}
                 className="object-cover"
-                fill
+                fallbackLabel={anime.title}
                 sizes="56px"
-                unoptimized
+                src={anime.cover}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-xs text-[var(--ink-subtle)]">
