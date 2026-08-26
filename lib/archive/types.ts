@@ -47,4 +47,10 @@ export interface YearRecap {
   topAnime: { title: string; rating: number } | null;
   /** 出现最多的标签，至多 3 个；并列时按标题顺序。 */
   topTags: string[];
+  /** 年度总话数（不含未知话数）。 */
+  episodesTotal: number;
+  /** 9 分及以上的记录数。 */
+  topRatedCount: number;
+  /** 各季度部数，按春/夏/秋/冬排列，只含有记录的季度。 */
+  seasonCounts: Array<{ season: string; count: number }>;
 }

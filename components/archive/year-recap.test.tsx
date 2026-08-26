@@ -13,6 +13,14 @@ const recaps: YearRecap[] = [
     averageRating: 8.6,
     topAnime: { title: "孤独摇滚！", rating: 9 },
     topTags: ["日常", "音乐"],
+    episodesTotal: 156,
+    topRatedCount: 5,
+    seasonCounts: [
+      { season: "春", count: 3 },
+      { season: "夏", count: 4 },
+      { season: "秋", count: 3 },
+      { season: "冬", count: 2 },
+    ],
   },
 ];
 

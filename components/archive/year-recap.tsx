@@ -66,13 +66,37 @@ export default function YearRecapPanel({
                 <span className="text-lg font-black tracking-tight text-[var(--ink)]">
                   {recap.year} 年
                 </span>
-                <span className="text-xs font-bold text-[var(--ink-subtle)]">
-                  {recap.total} 部 · 均分{" "}
+                <span className="text-xs font-bold tabular-nums text-[var(--ink-subtle)]">
+                  {recap.total} 部
+                  {recap.episodesTotal > 0 && ` · ${recap.episodesTotal} 话`}
+                  {" · "}
                   <span className="text-[var(--warning)]">
                     ★ {recap.averageRating.toFixed(1)}
                   </span>
                 </span>
               </div>
+
+              {recap.seasonCounts.length > 0 && (
+                <p className="mt-1.5 text-xs tabular-nums text-[var(--ink-muted)]">
+                  {recap.seasonCounts.map(({ season, count }, index) => (
+                    <span key={season}>
+                      {index > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="mx-1.5 text-[var(--ink-subtle)]"
+                        >
+                          ·
+                        </span>
+                      )}
+                      <span className="font-bold text-[var(--accent-strong)]">
+                        {season}
+                      </span>{" "}
+                      {count}
+                    </span>
+                  ))}
+                </p>
+              )}
+
               {recap.topAnime && (
                 <p className="mt-2 truncate text-sm text-[var(--ink)]">
                   <span className="ui-kicker mr-1.5">年度之作</span>
@@ -82,15 +106,19 @@ export default function YearRecapPanel({
                   </span>
                 </p>
               )}
-              {recap.topTags.length > 0 && (
-                <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {recap.topTags.map((tag) => (
-                    <span className="ui-chip px-2.5 py-1 text-[11px]" key={tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                {recap.topRatedCount > 0 && (
+                  <span className="rounded-full border border-amber-100 bg-[var(--warning-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--warning)]">
+                    9 分以上 {recap.topRatedCount} 部
+                  </span>
+                )}
+                {recap.topTags.map((tag) => (
+                  <span className="ui-chip px-2.5 py-1 text-[11px]" key={tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </button>
           ))}
         </div>

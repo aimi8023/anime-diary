@@ -291,6 +291,12 @@ describe("getYearlyRecap", () => {
         averageRating: 8.5,
         topAnime: { title: "甲", rating: 9 },
         topTags: ["日常", "治愈"],
+        episodesTotal: 24,
+        topRatedCount: 1,
+        seasonCounts: [
+          { season: "夏", count: 1 },
+          { season: "冬", count: 1 },
+        ],
       },
       {
         year: "2023",
@@ -298,6 +304,9 @@ describe("getYearlyRecap", () => {
         averageRating: 9,
         topAnime: { title: "丙", rating: 9 },
         topTags: ["奇幻"],
+        episodesTotal: 24,
+        topRatedCount: 1,
+        seasonCounts: [{ season: "秋", count: 1 }],
       },
     ]);
   });
@@ -332,6 +341,12 @@ describe("getYearlyRecap", () => {
     // 平分时取标题顺序靠前的作品。
     expect(recap[0].topAnime).toEqual({ title: "甲", rating: 9 });
     expect(recap[0].topTags).toEqual(["A", "B", "C"]);
+    expect(recap[0].episodesTotal).toBe(2);
+    expect(recap[0].topRatedCount).toBe(2);
+    expect(recap[0].seasonCounts).toEqual([
+      { season: "春", count: 1 },
+      { season: "夏", count: 1 },
+    ]);
   });
 
   it("returns an empty recap for empty data", () => {

@@ -241,6 +241,34 @@ export function getYearlyRecap(data: Anime[]): YearRecap[] {
       );
       const averageRating = Math.round((ratingSum / total) * 10) / 10;
 
+      const episodesTotal = records.reduce(
+        (sum, anime) =>
+          sum + (Number.isInteger(anime.episodes) && anime.episodes > 0
+            ? anime.episodes
+            : 0),
+        0,
+      );
+      const topRatedCount = records.filter(
+        (anime) => Number.isFinite(anime.rating) && anime.rating >= 9,
+      ).length;
+
+      const countsBySeason = new Map<string, number>();
+      for (const anime of records) {
+        const match = anime.season.match(/^(?:\d{4})([春夏秋冬])$/);
+        const seasonName = match?.[1];
+        if (!seasonName) continue;
+        countsBySeason.set(
+          seasonName,
+          (countsBySeason.get(seasonName) ?? 0) + 1,
+        );
+      }
+      const seasonCounts = (["春", "夏", "秋", "冬"] as const)
+        .filter((season) => countsBySeason.has(season))
+        .map((season) => ({
+          season,
+          count: countsBySeason.get(season) ?? 0,
+        }));
+
       const topAnime = records.reduce<Anime | null>((best, anime) => {
         if (!best) return anime;
         if (anime.rating > best.rating) return anime;
@@ -273,6 +301,9 @@ export function getYearlyRecap(data: Anime[]): YearRecap[] {
           ? { title: topAnime.title, rating: topAnime.rating }
           : null,
         topTags,
+        episodesTotal,
+        topRatedCount,
+        seasonCounts,
       };
     });
 }
