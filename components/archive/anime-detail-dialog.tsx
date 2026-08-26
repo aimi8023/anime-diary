@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Anime } from "@/lib/types";
 import CoverImage from "@/components/cover-image";
-import { useFocusTrap } from "./use-focus-trap";
+import { useFocusTrap } from "@/components/use-focus-trap";
 
 interface AnimeDetailDialogProps {
   anime: Anime | null;

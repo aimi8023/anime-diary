@@ -10,7 +10,7 @@ import type {
   ArchiveSort,
 } from "@/lib/archive/types";
 import { useArchiveSearch } from "./archive-search-context";
-import { useFocusTrap } from "./use-focus-trap";
+import { useFocusTrap } from "@/components/use-focus-trap";
 
 interface ArchiveToolbarProps {
   filters: ArchiveFilters;

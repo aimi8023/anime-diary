@@ -151,7 +151,6 @@ describe("AdminPage Bangumi entry", () => {
     const alertSpy = vi
       .spyOn(window, "alert")
       .mockImplementation(() => undefined);
-    vi.stubGlobal("confirm", vi.fn(() => true));
     vi.stubGlobal(
       "fetch",
       vi.fn(
@@ -187,6 +186,12 @@ describe("AdminPage Bangumi entry", () => {
     expect(await screen.findByText("葬送的芙莉莲")).toBeInTheDocument();
     await user.click(
       screen.getByRole("button", { name: "删除《葬送的芙莉莲》" }),
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "删除《葬送的芙莉莲》？" });
+    expect(dialog).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "确认删除" }),
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(

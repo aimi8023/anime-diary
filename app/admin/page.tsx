@@ -11,6 +11,7 @@ import BackupManager from "@/components/backup-manager";
 import AdminSectionNav, {
   type AdminSection,
 } from "@/components/admin/admin-section-nav";
+import ConfirmDialog from "@/components/confirm-dialog";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 import { readApiError } from "@/lib/http/client";
 
@@ -32,6 +33,7 @@ export default function AdminPage() {
   const [editing, setEditing] = useState<Anime | null>(null);
   const [section, setSection] = useState<AdminSection>("records");
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Anime | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [entryMode, setEntryMode] = useState<EntryMode>("bangumi");
@@ -102,15 +104,23 @@ export default function AdminPage() {
     fetchList();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("确定要删除这部番剧吗？")) return;
+  const handleDelete = (id: string) => {
+    const anime = animeList.find((item) => item.id === id);
+    if (!anime) return;
     setOperationError("");
+    setPendingDelete(anime);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const id = pendingDelete.id;
     setDeleting(id);
     try {
       const res = await fetch(`/api/anime/${id}`, { method: "DELETE" });
       if (!res.ok) {
         throw new Error(await readApiError(res, "删除失败"));
       }
+      setPendingDelete(null);
       fetchList();
     } catch (err) {
       setOperationError(
@@ -412,6 +422,19 @@ export default function AdminPage() {
           />
         </section>
       )}
+
+      <ConfirmDialog
+        busy={deleting === pendingDelete?.id}
+        confirmLabel="确认删除"
+        danger
+        description="删除前会自动创建快照，之后可以在备份工作区恢复。该记录会立即从公开档案中消失。"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          void confirmDelete();
+        }}
+        open={pendingDelete !== null}
+        title={`删除《${pendingDelete?.title ?? ""}》？`}
+      />
     </div>
   );
 }
