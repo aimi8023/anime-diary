@@ -233,7 +233,12 @@ export default function AnimeDetailDialog({
                 />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-[var(--ink-subtle)]">
-                  <span aria-hidden="true" className="text-5xl">◌</span>
+                  <span
+                    aria-hidden="true"
+                    className="text-5xl font-black tracking-tight"
+                  >
+                    {anime.title.charAt(0) || "◌"}
+                  </span>
                   <span className="text-sm font-semibold">封面暂缺</span>
                 </div>
               )}

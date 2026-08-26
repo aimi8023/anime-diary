@@ -44,8 +44,16 @@ export default function ArchiveAnimeCard({
               src={anime.cover}
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-4xl text-gray-300">
-              ◌
+            <div className="flex h-full flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#fdeef5] to-[#e8f2fc]">
+              <span
+                aria-hidden="true"
+                className="text-3xl font-black tracking-tight text-[var(--ink-subtle)]"
+              >
+                {anime.title.charAt(0) || "◌"}
+              </span>
+              <span className="px-2 text-center text-[10px] font-semibold text-[var(--ink-subtle)]">
+                封面暂缺
+              </span>
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#211d35]/30 to-transparent" />
