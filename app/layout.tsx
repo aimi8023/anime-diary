@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SiteHeader from "@/components/site-header";
+import BackToTop from "@/components/back-to-top";
 import { ArchiveSearchProvider } from "@/components/archive/archive-search-context";
 
 const geistSans = Geist({
@@ -55,6 +56,7 @@ export default function RootLayout({
         <ArchiveSearchProvider>
           <SiteHeader />
           <main className="relative z-10 flex-1">{children}</main>
+          <BackToTop />
           <footer className="relative z-10 mt-auto border-t border-white/60 bg-white/45 py-6 backdrop-blur-xl">
             <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 text-center sm:flex-row sm:px-6 sm:text-left">
               <p className="text-xs font-semibold text-[var(--ink-muted)]">
