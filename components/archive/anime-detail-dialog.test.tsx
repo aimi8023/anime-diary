@@ -146,3 +146,79 @@ describe("AnimeDetailDialog", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });
+
+function NavigationHarness({ total = 3 }: { total?: number }) {
+  const list = Array.from({ length: total }, (_, i) => ({
+    ...completeAnime,
+    id: `anime-${i + 1}`,
+    title: `作品${i + 1}`,
+  }));
+  const [index, setIndex] = useState(0);
+  const [open, setOpen] = useState(true);
+  return (
+    <AnimeDetailDialog
+      anime={open ? list[index] : null}
+      onClose={() => setOpen(false)}
+      onNavigate={(delta) =>
+        setIndex((current) =>
+          Math.min(total - 1, Math.max(0, current + delta)),
+        )
+      }
+      position={{ index, total }}
+    />
+  );
+}
+
+describe("AnimeDetailDialog navigation", () => {
+  it("hides navigation controls when no navigation callback is given", async () => {
+    const user = userEvent.setup();
+    render(<DialogHarness />);
+
+    await user.click(screen.getByRole("button", { name: "打开详情" }));
+
+    expect(
+      screen.queryByRole("button", { name: "上一部" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "下一部" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("steps through records with buttons, clamps at bounds, and shows position", async () => {
+    const user = userEvent.setup();
+    render(<NavigationHarness />);
+
+    expect(screen.getByText("1 / 3")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "上一部" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "下一部" })).toBeEnabled();
+
+    await user.click(screen.getByRole("button", { name: "下一部" }));
+
+    expect(
+      screen.getByRole("dialog", { name: "作品2" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 / 3")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "上一部" })).toBeEnabled();
+
+    await user.click(screen.getByRole("button", { name: "下一部" }));
+    await user.click(screen.getByRole("button", { name: "下一部" }));
+
+    expect(screen.getByText("3 / 3")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "下一部" })).toBeDisabled();
+  });
+
+  it("moves with arrow keys without leaving the dialog", async () => {
+    const user = userEvent.setup();
+    render(<NavigationHarness />);
+
+    await user.keyboard("{ArrowRight}");
+    expect(
+      screen.getByRole("dialog", { name: "作品2" }),
+    ).toBeInTheDocument();
+
+    await user.keyboard("{ArrowLeft}");
+    expect(
+      screen.getByRole("dialog", { name: "作品1" }),
+    ).toBeInTheDocument();
+  });
+});

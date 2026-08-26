@@ -231,4 +231,24 @@ describe("ArchiveBrowser filtering", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("找到 2 部")).toBeInTheDocument();
   });
+
+  it("steps through filtered records inside the detail dialog", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+
+    await user.click(
+      screen.getByRole("button", { name: "查看《葬送的芙莉莲》详情" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "葬送的芙莉莲" }),
+    ).toBeInTheDocument();
+
+    await user.keyboard("{ArrowRight}");
+
+    // 按评分排序：芙莉莲 9.5 → 孤独摇滚 9。
+    expect(
+      screen.getByRole("dialog", { name: "孤独摇滚！" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 / 3")).toBeInTheDocument();
+  });
 });

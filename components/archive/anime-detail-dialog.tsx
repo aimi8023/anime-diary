@@ -10,25 +10,58 @@ import type { Anime } from "@/lib/types";
 interface AnimeDetailDialogProps {
   anime: Anime | null;
   onClose: () => void;
+  /** 在当前筛选结果中移动相对步长；不提供时隐藏切换控件。 */
+  onNavigate?: (delta: 1 | -1) => void;
+  /** 当前记录在结果序列中的位置，用于边界判断与计数展示。 */
+  position?: { index: number; total: number } | null;
 }
 
 export default function AnimeDetailDialog({
   anime,
   onClose,
+  onNavigate,
+  position,
 }: AnimeDetailDialogProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const paneScrollRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
+  // 用 ref 读取最新回调，让开关生命周期只依赖“是否打开”，
+  // 切换相邻记录时不会重新锁定滚动或打断焦点。
+  const onCloseRef = useRef(onClose);
+  const onNavigateRef = useRef(onNavigate);
   useEffect(() => {
-    if (!anime) return;
+    onCloseRef.current = onClose;
+    onNavigateRef.current = onNavigate;
+  });
+
+  const isOpen = Boolean(anime);
+  const canNavigate = Boolean(onNavigate && position && position.total > 1);
+  const navIndex = canNavigate && position ? position.index : 0;
+  const navTotal = canNavigate && position ? position.total : 0;
+  const hasPrev = canNavigate && navIndex > 0;
+  const hasNext = canNavigate && navIndex < navTotal - 1;
+
+  useEffect(() => {
+    if (!isOpen) return;
     previousFocusRef.current = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
+      if (!onNavigateRef.current) return;
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        onNavigateRef.current(-1);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        onNavigateRef.current(1);
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -37,7 +70,13 @@ export default function AnimeDetailDialog({
       document.body.style.overflow = previousOverflow;
       previousFocusRef.current?.focus();
     };
-  }, [anime, onClose]);
+  }, [isOpen]);
+
+  // 切换到相邻记录时，把两个滚动容器都回到顶部，避免停留在上一部的位置。
+  useEffect(() => {
+    if (mobileScrollRef.current) mobileScrollRef.current.scrollTop = 0;
+    if (paneScrollRef.current) paneScrollRef.current.scrollTop = 0;
+  }, [anime?.id]);
 
   if (!anime) return null;
   if (typeof document === "undefined") return null;
@@ -65,17 +104,68 @@ export default function AnimeDetailDialog({
         }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
       >
-        <button
-          aria-label="关闭详情"
-          className="ui-icon-button absolute right-4 top-4 z-20 border border-white/80 bg-white/90 text-xl font-normal text-[var(--ink-muted)] shadow-sm backdrop-blur"
-          onClick={onClose}
-          ref={closeButtonRef}
-          type="button"
-        >
-          <span aria-hidden="true">×</span>
-        </button>
+        <div className="absolute right-4 top-4 z-20 flex items-center gap-1.5">
+          {canNavigate && (
+            <>
+              <span
+                aria-hidden="true"
+                className="mr-1 hidden rounded-full border border-white/80 bg-white/90 px-2.5 py-1 text-[11px] font-bold tabular-nums text-[var(--ink-muted)] shadow-sm backdrop-blur sm:block"
+              >
+                {navIndex + 1} / {navTotal}
+              </span>
+              <button
+                aria-label="上一部"
+                className="ui-icon-button border border-white/80 bg-white/90 shadow-sm backdrop-blur"
+                disabled={!hasPrev}
+                onClick={() => onNavigate?.(-1)}
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <button
+                aria-label="下一部"
+                className="ui-icon-button border border-white/80 bg-white/90 shadow-sm backdrop-blur"
+                disabled={!hasNext}
+                onClick={() => onNavigate?.(1)}
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </>
+          )}
+          <button
+            aria-label="关闭详情"
+            className="ui-icon-button border border-white/80 bg-white/90 text-xl font-normal text-[var(--ink-muted)] shadow-sm backdrop-blur"
+            onClick={onClose}
+            ref={closeButtonRef}
+            type="button"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
 
-        <div className="grid max-h-[94vh] overflow-y-auto md:grid-cols-[minmax(260px,0.78fr)_minmax(0,1.35fr)] md:overflow-hidden">
+        <div
+          className="grid max-h-[94vh] overflow-y-auto md:grid-cols-[minmax(260px,0.78fr)_minmax(0,1.35fr)] md:overflow-hidden"
+          ref={mobileScrollRef}
+        >
           <section
             aria-label="作品封面"
             className="relative flex min-h-[290px] items-center justify-center overflow-hidden bg-gradient-to-br from-[#eee5f5] to-[#dce8f4] px-8 py-5 md:min-h-[580px] md:p-8"
@@ -117,9 +207,10 @@ export default function AnimeDetailDialog({
           <section
             aria-label="追番详情"
             className="relative md:max-h-[94vh] md:overflow-y-auto"
+            ref={paneScrollRef}
           >
             <div className="space-y-7 px-6 pb-8 pt-7 sm:px-8 md:px-10 md:pb-10 md:pt-16">
-              <header>
+              <header aria-live="polite">
                 <p className="ui-kicker">{anime.season} · MY ARCHIVE</p>
                 <h2
                   className="mt-3 text-3xl font-black tracking-[-0.035em] text-[var(--ink)] sm:text-4xl"

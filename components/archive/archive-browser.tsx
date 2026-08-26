@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Anime } from "@/lib/types";
 import {
   DEFAULT_ARCHIVE_FILTERS,
@@ -32,11 +32,32 @@ export default function ArchiveBrowser({
 }: ArchiveBrowserProps) {
   const [filters, setFilters] = useState(initialFilters);
   const [queryDraft, setQueryDraft] = useState(initialFilters.q);
-  const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
+  // 只记住选中 id：筛选结果变化时自动派生记录与相邻关系。
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const options = useMemo(() => getArchiveOptions(records), [records]);
   const filteredRecords = useMemo(
     () => filterAnime(records, filters),
     [filters, records],
+  );
+  const selectedIndex = filteredRecords.findIndex(
+    (anime) => anime.id === selectedId,
+  );
+  const selectedAnime =
+    selectedIndex >= 0 ? filteredRecords[selectedIndex] : null;
+
+  const navigateSelection = useCallback(
+    (delta: 1 | -1) => {
+      setSelectedId((current) => {
+        const index = filteredRecords.findIndex(
+          (anime) => anime.id === current,
+        );
+        if (index === -1) return current;
+        const next = index + delta;
+        if (next < 0 || next >= filteredRecords.length) return current;
+        return filteredRecords[next].id;
+      });
+    },
+    [filteredRecords],
   );
 
   useEffect(() => {
@@ -144,7 +165,7 @@ export default function ArchiveBrowser({
           />
           <ArchiveResults
             onClearFilters={clearFilters}
-            onSelect={setSelectedAnime}
+            onSelect={(anime) => setSelectedId(anime.id)}
             records={filteredRecords}
             sort={filters.sort}
           />
@@ -152,7 +173,15 @@ export default function ArchiveBrowser({
       )}
       <AnimeDetailDialog
         anime={selectedAnime}
-        onClose={() => setSelectedAnime(null)}
+        onClose={() => setSelectedId(null)}
+        onNavigate={
+          filteredRecords.length > 1 ? navigateSelection : undefined
+        }
+        position={
+          selectedAnime
+            ? { index: selectedIndex, total: filteredRecords.length }
+            : null
+        }
       />
     </div>
   );
