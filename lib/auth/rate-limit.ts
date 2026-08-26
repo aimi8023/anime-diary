@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import { Redis } from "@upstash/redis";
+import { resolveRedisConfig } from "@/lib/redis-config";
 
 const WINDOW_SECONDS = 15 * 60;
 const MAX_FAILURES = 5;
@@ -147,33 +148,9 @@ export function createRedisLoginRateLimiter(
 }
 
 function configuredRedis(): RedisRateLimitClient | null {
-  const redisUrl =
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.KV_REST_API_URL ||
-    process.env.REDIS_URL;
-  let token =
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.KV_REST_API_TOKEN;
-
-  if (!redisUrl) return null;
-  if (!token && redisUrl.includes("?token=")) {
-    token = redisUrl.split("?token=")[1];
-  }
-  if (!token && redisUrl.startsWith("rediss://")) {
-    token = redisUrl.match(/rediss:\/\/[^:]+:([^@]+)@/)?.[1];
-  }
-  if (!token) return null;
-
-  let url = redisUrl;
-  if (redisUrl.startsWith("rediss://")) {
-    const host = redisUrl.match(/rediss:\/\/[^@]+@([^:]+)/)?.[1];
-    if (!host) return null;
-    url = `https://${host}`;
-  } else if (redisUrl.includes("?token=")) {
-    url = redisUrl.split("?token=")[0];
-  }
-
-  return new Redis({ url, token }) as RedisRateLimitClient;
+  const config = resolveRedisConfig();
+  if (!config) return null;
+  return new Redis(config) as RedisRateLimitClient;
 }
 
 const redis = configuredRedis();

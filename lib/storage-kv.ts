@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { resolveRedisConfig } from "./redis-config";
 import type {
   AnimeState,
   BackupMetadata,
@@ -71,45 +72,16 @@ return #ids
 `;
 
 function getRedis(): Redis {
-  const redisUrl =
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.KV_REST_API_URL ||
-    process.env.REDIS_URL;
+  const config = resolveRedisConfig();
 
-  if (!redisUrl) {
+  if (!config) {
     throw new Error(
-      "REDIS_URL, KV_REST_API_URL, or UPSTASH_REDIS_REST_URL is not set",
+      "Redis 未配置或缺少 Token：需要 UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN、" +
+        "KV_REST_API_URL/KV_REST_API_TOKEN，或在 REDIS_URL 中内嵌 Token",
     );
   }
 
-  let token =
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.KV_REST_API_TOKEN;
-
-  if (!token && redisUrl.includes("?token=")) {
-    token = redisUrl.split("?token=")[1];
-  }
-
-  if (!token && redisUrl.startsWith("rediss://")) {
-    const match = redisUrl.match(/rediss:\/\/[^:]+:([^@]+)@/);
-    if (match?.[1]) token = match[1];
-  }
-
-  if (!token) {
-    throw new Error(
-      "UPSTASH_REDIS_REST_TOKEN, KV_REST_API_TOKEN, or token in REDIS_URL is not set",
-    );
-  }
-
-  let baseUrl = redisUrl;
-  if (redisUrl.startsWith("rediss://")) {
-    const hostMatch = redisUrl.match(/rediss:\/\/[^@]+@([^:]+)/);
-    if (hostMatch?.[1]) baseUrl = `https://${hostMatch[1]}`;
-  } else if (redisUrl.includes("?token=")) {
-    baseUrl = redisUrl.split("?token=")[0];
-  }
-
-  return new Redis({ url: baseUrl, token });
+  return new Redis(config);
 }
 
 function parseStored(value: unknown, label: string): unknown {
