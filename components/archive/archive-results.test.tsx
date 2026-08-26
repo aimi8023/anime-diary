@@ -62,13 +62,14 @@ describe("ArchiveResults", () => {
     expect(
       screen.getByRole("heading", { name: "2024年4月" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
-    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
+    // 循环滚动行渲染两份内容，保证首尾相接。
+    expect(screen.getAllByText("葬送的芙莉莲")).toHaveLength(2);
+    expect(screen.getAllByText("孤独摇滚！")).toHaveLength(2);
 
     // 卡片行：横向滚动 + 紧凑卡片。
     const row = container.querySelector("div.overflow-x-auto");
     expect(row).not.toBeNull();
-    expect(row?.firstElementChild).toHaveClass("w-[122px]");
+    expect(row?.firstElementChild?.firstElementChild).toHaveClass("w-[122px]");
   });
 
   it("groups by rating buckets without season dividers", () => {
@@ -111,7 +112,7 @@ describe("ArchiveResults", () => {
 
     renderResults({ records: [records[1], legacyRecord] });
 
-    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
+    expect(screen.getAllByText("孤独摇滚！").length).toBeGreaterThan(0);
   });
 
   it("renders a recoverable no-result state", async () => {

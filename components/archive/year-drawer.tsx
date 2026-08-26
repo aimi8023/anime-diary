@@ -143,7 +143,7 @@ export default function YearDrawer({
                 {(recordsByYear.get(recap.year) ?? []).map((anime) => (
                   <button
                     aria-label={`查看《${anime.title}》详情`}
-                    className="ui-focus group w-[108px] shrink-0 snap-start text-left"
+                    className="ui-focus group w-[108px] shrink-0 text-left"
                     key={anime.id}
                     onClick={() => onSelect(anime)}
                     type="button"

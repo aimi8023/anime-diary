@@ -13,8 +13,7 @@ interface ArchiveResultsProps {
   onClearFilters: () => void;
 }
 
-const ROW_CARD_CLASS =
-  "w-[122px] shrink-0 snap-start sm:w-[140px]";
+const ROW_CARD_CLASS = "w-[122px] shrink-0 sm:w-[140px]";
 
 function PosterRow({
   cards,
