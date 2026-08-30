@@ -116,6 +116,16 @@ function seasonSortKey(season: string): number {
   return Number(parts.year) * 100 + parts.rank;
 }
 
+function bySeason(a: Anime, b: Anime, flip: number): number {
+  const keyA = seasonSortKey(a.season);
+  const keyB = seasonSortKey(b.season);
+  // 缺失季度的记录固定垫底。
+  if (keyA === 0 && keyB === 0) return 0;
+  if (keyA === 0) return 1;
+  if (keyB === 0) return -1;
+  return (keyA - keyB) * flip;
+}
+
 function compareByGroup(
   a: Anime,
   b: Anime,
@@ -124,14 +134,10 @@ function compareByGroup(
 ): number {
   const flip = direction === "asc" ? 1 : -1;
   if (group === "rating") {
-    return (a.rating - b.rating) * flip || byTitle(a, b);
+    // 同分档内按播出档期排序，评分组也能按时间线浏览。
+    return (a.rating - b.rating) * flip || bySeason(a, b, flip) || byTitle(a, b);
   }
-  // 季度维度：按播出档期整体排序；缺失季度的“其他”固定垫底。
-  const keyA = seasonSortKey(a.season);
-  const keyB = seasonSortKey(b.season);
-  if (keyA === 0 && keyB !== 0) return 1;
-  if (keyB === 0 && keyA !== 0) return -1;
-  return (keyA - keyB) * flip || byTitle(a, b);
+  return bySeason(a, b, flip) || byTitle(a, b);
 }
 
 function seasonParts(season: string): {
@@ -224,7 +230,9 @@ export function groupArchive(
           ? key === "其他"
             ? "其他"
             : formatSeasonLabel(key)
-          : `★ ${Number(key).toFixed(1)}`,
+          : key === "0"
+            ? "未评分"
+            : `★ ${Number(key).toFixed(1)}`,
       records: [...bucket.records].sort((a, b) =>
         compareByGroup(a, b, filters.group, filters.direction),
       ),
@@ -273,11 +281,18 @@ export function getYearlyRecap(data: Anime[]): YearRecap[] {
     .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
     .map(([year, records]) => {
       const total = records.length;
-      const ratingSum = records.reduce(
-        (sum, anime) => sum + (Number.isFinite(anime.rating) ? anime.rating : 0),
+      // 未评分（rating 0）不参与均分统计。
+      const ratedRecords = records.filter(
+        (anime) => Number.isFinite(anime.rating) && anime.rating > 0,
+      );
+      const ratingSum = ratedRecords.reduce(
+        (sum, anime) => sum + anime.rating,
         0,
       );
-      const averageRating = Math.round((ratingSum / total) * 10) / 10;
+      const averageRating =
+        ratedRecords.length > 0
+          ? Math.round((ratingSum / ratedRecords.length) * 10) / 10
+          : null;
 
       const episodesTotal = records.reduce(
         (sum, anime) =>
@@ -308,6 +323,7 @@ export function getYearlyRecap(data: Anime[]): YearRecap[] {
         }));
 
       const topAnime = records.reduce<Anime | null>((best, anime) => {
+        if (!Number.isFinite(anime.rating) || anime.rating <= 0) return best;
         if (!best) return anime;
         if (anime.rating > best.rating) return anime;
         if (

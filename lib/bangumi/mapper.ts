@@ -15,8 +15,11 @@ export function seasonFromAirDate(airDate?: string): string {
   const month = Number(match[2]);
   if (month < 1 || month > 12) return "";
 
+  // 季度划分：春=12/1/2 月、夏=3–5 月、秋=6–8 月、冬=9–11 月；
+  // 12 月首播归入次年春。
+  if (month === 12) return `${Number(match[1]) + 1}春`;
   const season =
-    month <= 3 ? "春" : month <= 6 ? "夏" : month <= 9 ? "秋" : "冬";
+    month <= 2 ? "春" : month <= 5 ? "夏" : month <= 8 ? "秋" : "冬";
   return `${match[1]}${season}`;
 }
 

@@ -9,6 +9,7 @@ interface AnimeListProps {
   onEdit: (anime: Anime) => void;
   onDelete: (id: string) => void;
   deleting: string | null;
+  onQuickRate?: (anime: Anime) => void;
 }
 
 export default function AnimeList({
@@ -16,6 +17,7 @@ export default function AnimeList({
   onEdit,
   onDelete,
   deleting,
+  onQuickRate,
 }: AnimeListProps) {
   if (animeList.length === 0) {
     return (
@@ -65,13 +67,28 @@ export default function AnimeList({
                 {formatSeasonLabel(anime.season)}
               </span>
               {anime.episodes > 0 && <span>{anime.episodes}话</span>}
-              <span className="rounded-full bg-[var(--warning-soft)] px-2 py-1 font-bold text-[var(--warning)]">
-                ★ {anime.rating}
+              <span
+                className={`rounded-full px-2 py-1 font-bold ${
+                  anime.rating > 0
+                    ? "bg-[var(--warning-soft)] text-[var(--warning)]"
+                    : "bg-white/60 text-[var(--ink-subtle)]"
+                }`}
+              >
+                {anime.rating > 0 ? `★ ${anime.rating}` : "未评分"}
               </span>
             </div>
           </div>
 
           <div className="flex flex-shrink-0 items-center gap-1">
+            {anime.rating === 0 && onQuickRate && (
+              <button
+                aria-label={`补评分《${anime.title}》`}
+                onClick={() => onQuickRate(anime)}
+                className="ui-button ui-button-secondary min-w-11 px-3 text-xs"
+              >
+                补评分
+              </button>
+            )}
             <button
               aria-label={`编辑《${anime.title}》`}
               onClick={() => onEdit(anime)}

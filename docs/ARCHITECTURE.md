@@ -120,7 +120,7 @@ interface Anime {
 
 - `title` 去除首尾空白并限制长度；
 - `season` 存储格式为 `YYYY` 加春/夏/秋/冬（如 `2024春`），年份分组、表单预填与归档展示都依赖该格式；展示层统一通过 `lib/season-label.ts` 转换为“1月/4月/7月/10月”档期表述；
-- `rating` 必须为 1–10 之间的 0.5 倍数；
+- `rating` 必须为 0–10 之间的 0.5 倍数；`0` 是"未评分"哨兵值（批量入库的默认状态），展示层统一显示"未评分"，年度回顾均分与年度之作统计排除该值；`lib/backups/validation.ts` 镜像同一规则，导入备份同样接受 0；
 - `episodes` 必须为 0–9999 的整数；
 - 最多 20 个标签，每个标签 1–30 个字符，并去重；
 - 封面和 Bangumi 地址只允许 HTTP(S) URL；
@@ -202,6 +202,9 @@ Redis 键：
 - 搜索缓存约 5 分钟，详情缓存约 1 小时，只是进程内性能优化；
 - 请求超时为 8 秒；
 - User-Agent 和可选 Token 只由服务端读取，Token 不进入浏览器或错误响应。
+- 可选出站代理：配置 `BANGUMI_PROXY`（或标准 `HTTPS_PROXY`）后 Bangumi 请求改走该代理（undici ProxyAgent），用于直连超时的本地网络；未配置时保持直连，生产环境不受影响。
+
+季度批量入库：`GET /api/bangumi/season?year=&season=`（管理员）按播出日期区间过滤、按热度排序拉取一季度放送列表；Bangumi 搜索单页上限 20 条，客户端分页拉取至多 5 页（100 部），缓存 5 分钟，重复检测装饰与搜索端点一致；管理端勾选后逐部 `POST /api/anime` 入库，评分记 0（未评分），之后经记录工作区的快速补评分对话框补填评分与感想。
 
 ## 路由、认证与安全
 
@@ -308,7 +311,7 @@ Redis 键：
 
 修改项目时保持以下单一职责：
 
-- 番剧输入规则只改 `lib/anime/validation.ts`；
+- 番剧输入规则只改 `lib/anime/validation.ts`，备份导入镜像规则只改 `lib/backups/validation.ts`，两者同步放开；
 - 公开筛选、URL、分组和统计只改 `lib/archive/`；
 - API 错误和同源规则只改 `lib/http/`；
 - 登录限流只改 `lib/auth/rate-limit.ts`；

@@ -69,13 +69,23 @@ describe("parseAnimeCreateInput", () => {
     },
   );
 
+  it("accepts rating 0 as the unrated sentinel in create and update", () => {
+    expect(
+      parseAnimeCreateInput({ ...validInput, rating: 0 }),
+    ).toMatchObject({ ok: true, data: { rating: 0 } });
+    expect(parseAnimeUpdateInput({ rating: 0 })).toMatchObject({
+      ok: true,
+      data: { rating: 0 },
+    });
+  });
+
   it.each([
     ["non-object body", null, "$"],
     ["empty title", { ...validInput, title: " " }, "title"],
     ["missing season", { ...validInput, season: undefined }, "season"],
     ["foreign URL scheme", { ...validInput, cover: "javascript:alert(1)" }, "cover"],
     ["non-finite rating", { ...validInput, rating: "NaN" }, "rating"],
-    ["rating below range", { ...validInput, rating: 0.5 }, "rating"],
+    ["rating below range", { ...validInput, rating: -0.5 }, "rating"],
     ["rating off step", { ...validInput, rating: 9.2 }, "rating"],
     ["fractional episodes", { ...validInput, episodes: 12.5 }, "episodes"],
     ["negative episodes", { ...validInput, episodes: -1 }, "episodes"],

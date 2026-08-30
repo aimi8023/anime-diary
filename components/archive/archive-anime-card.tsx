@@ -8,25 +8,22 @@ interface ArchiveAnimeCardProps {
   anime: Anime;
   index: number;
   onSelect: (anime: Anime) => void;
-  /** 横向滚动行中的小卡片模式：标题更紧凑。 */
-  compact?: boolean;
-  /** 由调用方决定卡片宽度（网格或横向行）。 */
-  className?: string;
+  /** 评分维度分组时展示，补充卡片缺失的季度上下文。 */
+  seasonLabel?: string;
 }
 
 export default function ArchiveAnimeCard({
   anime,
   index,
   onSelect,
-  compact = false,
-  className,
+  seasonLabel,
 }: ArchiveAnimeCardProps) {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.article
       animate={{ opacity: 1, y: 0 }}
-      className={`group relative overflow-hidden rounded-[0.9rem] border border-white/85 bg-[rgba(255,255,255,0.76)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-md)] ${className ?? ""}`}
+      className="group relative overflow-hidden rounded-[0.9rem] border border-white/85 bg-[rgba(255,255,255,0.76)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-md)]"
       initial={{ opacity: 0, y: reduceMotion ? 0 : 14 }}
       transition={{
         delay: reduceMotion ? 0 : Math.min(index, 8) * 0.035,
@@ -35,7 +32,7 @@ export default function ArchiveAnimeCard({
     >
       <button
         aria-label={`查看《${anime.title}》详情`}
-        className="ui-focus archive-poster-card block h-full w-full rounded-[0.9rem] text-left"
+        className="ui-focus block h-full w-full rounded-[0.9rem] text-left"
         onClick={() => onSelect(anime)}
         type="button"
       >
@@ -63,13 +60,24 @@ export default function ArchiveAnimeCard({
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#211d35]/30 to-transparent" />
-          <span className="absolute right-2 top-2 rounded-full border border-white/80 bg-[rgba(255,248,228,0.92)] px-2 py-0.5 text-[11px] font-black text-[var(--warning)] shadow-sm backdrop-blur">
-            ★ {anime.rating}
+          {seasonLabel && (
+            <span className="absolute bottom-2 left-2 rounded-full bg-[#211d35]/55 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+              {seasonLabel}
+            </span>
+          )}
+          <span
+            className={`absolute right-2 top-2 rounded-full border border-white/80 px-2 py-0.5 text-[11px] font-black shadow-sm backdrop-blur ${
+              anime.rating > 0
+                ? "bg-[rgba(255,248,228,0.92)] text-[var(--warning)]"
+                : "bg-[rgba(255,255,255,0.85)] text-[var(--ink-subtle)]"
+            }`}
+          >
+            {anime.rating > 0 ? `★ ${anime.rating}` : "未评分"}
           </span>
         </div>
-        <div className={compact ? "p-2" : "p-2.5 sm:p-3"}>
+        <div className="p-2.5 sm:p-3">
           <h4
-            className={`line-clamp-2 text-sm font-bold leading-5 text-[var(--ink)] ${compact ? "min-h-8 text-xs leading-4" : "min-h-10"}`}
+            className="line-clamp-2 min-h-10 text-sm font-bold leading-5 text-[var(--ink)]"
             title={anime.title}
           >
             {anime.title}

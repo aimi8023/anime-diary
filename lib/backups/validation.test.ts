@@ -128,6 +128,12 @@ describe("parseBackupJson", () => {
     expect(result.issues).toContainEqual(expect.objectContaining({ code }));
   });
 
+  it("accepts rating 0 as the unrated sentinel", () => {
+    const result = parseBackupJson(JSON.stringify([{ ...anime, rating: 0 }]));
+
+    expect(result).toMatchObject({ ok: true });
+  });
+
   it("accepts an empty dataset but marks it for extra confirmation", () => {
     expect(parseBackupJson("[]")).toEqual({
       ok: true,

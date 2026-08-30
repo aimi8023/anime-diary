@@ -76,14 +76,14 @@ function validateAnime(value: unknown, index: number): BackupIssue[] {
   if (
     typeof value.rating !== "number" ||
     !Number.isFinite(value.rating) ||
-    value.rating < 1 ||
+    value.rating < 0 ||
     value.rating > 10 ||
     value.rating * 2 !== Math.round(value.rating * 2)
   ) {
     issues.push(
       issue(
         "invalid_rating",
-        "rating 必须是 1 到 10 之间的 0.5 倍数",
+        "rating 必须是 0 到 10 之间的 0.5 倍数（0 表示未评分）",
         index,
         "rating",
       ),

@@ -1,3 +1,4 @@
+import { ProxyAgent, fetch as undiciFetch } from "undici";
 import { mapSearchSubject, mapSubjectToPrefill } from "./mapper";
 import type {
   BangumiPrefill,
@@ -17,6 +18,7 @@ interface CacheEntry<T> {
 }
 
 const searchCache = new Map<string, CacheEntry<BangumiSearchResult[]>>();
+const seasonListCache = new Map<string, CacheEntry<BangumiSearchResult[]>>();
 const detailCache = new Map<number, CacheEntry<BangumiPrefill>>();
 
 export class BangumiClientError extends Error {
@@ -49,7 +51,24 @@ function getCached<K, V>(
 
 export function clearBangumiCacheForTests(): void {
   searchCache.clear();
+  seasonListCache.clear();
   detailCache.clear();
+  proxyDispatcher = undefined;
+}
+
+// 部分本地网络直连 Bangumi 会超时（DNS 污染），配置代理后改走代理；
+// 生产环境通常不设置该变量，保持直连。
+let proxyDispatcher: ProxyAgent | null | undefined;
+
+function bangumiDispatcher(): ProxyAgent | undefined {
+  if (proxyDispatcher === undefined) {
+    const proxyUrl =
+      process.env.BANGUMI_PROXY ||
+      process.env.HTTPS_PROXY ||
+      process.env.https_proxy;
+    proxyDispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : null;
+  }
+  return proxyDispatcher ?? undefined;
 }
 
 function requestHeaders(): Record<string, string> {
@@ -82,11 +101,19 @@ function errorForStatus(status: number): BangumiClientError {
 async function requestJson(url: string, init: RequestInit): Promise<unknown> {
   let response: Response;
   try {
-    response = await fetch(url, {
-      ...init,
-      headers: requestHeaders(),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    const dispatcher = bangumiDispatcher();
+    response = dispatcher
+      ? ((await undiciFetch(url, {
+          ...(init as object),
+          headers: requestHeaders(),
+          signal: AbortSignal.timeout(TIMEOUT_MS),
+          dispatcher,
+        })) as unknown as Response)
+      : await fetch(url, {
+          ...init,
+          headers: requestHeaders(),
+          signal: AbortSignal.timeout(TIMEOUT_MS),
+        });
   } catch (error) {
     if (
       error instanceof DOMException &&
@@ -174,6 +201,81 @@ export async function searchBangumiSubjects(
     .slice(0, 8)
     .map(mapSearchSubject);
   searchCache.set(cacheKey, {
+    expiresAt: Date.now() + SEARCH_TTL_MS,
+    value: cloneSearchResults(results),
+  });
+  return cloneSearchResults(results);
+}
+
+export type BroadcastSeason = "春" | "夏" | "秋" | "冬";
+
+// 季度→播出日期区间：春=12/1/2 月（含上年 12 月）、夏=3–5 月、
+// 秋=6–8 月、冬=9–11 月，与 seasonFromAirDate 的存储划分一致。
+function seasonAirDateRange(
+  year: number,
+  season: BroadcastSeason,
+): [string, string] {
+  switch (season) {
+    case "春":
+      return [`>=${year - 1}-12-01`, `<${year}-03-01`];
+    case "夏":
+      return [`>=${year}-03-01`, `<${year}-06-01`];
+    case "秋":
+      return [`>=${year}-06-01`, `<${year}-09-01`];
+    case "冬":
+      return [`>=${year}-09-01`, `<${year}-12-01`];
+  }
+}
+
+const SEASON_PAGE_SIZE = 20; // Bangumi 搜索接口单页上限 20，limit 传更大也会被钳制。
+const SEASON_MAX_PAGES = 5;
+
+function subjectSummaryPage(payload: unknown): BangumiSubjectSummary[] {
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    !Array.isArray((payload as { data?: unknown }).data) ||
+    !(payload as { data: unknown[] }).data.every(isSubjectSummary)
+  ) {
+    throw new BangumiClientError(
+      "invalid_response",
+      "Bangumi 季度列表格式异常",
+    );
+  }
+  return (payload as { data: BangumiSubjectSummary[] }).data;
+}
+
+export async function listSeasonSubjects(
+  year: number,
+  season: BroadcastSeason,
+): Promise<BangumiSearchResult[]> {
+  const cacheKey = `${year}-${season}`;
+  const cached = getCached(seasonListCache, cacheKey);
+  if (cached) return cloneSearchResults(cached);
+
+  const [gte, lt] = seasonAirDateRange(year, season);
+  const body = JSON.stringify({
+    keyword: "",
+    sort: "heat",
+    filter: { type: [2], nsfw: false, air_date: [gte, lt] },
+  });
+
+  const collected: BangumiSubjectSummary[] = [];
+  for (let page = 0; page < SEASON_MAX_PAGES; page++) {
+    const pageData = subjectSummaryPage(
+      await requestJson(
+        `${API_BASE}/v0/search/subjects?limit=${SEASON_PAGE_SIZE}&offset=${
+          page * SEASON_PAGE_SIZE
+        }`,
+        { method: "POST", body },
+      ),
+    );
+    collected.push(...pageData);
+    if (pageData.length < SEASON_PAGE_SIZE) break;
+  }
+
+  const results = collected.map(mapSearchSubject);
+  seasonListCache.set(cacheKey, {
     expiresAt: Date.now() + SEARCH_TTL_MS,
     value: cloneSearchResults(results),
   });

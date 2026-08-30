@@ -3,8 +3,8 @@
 import type { Anime } from "@/lib/types";
 import type { ArchiveCardGroup, ArchiveFilters } from "@/lib/archive/types";
 import { groupArchive } from "@/lib/archive/filter";
+import { formatSeasonLabel } from "@/lib/season-label";
 import ArchiveAnimeCard from "./archive-anime-card";
-import ScrollRow from "./scroll-row";
 
 interface ArchiveResultsProps {
   records: Anime[];
@@ -13,30 +13,9 @@ interface ArchiveResultsProps {
   onClearFilters: () => void;
 }
 
-const ROW_CARD_CLASS = "w-[122px] shrink-0 sm:w-[140px]";
-
-function PosterRow({
-  cards,
-  onSelect,
-}: {
-  cards: Anime[];
-  onSelect: (anime: Anime) => void;
-}) {
-  return (
-    <ScrollRow>
-      {cards.map((anime, index) => (
-        <ArchiveAnimeCard
-          anime={anime}
-          compact
-          index={index}
-          key={anime.id}
-          onSelect={onSelect}
-          className={ROW_CARD_CLASS}
-        />
-      ))}
-    </ScrollRow>
-  );
-}
+// 列数与 ArchiveAnimeCard 中 CoverImage 的 sizes 档位保持一致：2/3/4/6/7。
+const GRID_CLASS =
+  "grid grid-cols-2 gap-3 min-[420px]:grid-cols-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6 xl:grid-cols-7";
 
 export default function ArchiveResults({
   records,
@@ -71,9 +50,10 @@ export default function ArchiveResults({
   }
 
   const groups: ArchiveCardGroup[] = groupArchive(records, filters);
+  const showSeasonLabel = filters.group === "rating";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {groups.map((group) => (
         <section aria-label={group.label} key={group.key}>
           <div className="mb-3 flex items-baseline gap-2">
@@ -84,7 +64,19 @@ export default function ArchiveResults({
               {group.records.length} 部
             </span>
           </div>
-          <PosterRow cards={group.records} onSelect={onSelect} />
+          <div className={GRID_CLASS}>
+            {group.records.map((anime, index) => (
+              <ArchiveAnimeCard
+                anime={anime}
+                index={index}
+                key={anime.id}
+                onSelect={onSelect}
+                seasonLabel={
+                  showSeasonLabel ? formatSeasonLabel(anime.season) : undefined
+                }
+              />
+            ))}
+          </div>
         </section>
       ))}
     </div>

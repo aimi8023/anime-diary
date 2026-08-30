@@ -276,10 +276,30 @@ export default function AnimeDetailDialog({
                     {anime.season}
                   </dd>
                 </div>
-                <div className="rounded-2xl border border-amber-100 bg-[var(--warning-soft)] p-3.5">
-                  <dt className="text-xs text-[var(--warning)]">评分</dt>
-                  <dd className="mt-1 font-black text-[var(--warning)]">
-                    ★ {anime.rating}
+                <div
+                  className={`rounded-2xl border p-3.5 ${
+                    anime.rating > 0
+                      ? "border-amber-100 bg-[var(--warning-soft)]"
+                      : "border-white/80 bg-white/72"
+                  }`}
+                >
+                  <dt
+                    className={`text-xs ${
+                      anime.rating > 0
+                        ? "text-[var(--warning)]"
+                        : "text-[var(--ink-subtle)]"
+                    }`}
+                  >
+                    评分
+                  </dt>
+                  <dd
+                    className={`mt-1 font-black ${
+                      anime.rating > 0
+                        ? "text-[var(--warning)]"
+                        : "text-[var(--ink-muted)]"
+                    }`}
+                  >
+                    {anime.rating > 0 ? `★ ${anime.rating}` : "未评分"}
                   </dd>
                 </div>
                 {anime.episodes > 0 && (

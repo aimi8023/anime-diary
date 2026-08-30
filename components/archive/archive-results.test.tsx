@@ -53,7 +53,7 @@ function renderResults(
 }
 
 describe("ArchiveResults", () => {
-  it("renders one horizontal poster row per broadcast season", () => {
+  it("renders one poster grid per broadcast season", () => {
     const { container } = renderResults();
 
     expect(
@@ -62,14 +62,14 @@ describe("ArchiveResults", () => {
     expect(
       screen.getByRole("heading", { name: "2024年4月" }),
     ).toBeInTheDocument();
-    // 循环滚动行渲染两份内容，保证首尾相接。
-    expect(screen.getAllByText("葬送的芙莉莲")).toHaveLength(2);
-    expect(screen.getAllByText("孤独摇滚！")).toHaveLength(2);
+    // 网格直接铺开，不再渲染循环滚动行的重复副本。
+    expect(screen.getByText("葬送的芙莉莲")).toBeInTheDocument();
+    expect(screen.getByText("孤独摇滚！")).toBeInTheDocument();
+    expect(container.querySelector("div.overflow-x-auto")).toBeNull();
 
-    // 卡片行：横向滚动 + 紧凑卡片。
-    const row = container.querySelector("div.overflow-x-auto");
-    expect(row).not.toBeNull();
-    expect(row?.firstElementChild?.firstElementChild).toHaveClass("w-[122px]");
+    const grid = container.querySelector("div.grid");
+    expect(grid).not.toBeNull();
+    expect(grid?.querySelectorAll("article")).toHaveLength(1);
   });
 
   it("groups by rating buckets without season dividers", () => {
@@ -80,6 +80,9 @@ describe("ArchiveResults", () => {
     expect(
       screen.queryByRole("heading", { name: /月$/ }),
     ).not.toBeInTheDocument();
+    // 评分维度下卡片补充季度标签。
+    expect(screen.getByText("2025年1月")).toBeInTheDocument();
+    expect(screen.getByText("2024年4月")).toBeInTheDocument();
   });
 
   it("reverses group order in ascending direction", () => {

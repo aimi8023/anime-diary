@@ -42,8 +42,8 @@ export interface ArchiveOptions {
 export interface YearRecap {
   year: string;
   total: number;
-  /** 年度平均分，保留一位小数。 */
-  averageRating: number;
+  /** 年度平均分，保留一位小数；该年没有已评分记录时为 null。 */
+  averageRating: number | null;
   /** 年度最高分作品；并列时取标题顺序靠前者。 */
   topAnime: { title: string; rating: number } | null;
   /** 出现最多的标签，至多 3 个；并列时按标题顺序。 */

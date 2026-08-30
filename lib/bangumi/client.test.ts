@@ -3,8 +3,18 @@ import {
   BangumiClientError,
   clearBangumiCacheForTests,
   getBangumiPrefill,
+  listSeasonSubjects,
   searchBangumiSubjects,
 } from "./client";
+
+const undiciMock = vi.hoisted(() => ({
+  fetch: vi.fn(),
+  ProxyAgent: class ProxyAgent {
+    constructor(public readonly url: string) {}
+  },
+}));
+
+vi.mock("undici", () => undiciMock);
 
 const searchPayload = {
   total: 1,
@@ -56,6 +66,7 @@ describe("Bangumi client", () => {
     vi.unstubAllGlobals();
     delete process.env.BANGUMI_ACCESS_TOKEN;
     delete process.env.BANGUMI_USER_AGENT;
+    delete process.env.BANGUMI_PROXY;
   });
 
   it("searches only safe anime results and maps them", async () => {
@@ -115,6 +126,22 @@ describe("Bangumi client", () => {
     expect(fetchMock.mock.calls[0][1]?.headers).not.toHaveProperty(
       "Authorization",
     );
+  });
+
+  it("routes requests through BANGUMI_PROXY when configured", async () => {
+    process.env.BANGUMI_PROXY = "http://127.0.0.1:7897";
+    const globalFetch = vi.fn();
+    vi.stubGlobal("fetch", globalFetch);
+    undiciMock.fetch.mockResolvedValue(jsonResponse(searchPayload));
+
+    await searchBangumiSubjects("孤独摇滚");
+
+    expect(globalFetch).not.toHaveBeenCalled();
+    expect(undiciMock.fetch).toHaveBeenCalledTimes(1);
+    const options = undiciMock.fetch.mock.calls[0][1] as {
+      dispatcher?: unknown;
+    };
+    expect(options.dispatcher).toBeInstanceOf(undiciMock.ProxyAgent);
   });
 
   it("caches successful search results for five minutes", async () => {
@@ -191,5 +218,108 @@ describe("Bangumi client", () => {
 
     await expect(action()).rejects.toBeInstanceOf(BangumiClientError);
     await expect(action()).rejects.toMatchObject({ kind: "invalid_response" });
+  });
+
+  describe("listSeasonSubjects", () => {
+    it("requests the broadcast window sorted by heat", async () => {
+      const fetchMock = vi.fn().mockResolvedValue(jsonResponse(searchPayload));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const results = await listSeasonSubjects(2022, "秋");
+
+      expect(results[0].title).toBe("孤独摇滚！");
+      expect(fetchMock).toHaveBeenCalledWith(
+        "https://api.bgm.tv/v0/search/subjects?limit=20&offset=0",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            keyword: "",
+            sort: "heat",
+            filter: {
+              type: [2],
+              nsfw: false,
+              air_date: [">=2022-06-01", "<2022-09-01"],
+            },
+          }),
+        }),
+      );
+    });
+
+    it("starts the spring window at the previous December", async () => {
+      const fetchMock = vi.fn().mockResolvedValue(jsonResponse(searchPayload));
+      vi.stubGlobal("fetch", fetchMock);
+
+      await listSeasonSubjects(2024, "春");
+
+      expect(fetchMock.mock.calls[0][1]?.body).toContain(
+        '"air_date":[">=2023-12-01","<2024-03-01"]',
+      );
+    });
+
+    const fullPage = Array.from({ length: 20 }, (_, index) => ({
+      id: index + 1,
+      name: `番剧${index + 1}`,
+    }));
+
+    it("merges pages and stops at a short page", async () => {
+      const shortPage = fullPage
+        .slice(0, 5)
+        .map((subject) => ({ ...subject, id: subject.id + 100 }));
+      const fetchMock = vi.fn().mockImplementation((input: string) => {
+        const url = String(input);
+        if (url.includes("offset=0")) {
+          return Promise.resolve(jsonResponse({ data: fullPage }));
+        }
+        if (url.includes("offset=20")) {
+          return Promise.resolve(jsonResponse({ data: shortPage }));
+        }
+        return Promise.resolve(jsonResponse({ data: [] }));
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      const results = await listSeasonSubjects(2022, "秋");
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(results).toHaveLength(25);
+      expect(results[0].bangumiId).toBe(1);
+      expect(results[24].bangumiId).toBe(105);
+    });
+
+    it("caps season listings at five pages", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockImplementation(() =>
+          Promise.resolve(jsonResponse({ data: fullPage })),
+        );
+      vi.stubGlobal("fetch", fetchMock);
+
+      const results = await listSeasonSubjects(2022, "秋");
+
+      expect(fetchMock).toHaveBeenCalledTimes(5);
+      expect(results).toHaveLength(100);
+    });
+
+    it("caches season listings for five minutes", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockImplementation(() => Promise.resolve(jsonResponse(searchPayload)));
+      vi.stubGlobal("fetch", fetchMock);
+
+      await listSeasonSubjects(2022, "秋");
+      await listSeasonSubjects(2022, "秋");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+      await listSeasonSubjects(2022, "秋");
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("rejects malformed season listings", async () => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ data: "wrong" })));
+
+      await expect(listSeasonSubjects(2022, "秋")).rejects.toMatchObject({
+        kind: "invalid_response",
+      });
+    });
   });
 });

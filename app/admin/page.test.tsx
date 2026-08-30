@@ -48,6 +48,91 @@ function jsonResponse(body: unknown, status = 200): Response {
 
 afterEach(() => vi.unstubAllGlobals());
 
+describe("AdminPage unrated workflow", () => {
+  const candidate = {
+    bangumiId: 999,
+    bangumiUrl: "https://bgm.tv/subject/999",
+    title: "新番甲",
+    originalTitle: "新番甲",
+    cover: "",
+    airDate: "2024-04-10",
+    episodes: 12,
+    alreadyAdded: false,
+  };
+
+  function setup() {
+    let records: Array<Record<string, unknown>> = [
+      { ...existingAnime },
+    ];
+    const fetchMock = vi.fn(
+      async (input: string | URL | Request, init?: RequestInit) => {
+        const url = String(input);
+        const method = init?.method ?? "GET";
+        if (url === "/api/anime" && method === "GET") {
+          return jsonResponse(records);
+        }
+        if (url.includes("/api/bangumi/season")) {
+          return jsonResponse([candidate]);
+        }
+        if (url === "/api/anime" && method === "POST") {
+          const body = JSON.parse(String(init?.body)) as Record<
+            string,
+            unknown
+          >;
+          records = [
+            ...records,
+            { ...body, id: "anime-999", createdAt: "2026-08-30T00:00:00.000Z" },
+          ];
+          return jsonResponse({ id: "anime-999" }, 201);
+        }
+        if (url.startsWith("/api/anime/") && method === "PUT") {
+          const body = JSON.parse(String(init?.body)) as Record<
+            string,
+            unknown
+          >;
+          records = records.map((record) => ({ ...record, ...body }));
+          return jsonResponse({ id: "anime-999" });
+        }
+        throw new Error(`Unexpected fetch: ${method} ${url}`);
+      },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    return fetchMock;
+  }
+
+  it("batch-adds an unrated record and rates it later from the records workspace", async () => {
+    const user = userEvent.setup();
+    setup();
+
+    render(<AdminPage />);
+    expect(await screen.findByText("葬送的芙莉莲")).toBeInTheDocument();
+
+    // 季度批量入库。
+    await user.click(screen.getByRole("button", { name: "+ 添加番剧" }));
+    await user.click(screen.getByRole("button", { name: "季度批量" }));
+    await user.click(screen.getByRole("button", { name: "获取季度列表" }));
+    await user.click(await screen.findByText("新番甲"));
+    await user.click(screen.getByRole("button", { name: "入库所选 1 部" }));
+    await screen.findByText(/新增 1 部，跳过重复 0 部，失败 0 部/);
+
+    // 跳转到记录工作区并激活未评分过滤。
+    await user.click(screen.getByRole("button", { name: "前往记录补评分" }));
+    const chip = screen.getByRole("button", { name: "只看未评分 1" });
+    expect(chip).toHaveAttribute("aria-pressed", "true");
+    const row = await screen.findByLabelText("补评分《新番甲》");
+
+    // 快速补评分。
+    await user.click(row);
+    const dialog = screen.getByRole("dialog", { name: "补评分《新番甲》" });
+    await user.click(within(dialog).getByRole("button", { name: "8 分" }));
+    await user.click(within(dialog).getByRole("button", { name: "保存" }));
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText("补评分《新番甲》")).toBeNull();
+    });
+  });
+});
+
 describe("AdminPage Bangumi entry", () => {
   it("asks for confirmation before discarding unsaved form edits", async () => {
     const user = userEvent.setup();

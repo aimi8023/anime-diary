@@ -134,9 +134,13 @@ export default function YearDrawer({
                 </h3>
                 <span className="text-xs tabular-nums text-[var(--ink-subtle)]">
                   {recap.total} 部 ·{" "}
-                  <span className="font-bold text-[var(--warning)]">
-                    ★ {recap.averageRating.toFixed(1)}
-                  </span>
+                  {recap.averageRating !== null ? (
+                    <span className="font-bold text-[var(--warning)]">
+                      ★ {recap.averageRating.toFixed(1)}
+                    </span>
+                  ) : (
+                    <span>暂无评分</span>
+                  )}
                 </span>
               </div>
               <ScrollRow>
@@ -162,8 +166,14 @@ export default function YearDrawer({
                           {anime.title.charAt(0) || "◌"}
                         </div>
                       )}
-                      <span className="absolute right-1.5 top-1.5 rounded-full border border-white/80 bg-[rgba(255,248,228,0.92)] px-1.5 py-0.5 text-[10px] font-black text-[var(--warning)]">
-                        ★ {anime.rating}
+                      <span
+                        className={`absolute right-1.5 top-1.5 rounded-full border border-white/80 px-1.5 py-0.5 text-[10px] font-black ${
+                          anime.rating > 0
+                            ? "bg-[rgba(255,248,228,0.92)] text-[var(--warning)]"
+                            : "bg-[rgba(255,255,255,0.85)] text-[var(--ink-subtle)]"
+                        }`}
+                      >
+                        {anime.rating > 0 ? `★ ${anime.rating}` : "未评分"}
                       </span>
                     </div>
                     <p className="mt-1.5 line-clamp-2 min-h-8 text-xs font-semibold leading-4 text-[var(--ink)]">

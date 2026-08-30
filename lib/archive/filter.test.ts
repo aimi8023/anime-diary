@@ -263,6 +263,69 @@ describe("archive filtering and grouping", () => {
     ]);
   });
 
+  it("orders same-rating records by broadcast season within a bucket", () => {
+    const sameRating: Anime[] = [
+      { ...records[0], id: "old", season: "2023秋" },
+      { ...records[0], id: "new", season: "2025冬" },
+      { ...records[0], id: "mid", season: "2024春" },
+    ];
+
+    const desc = groupArchive(sameRating, {
+      group: "rating",
+      direction: "desc",
+    });
+    expect(desc).toHaveLength(1);
+    expect(desc[0].records.map((anime) => anime.id)).toEqual([
+      "new",
+      "mid",
+      "old",
+    ]);
+
+    const asc = groupArchive(sameRating, {
+      group: "rating",
+      direction: "asc",
+    });
+    expect(asc[0].records.map((anime) => anime.id)).toEqual([
+      "old",
+      "mid",
+      "new",
+    ]);
+  });
+
+  it("places unrated records in a bottom 未评分 bucket", () => {
+    const withUnrated: Anime[] = [
+      ...records,
+      { ...records[0], id: "anime-0", title: "未评分作品", rating: 0 },
+    ];
+
+    const groups = groupArchive(withUnrated, {
+      group: "rating",
+      direction: "desc",
+    });
+
+    const last = groups[groups.length - 1];
+    expect(last.label).toBe("未评分");
+    expect(last.records.map((anime) => anime.id)).toEqual(["anime-0"]);
+  });
+
+  it("excludes unrated records from yearly averages and top work", () => {
+    const mixed: Anime[] = [
+      { ...records[2] },
+      { ...records[2], id: "anime-x", title: "未评分", rating: 0 },
+    ];
+
+    const [recap] = getYearlyRecap(mixed);
+    expect(recap.total).toBe(2);
+    expect(recap.averageRating).toBe(9.5);
+    expect(recap.topAnime?.title).toBe(records[2].title);
+
+    const [allUnrated] = getYearlyRecap([
+      { ...records[2], id: "anime-y", rating: 0 },
+    ]);
+    expect(allUnrated.averageRating).toBeNull();
+    expect(allUnrated.topAnime).toBeNull();
+  });
+
   it("returns unique browse options and archive statistics", () => {
     expect(getArchiveOptions(records)).toEqual({
       years: ["2025", "2024"],

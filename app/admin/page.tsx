@@ -8,6 +8,8 @@ import AnimeList from "@/components/anime-list";
 import AnimeForm from "@/components/anime-form";
 import BangumiSearch from "@/components/bangumi-search";
 import BackupManager from "@/components/backup-manager";
+import QuickRateDialog from "@/components/admin/quick-rate-dialog";
+import SeasonBatchAdd from "@/components/admin/season-batch-add";
 import AdminSectionNav, {
   type AdminSection,
 } from "@/components/admin/admin-section-nav";
@@ -15,7 +17,7 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 import { readApiError } from "@/lib/http/client";
 
-type EntryMode = "bangumi" | "manual";
+type EntryMode = "bangumi" | "manual" | "season";
 
 async function loadAnimeList(): Promise<Anime[]> {
   const response = await fetch("/api/anime");
@@ -43,6 +45,8 @@ export default function AdminPage() {
   const [entryMode, setEntryMode] = useState<EntryMode>("bangumi");
   const [prefill, setPrefill] = useState<BangumiPrefill | null>(null);
   const [operationError, setOperationError] = useState("");
+  const [showUnratedOnly, setShowUnratedOnly] = useState(false);
+  const [quickRating, setQuickRating] = useState<Anime | null>(null);
 
   const fetchList = useCallback(async () => {
     try {
@@ -65,12 +69,13 @@ export default function AdminPage() {
     void fetchList();
   }, [fetchList]);
 
-  // Filter by search query
-  const filteredList = searchQuery.trim()
-    ? animeList.filter((anime) =>
-        anime.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : animeList;
+  // Filter by unrated toggle and search query
+  const filteredList = animeList.filter((anime) => {
+    if (showUnratedOnly && anime.rating !== 0) return false;
+    const query = searchQuery.trim().toLowerCase();
+    return !query || anime.title.toLowerCase().includes(query);
+  });
+  const unratedCount = animeList.filter((anime) => anime.rating === 0).length;
 
   const handleSave = async (data: AnimeInput) => {
     const res = await fetch(
@@ -268,6 +273,16 @@ export default function AdminPage() {
                 )}
               </div>
               <button
+                aria-pressed={showUnratedOnly}
+                className={`ui-chip min-h-11 whitespace-nowrap px-3 text-xs font-bold ${
+                  showUnratedOnly ? "ui-chip-active" : ""
+                }`}
+                onClick={() => setShowUnratedOnly((value) => !value)}
+                type="button"
+              >
+                只看未评分{unratedCount > 0 ? ` ${unratedCount}` : ""}
+              </button>
+              <button
                 className="ui-button ui-button-primary whitespace-nowrap rounded-xl"
                 onClick={handleStartAdd}
                 type="button"
@@ -307,6 +322,7 @@ export default function AdminPage() {
               deleting={deleting}
               onDelete={handleDelete}
               onEdit={handleEdit}
+              onQuickRate={setQuickRating}
             />
           )}
         </section>
@@ -329,7 +345,7 @@ export default function AdminPage() {
                 <p className="mt-1 text-sm text-[var(--ink-muted)]">
                   {editing
                     ? `正在编辑《${editing.title}》`
-                    : "先从 Bangumi 查找，找不到时再手动填写。"}
+                    : "支持按季度批量入库，或从 Bangumi 查找、手动填写。"}
                 </p>
               </div>
               <button
@@ -353,7 +369,18 @@ export default function AdminPage() {
           ) : (
             <>
               {!prefill && (
-                <div className="mb-5 grid grid-cols-2 gap-1.5 rounded-2xl border border-white/70 bg-white/38 p-1.5">
+                <div className="mb-5 grid grid-cols-1 gap-1.5 rounded-2xl border border-white/70 bg-white/38 p-1.5 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => setEntryMode("season")}
+                    className={`min-h-11 rounded-xl text-sm font-bold transition-colors ${
+                      entryMode === "season"
+                        ? "bg-white text-[var(--accent-strong)] shadow-sm"
+                        : "text-[var(--ink-muted)] hover:bg-white/45"
+                    }`}
+                  >
+                    季度批量
+                  </button>
                   <button
                     type="button"
                     onClick={() => setEntryMode("bangumi")}
@@ -379,7 +406,15 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {entryMode === "bangumi" && !prefill ? (
+              {entryMode === "season" && !prefill ? (
+                <SeasonBatchAdd
+                  onCreated={fetchList}
+                  onGoToUnrated={() => {
+                    setSection("records");
+                    setShowUnratedOnly(true);
+                  }}
+                />
+              ) : entryMode === "bangumi" && !prefill ? (
                 <BangumiSearch
                   onSelect={setPrefill}
                   onEditExisting={handleEditExisting}
@@ -472,6 +507,13 @@ export default function AdminPage() {
         }}
         open={pendingDiscard !== null}
         title="放弃未保存的修改？"
+      />
+
+      <QuickRateDialog
+        anime={quickRating}
+        key={quickRating?.id ?? "quick-rate-closed"}
+        onClose={() => setQuickRating(null)}
+        onSaved={fetchList}
       />
     </div>
   );

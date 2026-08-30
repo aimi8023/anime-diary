@@ -150,13 +150,13 @@ function validateInput(
     } else if (
       typeof raw !== "number" ||
       !Number.isFinite(raw) ||
-      raw < 1 ||
+      raw < 0 ||
       raw > 10 ||
       !Number.isInteger(raw * 2)
     ) {
       issues.push({
         path: "rating",
-        message: "评分必须是 1–10 之间的 0.5 倍数",
+        message: "评分必须是 0–10 之间的 0.5 倍数（0 表示未评分）",
       });
     } else {
       data.rating = raw;
