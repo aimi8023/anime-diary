@@ -11,8 +11,8 @@
   --canvas: #f9f7fb;
   --canvas-tint: #fff5f8;
   --canvas-blue: #eef7ff;
-  --surface: rgba(255, 255, 255, 0.66);
-  --surface-strong: rgba(255, 255, 255, 0.88);
+  --surface: rgba(255, 255, 255, 0.8);
+  --surface-strong: rgba(255, 255, 255, 0.93);
   --surface-soft: rgba(255, 255, 255, 0.48);
   --surface-border: rgba(255, 255, 255, 0.78);
   --ink: #211d35;
@@ -51,11 +51,6 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-color: var(--canvas);
-  background-image: url("/bg.webp");
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-size: cover;
   color: var(--ink);
   font-family:
     var(--font-sans), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -70,10 +65,13 @@ body::after {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* 提升为独立合成层：背景只绘制一次，滚动由合成器完成，
+     不再触发整页重绘（body 上的 background-attachment: fixed 会卡滚动）。 */
+  transform: translateZ(0);
 }
 
 body::before {
-  background:
+  background-image:
     linear-gradient(
       180deg,
       rgba(255, 250, 252, 0.42) 0%,
@@ -85,7 +83,17 @@ body::before {
       rgba(255, 246, 250, 0.22),
       transparent 48%,
       rgba(234, 246, 255, 0.22)
-    );
+    ),
+    url("/bg.webp");
+  background-position:
+    center,
+    center,
+    center;
+  background-size:
+    auto,
+    auto,
+    cover;
+  background-repeat: no-repeat;
 }
 
 body::after {
@@ -121,8 +129,6 @@ a {
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(18px) saturate(1.08);
-  -webkit-backdrop-filter: blur(18px) saturate(1.08);
 }
 
 .ui-panel-strong {
@@ -130,8 +136,6 @@ a {
   border-radius: var(--radius-lg);
   background: var(--surface-strong);
   box-shadow: var(--shadow-md);
-  backdrop-filter: blur(24px) saturate(1.08);
-  -webkit-backdrop-filter: blur(24px) saturate(1.08);
 }
 
 .ui-field {
@@ -309,9 +313,11 @@ button:focus-visible {
 }
 
 @media (max-width: 640px) {
-  body {
-    background-attachment: scroll;
-    background-position: 52% center;
+  body::before {
+    background-position:
+      center,
+      center,
+      52% center;
   }
 }
 

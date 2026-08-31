@@ -22,6 +22,7 @@ const result = {
   title: "孤独摇滚！",
   originalTitle: "ぼっち・ざ・ろっく！",
   cover: "https://lain.bgm.tv/large.jpg",
+  coverThumb: "https://lain.bgm.tv/common.jpg",
   airDate: "2022-10-09",
   episodes: 12,
 };

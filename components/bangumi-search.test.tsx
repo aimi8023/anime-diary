@@ -11,6 +11,7 @@ const searchResult = {
   title: "孤独摇滚！",
   originalTitle: "ぼっち・ざ・ろっく！",
   cover: "https://lain.bgm.tv/cover.jpg",
+  coverThumb: "https://lain.bgm.tv/cover-thumb.jpg",
   airDate: "2022-10-09",
   episodes: 12,
   alreadyAdded: false,

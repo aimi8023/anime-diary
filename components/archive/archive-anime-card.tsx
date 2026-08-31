@@ -61,12 +61,12 @@ export default function ArchiveAnimeCard({
           )}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#211d35]/30 to-transparent" />
           {seasonLabel && (
-            <span className="absolute bottom-2 left-2 rounded-full bg-[#211d35]/55 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+            <span className="absolute bottom-2 left-2 rounded-full bg-[#211d35]/72 px-2 py-0.5 text-[10px] font-bold text-white">
               {seasonLabel}
             </span>
           )}
           <span
-            className={`absolute right-2 top-2 rounded-full border border-white/80 px-2 py-0.5 text-[11px] font-black shadow-sm backdrop-blur ${
+            className={`absolute right-2 top-2 rounded-full border border-white/80 px-2 py-0.5 text-[11px] font-black shadow-sm ${
               anime.rating > 0
                 ? "bg-[rgba(255,248,228,0.92)] text-[var(--warning)]"
                 : "bg-[rgba(255,255,255,0.85)] text-[var(--ink-subtle)]"

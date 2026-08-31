@@ -31,7 +31,7 @@ export default function BackToTop() {
     <button
       aria-hidden={!visible}
       aria-label="返回顶部"
-      className={`ui-icon-button fixed bottom-6 right-6 z-40 border border-white/80 bg-white/90 shadow-[var(--shadow-md)] backdrop-blur transition-[opacity,transform] duration-200 ${
+      className={`ui-icon-button fixed bottom-6 right-6 z-40 border border-white/80 bg-white/90 shadow-[var(--shadow-md)] transition-[opacity,transform] duration-200 ${
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-2 opacity-0"

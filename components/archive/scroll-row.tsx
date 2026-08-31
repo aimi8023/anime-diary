@@ -43,7 +43,7 @@ function ArrowButton({
   return (
     <button
       aria-label={direction === -1 ? "向左滚动" : "向右滚动"}
-      className={`absolute top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/80 bg-white/92 text-[var(--ink)] shadow-[var(--shadow-md)] backdrop-blur transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 ${
+      className={`absolute top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/80 bg-white/92 text-[var(--ink)] shadow-[var(--shadow-md)] transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 ${
         direction === -1 ? "left-2" : "right-2"
       } ${disabled ? "pointer-events-none opacity-0" : "opacity-0"}`}
       disabled={disabled}

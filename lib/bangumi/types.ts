@@ -27,7 +27,10 @@ export interface BangumiSearchResult {
   bangumiUrl: string;
   title: string;
   originalTitle: string;
+  /** 全尺寸封面（large），入库保存用。 */
   cover: string;
+  /** 压缩缩略图（common/medium），小图展示用，减少下载与解码开销。 */
+  coverThumb: string;
   airDate: string;
   episodes: number;
   alreadyAdded?: boolean;

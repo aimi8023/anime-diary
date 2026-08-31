@@ -42,7 +42,7 @@ export default function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/72 shadow-[0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/88 shadow-[0_1px_0_rgba(255,255,255,0.55)]">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link
           aria-label="追番记录首页"

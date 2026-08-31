@@ -115,4 +115,22 @@ describe("mapSubjectToPrefill", () => {
   it("uses an empty cover when no supported image exists", () => {
     expect(mapSearchSubject({ ...fullSubject, images: null }).cover).toBe("");
   });
+
+  it("derives a compressed thumbnail falling back common → medium → large", () => {
+    expect(mapSearchSubject(fullSubject).coverThumb).toBe(
+      "https://lain.bgm.tv/common.jpg",
+    );
+    expect(
+      mapSearchSubject({
+        ...fullSubject,
+        images: { large: "L", medium: "M" },
+      }).coverThumb,
+    ).toBe("M");
+    expect(
+      mapSearchSubject({ ...fullSubject, images: { large: "L" } }).coverThumb,
+    ).toBe("L");
+    expect(
+      mapSearchSubject({ ...fullSubject, images: null }).coverThumb,
+    ).toBe("");
+  });
 });

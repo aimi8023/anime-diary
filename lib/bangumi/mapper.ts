@@ -36,6 +36,17 @@ function coverOf(subject: BangumiSubjectSummary): string {
   );
 }
 
+// 候选列表的小卡片优先用压缩图，降低滚动时的下载与解码开销；
+// 全尺寸封面仍由 cover 字段携带，入库时保存的是它。
+function coverThumbOf(subject: BangumiSubjectSummary): string {
+  return (
+    subject.images?.common ||
+    subject.images?.medium ||
+    subject.images?.large ||
+    ""
+  );
+}
+
 function episodesOf(subject: BangumiSubjectSummary): number {
   return Number.isFinite(subject.eps) && (subject.eps ?? 0) > 0
     ? Number(subject.eps)
@@ -55,6 +66,7 @@ export function mapSearchSubject(
     title: titleOf(subject),
     originalTitle: subject.name.trim(),
     cover: coverOf(subject),
+    coverThumb: coverThumbOf(subject),
     airDate: validAirDate(subject),
     episodes: episodesOf(subject),
   };
@@ -73,8 +85,14 @@ export function mapSubjectToPrefill(
   ].slice(0, 12);
 
   return {
-    ...base,
+    bangumiId: base.bangumiId,
+    bangumiUrl: base.bangumiUrl,
+    title: base.title,
+    originalTitle: base.originalTitle,
+    cover: base.cover,
+    airDate: base.airDate,
     season: seasonFromAirDate(base.airDate),
+    episodes: base.episodes,
     suggestedTags,
   };
 }

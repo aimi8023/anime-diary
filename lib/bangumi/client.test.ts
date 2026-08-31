@@ -83,6 +83,7 @@ describe("Bangumi client", () => {
         title: "孤独摇滚！",
         originalTitle: "ぼっち・ざ・ろっく！",
         cover: "https://lain.bgm.tv/large.jpg",
+        coverThumb: "https://lain.bgm.tv/common.jpg",
         airDate: "2022-10-09",
         episodes: 12,
       },
@@ -144,7 +145,7 @@ describe("Bangumi client", () => {
     expect(options.dispatcher).toBeInstanceOf(undiciMock.ProxyAgent);
   });
 
-  it("caches successful search results for five minutes", async () => {
+  it("caches successful search results for ten minutes", async () => {
     const fetchMock = vi
       .fn()
       .mockImplementation(() => Promise.resolve(jsonResponse(searchPayload)));
@@ -157,7 +158,11 @@ describe("Bangumi client", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(second[0].title).toBe("孤独摇滚！");
 
-    vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+    vi.advanceTimersByTime(6 * 60 * 1000);
+    await searchBangumiSubjects("孤独摇滚");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(4 * 60 * 1000 + 1);
     await searchBangumiSubjects("孤独摇滚");
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
@@ -285,7 +290,7 @@ describe("Bangumi client", () => {
       expect(results[24].bangumiId).toBe(105);
     });
 
-    it("caps season listings at five pages", async () => {
+    it("caps season listings at 144 entries", async () => {
       const fetchMock = vi
         .fn()
         .mockImplementation(() =>
@@ -295,11 +300,11 @@ describe("Bangumi client", () => {
 
       const results = await listSeasonSubjects(2022, "秋");
 
-      expect(fetchMock).toHaveBeenCalledTimes(5);
-      expect(results).toHaveLength(100);
+      expect(fetchMock).toHaveBeenCalledTimes(8);
+      expect(results).toHaveLength(144);
     });
 
-    it("caches season listings for five minutes", async () => {
+    it("caches season listings for ten minutes", async () => {
       const fetchMock = vi
         .fn()
         .mockImplementation(() => Promise.resolve(jsonResponse(searchPayload)));
@@ -309,7 +314,11 @@ describe("Bangumi client", () => {
       await listSeasonSubjects(2022, "秋");
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
-      vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+      vi.advanceTimersByTime(6 * 60 * 1000);
+      await listSeasonSubjects(2022, "秋");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(4 * 60 * 1000 + 1);
       await listSeasonSubjects(2022, "秋");
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });

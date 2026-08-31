@@ -9,7 +9,7 @@ import type {
 
 const API_BASE = "https://api.bgm.tv";
 const TIMEOUT_MS = 8_000;
-const SEARCH_TTL_MS = 5 * 60 * 1_000;
+const LIST_TTL_MS = 10 * 60 * 1_000;
 const DETAIL_TTL_MS = 60 * 60 * 1_000;
 
 interface CacheEntry<T> {
@@ -201,7 +201,7 @@ export async function searchBangumiSubjects(
     .slice(0, 8)
     .map(mapSearchSubject);
   searchCache.set(cacheKey, {
-    expiresAt: Date.now() + SEARCH_TTL_MS,
+    expiresAt: Date.now() + LIST_TTL_MS,
     value: cloneSearchResults(results),
   });
   return cloneSearchResults(results);
@@ -228,7 +228,7 @@ function seasonAirDateRange(
 }
 
 const SEASON_PAGE_SIZE = 20; // Bangumi 搜索接口单页上限 20，limit 传更大也会被钳制。
-const SEASON_MAX_PAGES = 5;
+const SEASON_FETCH_LIMIT = 144; // 一季度最多拉取 144 部，前端按每页 24 部分页展示。
 
 function subjectSummaryPage(payload: unknown): BangumiSubjectSummary[] {
   if (
@@ -261,12 +261,10 @@ export async function listSeasonSubjects(
   });
 
   const collected: BangumiSubjectSummary[] = [];
-  for (let page = 0; page < SEASON_MAX_PAGES; page++) {
+  while (collected.length < SEASON_FETCH_LIMIT) {
     const pageData = subjectSummaryPage(
       await requestJson(
-        `${API_BASE}/v0/search/subjects?limit=${SEASON_PAGE_SIZE}&offset=${
-          page * SEASON_PAGE_SIZE
-        }`,
+        `${API_BASE}/v0/search/subjects?limit=${SEASON_PAGE_SIZE}&offset=${collected.length}`,
         { method: "POST", body },
       ),
     );
@@ -274,9 +272,11 @@ export async function listSeasonSubjects(
     if (pageData.length < SEASON_PAGE_SIZE) break;
   }
 
-  const results = collected.map(mapSearchSubject);
+  const results = collected
+    .slice(0, SEASON_FETCH_LIMIT)
+    .map(mapSearchSubject);
   seasonListCache.set(cacheKey, {
-    expiresAt: Date.now() + SEARCH_TTL_MS,
+    expiresAt: Date.now() + LIST_TTL_MS,
     value: cloneSearchResults(results),
   });
   return cloneSearchResults(results);

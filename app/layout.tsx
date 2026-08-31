@@ -57,7 +57,7 @@ export default function RootLayout({
           <SiteHeader />
           <main className="relative z-10 flex-1">{children}</main>
           <BackToTop />
-          <footer className="relative z-10 mt-auto border-t border-white/60 bg-white/45 py-6 backdrop-blur-xl">
+          <footer className="relative z-10 mt-auto border-t border-white/60 bg-white/72 py-6">
             <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 text-center sm:flex-row sm:px-6 sm:text-left">
               <p className="text-xs font-semibold text-[var(--ink-muted)]">
                 追番记录 · 收藏每一个季度的回忆
