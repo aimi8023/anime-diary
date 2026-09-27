@@ -166,6 +166,13 @@ a {
   color: var(--ink-subtle);
 }
 
+/* 搜索框自带清除按钮：改用组件内的可访问清除按钮，避免重复控件。 */
+.archive-search-input::-webkit-search-cancel-button,
+.archive-search-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .ui-button,
 .ui-icon-button {
   display: inline-flex;

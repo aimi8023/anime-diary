@@ -2,7 +2,6 @@
 
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ArchiveSearchProvider } from "@/components/archive/archive-search-context";
 import type { Anime } from "@/lib/types";
 
 const { getAll } = vi.hoisted(() => ({
@@ -41,11 +40,7 @@ describe("HomePage", () => {
     getAll.mockResolvedValueOnce([anime]);
 
     render(
-      <ArchiveSearchProvider>
-        {await HomePage({
-          searchParams: Promise.resolve({ year: "2024" }),
-        })}
-      </ArchiveSearchProvider>,
+      await HomePage({ searchParams: Promise.resolve({ year: "2024" }) }),
     );
 
     expect(getAll).toHaveBeenCalledTimes(1);
@@ -56,16 +51,22 @@ describe("HomePage", () => {
     expect(screen.queryByText("加载中...")).not.toBeInTheDocument();
   });
 
+  it("renders the inline search area as part of the first screen", async () => {
+    getAll.mockResolvedValueOnce([anime]);
+
+    render(await HomePage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("search")).toBeInTheDocument();
+    expect(screen.getByLabelText("搜索标题或感想")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "搜索档案" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders a distinct empty archive state", async () => {
     getAll.mockResolvedValueOnce([]);
 
-    render(
-      <ArchiveSearchProvider>
-        {await HomePage({
-          searchParams: Promise.resolve({}),
-        })}
-      </ArchiveSearchProvider>,
-    );
+    render(await HomePage({ searchParams: Promise.resolve({}) }));
 
     expect(screen.getByText("还没有建立追番档案")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -74,13 +75,7 @@ describe("HomePage", () => {
   it("shows a reloadable error instead of an empty archive", async () => {
     getAll.mockRejectedValueOnce(new Error("unavailable"));
 
-    render(
-      <ArchiveSearchProvider>
-        {await HomePage({
-          searchParams: Promise.resolve({}),
-        })}
-      </ArchiveSearchProvider>,
-    );
+    render(await HomePage({ searchParams: Promise.resolve({}) }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "暂时无法读取追番记录",

@@ -15,7 +15,6 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   q: "",
   year: "",
   season: "",
-  tags: [],
   rating: null,
   group: "season",
   direction: "desc",
@@ -30,7 +29,6 @@ export function countActiveArchiveFilters(
     Number(Boolean(filters.q)) +
     Number(Boolean(filters.year)) +
     Number(Boolean(filters.season)) +
-    filters.tags.length +
     Number(filters.rating !== null)
   );
 }
@@ -61,14 +59,6 @@ export function parseArchiveFilters(
   const seasonValue = readParam(params, "season")?.trim() ?? "";
   const groupValue = readParam(params, "group")?.trim() ?? "";
   const dirValue = readParam(params, "dir")?.trim() ?? "";
-  const tags = Array.from(
-    new Set(
-      (readParam(params, "tag") ?? "")
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    ),
-  );
 
   return {
     q: readParam(params, "q")?.trim() ?? "",
@@ -76,7 +66,6 @@ export function parseArchiveFilters(
     season: ["春", "夏", "秋", "冬"].includes(seasonValue)
       ? (seasonValue as ArchiveFilters["season"])
       : "",
-    tags,
     rating: parseRating(readParam(params, "rating")),
     // 兼容旧版参数：group=year 与旧 sort 值都归入季度维度。
     group: groupValue === "rating" ? "rating" : "season",
@@ -91,7 +80,6 @@ export function serializeArchiveFilters(
   if (filters.q) params.set("q", filters.q);
   if (filters.year) params.set("year", filters.year);
   if (filters.season) params.set("season", filters.season);
-  if (filters.tags.length > 0) params.set("tag", filters.tags.join(","));
   if (filters.rating !== null) params.set("rating", String(filters.rating));
   if (filters.group !== "season") params.set("group", filters.group);
   if (filters.direction !== "desc") params.set("dir", filters.direction);
@@ -162,23 +150,12 @@ export function filterAnime(
       if (filters.season && !anime.season.endsWith(filters.season)) {
         return false;
       }
-      if (
-        filters.tags.length > 0 &&
-        !filters.tags.every((tag) => anime.tags.includes(tag))
-      ) {
-        return false;
-      }
       if (filters.rating !== null && anime.rating < filters.rating) {
         return false;
       }
       if (!query) return true;
 
-      const searchable = [
-        anime.title,
-        anime.originalTitle ?? "",
-        anime.comment,
-        ...anime.tags,
-      ]
+      const searchable = [anime.title, anime.originalTitle ?? "", anime.comment]
         .join("\n")
         .toLocaleLowerCase("zh-CN");
       return searchable.includes(query);
@@ -247,10 +224,7 @@ export function getArchiveOptions(data: Anime[]): ArchiveOptions {
         .filter((year) => year !== "其他"),
     ),
   ).sort((a, b) => Number(b) - Number(a));
-  const tags = Array.from(
-    new Set(data.flatMap((anime) => anime.tags)),
-  ).sort((a, b) => a.localeCompare(b, "zh-CN"));
-  return { years, tags };
+  return { years };
 }
 
 export function getArchiveStats(data: Anime[]): ArchiveStats {

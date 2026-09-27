@@ -1,69 +1,51 @@
 // @vitest-environment jsdom
 
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ArchiveSearchProvider } from "./archive/archive-search-context";
 import SiteHeader from "./site-header";
 
 const navigation = vi.hoisted(() => ({
   pathname: "/",
-  push: vi.fn(),
   search: "",
 }));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => navigation.pathname,
-  useRouter: () => ({ push: navigation.push }),
   useSearchParams: () => new URLSearchParams(navigation.search),
 }));
 
 function renderHeader() {
-  return render(
-    <ArchiveSearchProvider>
-      <SiteHeader />
-    </ArchiveSearchProvider>,
-  );
+  return render(<SiteHeader />);
 }
 
 describe("SiteHeader", () => {
   beforeEach(() => {
     navigation.pathname = "/";
-    navigation.push.mockReset();
     navigation.search = "";
   });
 
-  it("opens archive search from the navigation", async () => {
-    const user = userEvent.setup();
+  it("no longer exposes a search launcher", () => {
     renderHeader();
 
-    const searchButton = screen.getByRole("button", {
-      name: "搜索档案",
-    });
-    expect(searchButton).toHaveAttribute("aria-expanded", "false");
-
-    await user.click(searchButton);
-
-    expect(searchButton).toHaveAttribute("aria-expanded", "true");
-    expect(navigation.push).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole("button", { name: "搜索档案" }),
+    ).not.toBeInTheDocument();
   });
 
-  it("returns home before opening search from another page", async () => {
-    const user = userEvent.setup();
-    navigation.pathname = "/admin";
-    renderHeader();
-
-    await user.click(screen.getByRole("button", { name: "搜索档案" }));
-
-    expect(navigation.push).toHaveBeenCalledWith("/");
-  });
-
-  it("shows the number of active archive conditions", () => {
+  it("shows how many archive conditions are active", () => {
     navigation.search =
-      "q=%E9%9F%B3%E4%B9%90&year=2024&tag=%E6%97%A5%E5%B8%B8,%E6%B2%BB%E6%84%88";
+      "q=%E9%9F%B3%E4%B9%90&year=2024&season=%E6%98%A5&rating=8";
     renderHeader();
 
-    expect(screen.getByLabelText("4 个筛选条件")).toHaveTextContent("4");
+    expect(
+      screen.getByLabelText("4 个筛选条件生效中"),
+    ).toHaveTextContent("筛选中 4");
+  });
+
+  it("hides the active filter hint when nothing is filtered", () => {
+    renderHeader();
+
+    expect(screen.queryByText(/筛选中/)).not.toBeInTheDocument();
   });
 
   it("gives the brand and management destinations explicit names", () => {

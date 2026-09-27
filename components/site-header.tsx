@@ -2,16 +2,11 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import {
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   countActiveArchiveFilters,
   parseArchiveFilters,
 } from "@/lib/archive/filter";
-import { useArchiveSearch } from "@/components/archive/archive-search-context";
 
 function ActiveFilterBadge() {
   const searchParams = useSearchParams();
@@ -23,24 +18,15 @@ function ActiveFilterBadge() {
 
   return (
     <span
-      aria-label={`${activeFilterCount} 个筛选条件`}
-      className="grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--accent-strong)] px-1 text-[10px] font-black text-white"
+      aria-label={`${activeFilterCount} 个筛选条件生效中`}
+      className="ui-chip ui-chip-active hidden min-h-8 px-3 text-xs font-bold sm:inline-flex"
     >
-      {activeFilterCount}
+      筛选中 {activeFilterCount}
     </span>
   );
 }
 
 export default function SiteHeader() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { isSearchOpen, openSearch } = useArchiveSearch();
-
-  function launchSearch() {
-    openSearch();
-    if (pathname !== "/") router.push("/");
-  }
-
   return (
     <header className="sticky top-0 z-40 border-b border-white/70 bg-white/88 shadow-[0_1px_0_rgba(255,255,255,0.55)]">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -70,33 +56,9 @@ export default function SiteHeader() {
           >
             首页
           </Link>
-          <button
-            aria-controls="archive-search-panel"
-            aria-expanded={isSearchOpen}
-            aria-label="搜索档案"
-            className="ui-button ui-button-secondary relative px-3 sm:px-4"
-            onClick={launchSearch}
-            type="button"
-          >
-            <svg
-              aria-hidden="true"
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path
-                d="m16.25 16.25 4 4"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="hidden sm:inline">搜索</span>
-            <Suspense fallback={null}>
-              <ActiveFilterBadge />
-            </Suspense>
-          </button>
+          <Suspense fallback={null}>
+            <ActiveFilterBadge />
+          </Suspense>
           <Link
             aria-label="管理后台"
             className="ui-button ui-button-secondary px-3 sm:px-4"

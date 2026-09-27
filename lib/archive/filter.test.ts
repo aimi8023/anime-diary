@@ -61,14 +61,15 @@ const records: Anime[] = [
 ];
 
 describe("archive active filter count", () => {
-  it("counts every effective filter including individual tags, excluding sort preference", () => {
+  it("counts every effective filter, excluding sort preference", () => {
     expect(countActiveArchiveFilters(DEFAULT_ARCHIVE_FILTERS)).toBe(0);
     expect(
       countActiveArchiveFilters({
         ...DEFAULT_ARCHIVE_FILTERS,
         q: "音乐",
         year: "2024",
-        tags: ["日常", "治愈"],
+        season: "夏",
+        rating: 8,
       }),
     ).toBe(4);
   });
@@ -81,7 +82,8 @@ describe("archive filter URL state", () => {
         q: "  音乐  ",
         year: "2024",
         season: "夏",
-        tag: "治愈,日常,治愈",
+        // 旧版 tag 参数已退出筛选范围，必须被忽略而不是报错。
+        tag: "治愈,日常",
         rating: "8.3",
         sort: "title",
       }),
@@ -89,7 +91,6 @@ describe("archive filter URL state", () => {
       q: "音乐",
       year: "2024",
       season: "夏",
-      tags: ["治愈", "日常"],
       rating: 8.5,
       group: "season",
       direction: "desc",
@@ -154,9 +155,9 @@ describe("archive filter URL state", () => {
       serializeArchiveFilters({
         ...DEFAULT_ARCHIVE_FILTERS,
         year: "2024",
-        tags: ["日常", "治愈"],
+        rating: 8,
       }).toString(),
-    ).toBe("year=2024&tag=%E6%97%A5%E5%B8%B8%2C%E6%B2%BB%E6%84%88");
+    ).toBe("year=2024&rating=8");
 
     expect(
       serializeArchiveFilters({
@@ -172,9 +173,10 @@ describe("archive filtering and grouping", () => {
   it.each([
     ["孤独", ["anime-1"]],
     ["ぼっち", ["anime-1"]],
-    ["音乐", ["anime-1"]],
+    // “音乐”只出现在 anime-1 的标签里：标签已退出搜索范围，因此不再命中。
+    ["音乐", []],
     ["乐队", ["anime-1"]],
-  ])("searches title, original title, tags, and comment for %s", (query, ids) => {
+  ])("searches title, original title, and comment for %s", (query, ids) => {
     expect(
       filterAnime(records, {
         ...DEFAULT_ARCHIVE_FILTERS,
@@ -183,18 +185,17 @@ describe("archive filtering and grouping", () => {
     ).toEqual(ids);
   });
 
-  it("requires every selected tag and every other active condition", () => {
+  it("requires every active condition to hold at once", () => {
     expect(
       filterAnime(records, {
         q: "",
         year: "2024",
         season: "夏",
-        tags: ["日常", "治愈"],
         rating: 8,
         group: "season",
         direction: "desc",
       }).map((anime) => anime.id),
-    ).toEqual(["anime-2"]);
+    ).toEqual(["anime-1", "anime-2"]);
   });
 
   it("orders the season dimension by broadcast season without mutating input", () => {
@@ -329,7 +330,6 @@ describe("archive filtering and grouping", () => {
   it("returns unique browse options and archive statistics", () => {
     expect(getArchiveOptions(records)).toEqual({
       years: ["2025", "2024"],
-      tags: ["科幻", "奇幻", "日常", "音乐", "治愈"],
     });
     expect(getArchiveStats(records)).toEqual({
       total: 4,
@@ -340,7 +340,7 @@ describe("archive filtering and grouping", () => {
   });
 
   it("returns safe empty options and statistics", () => {
-    expect(getArchiveOptions([])).toEqual({ years: [], tags: [] });
+    expect(getArchiveOptions([])).toEqual({ years: [] });
     expect(getArchiveStats([])).toEqual({
       total: 0,
       seasonCount: 0,

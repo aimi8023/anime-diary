@@ -17,7 +17,7 @@ import ActiveFilters from "./active-filters";
 import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
-import ArchiveSearchPanel from "./archive-search-panel";
+import ArchiveSearchBar from "./archive-search-bar";
 import YearDrawer from "./year-drawer";
 
 interface ArchiveBrowserProps {
@@ -131,15 +131,6 @@ export default function ArchiveBrowser({
     setFilters((current) => ({ ...current, ...patch }));
   }
 
-  function toggleTag(tag: string) {
-    setFilters((current) => ({
-      ...current,
-      tags: current.tags.includes(tag)
-        ? current.tags.filter((item) => item !== tag)
-        : [...current.tags, tag],
-    }));
-  }
-
   function clearFilters() {
     setQueryDraft("");
     // 排列维度与方向是浏览偏好，清除筛选时保持不变。
@@ -150,15 +141,9 @@ export default function ArchiveBrowser({
     }));
   }
 
-  function removeFilter(key: keyof ArchiveFilters, value?: string) {
+  function removeFilter(key: keyof ArchiveFilters) {
     if (key === "q") setQueryDraft("");
     setFilters((current) => {
-      if (key === "tags") {
-        return {
-          ...current,
-          tags: current.tags.filter((tag) => tag !== value),
-        };
-      }
       const defaults = DEFAULT_ARCHIVE_FILTERS;
       return { ...current, [key]: defaults[key] };
     });
@@ -167,6 +152,13 @@ export default function ArchiveBrowser({
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
       <ArchiveHero stats={stats} />
+      <ArchiveSearchBar
+        filters={filters}
+        onFilterChange={updateFilters}
+        onQueryChange={setQueryDraft}
+        options={options}
+        queryDraft={queryDraft}
+      />
       <ActiveFilters
         filters={filters}
         onClear={clearFilters}
@@ -174,15 +166,6 @@ export default function ArchiveBrowser({
         onGroupChange={(group) => updateFilters({ group })}
         onOpenYearArchive={() => setYearDrawerOpen(true)}
         onRemove={removeFilter}
-        resultCount={filteredRecords.length}
-      />
-      <ArchiveSearchPanel
-        filters={filters}
-        onFilterChange={updateFilters}
-        onQueryChange={setQueryDraft}
-        onToggleTag={toggleTag}
-        options={options}
-        queryDraft={queryDraft}
         resultCount={filteredRecords.length}
       />
 

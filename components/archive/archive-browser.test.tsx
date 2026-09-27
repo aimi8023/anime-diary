@@ -5,6 +5,7 @@ import {
   fireEvent,
   render,
   screen,
+  within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -13,10 +14,6 @@ import {
   DEFAULT_ARCHIVE_FILTERS,
   getArchiveStats,
 } from "@/lib/archive/filter";
-import {
-  ArchiveSearchProvider,
-  useArchiveSearch,
-} from "./archive-search-context";
 import ArchiveBrowser from "./archive-browser";
 
 vi.mock("@/components/timer", () => ({
@@ -63,23 +60,11 @@ function renderArchive(
   initialFilters = DEFAULT_ARCHIVE_FILTERS,
 ) {
   return render(
-    <ArchiveSearchProvider>
-      <SearchLauncher />
-      <ArchiveBrowser
-        records={records}
-        initialFilters={initialFilters}
-        stats={getArchiveStats(records)}
-      />
-    </ArchiveSearchProvider>,
-  );
-}
-
-function SearchLauncher() {
-  const { openSearch } = useArchiveSearch();
-  return (
-    <button onClick={openSearch} type="button">
-      打开搜索
-    </button>
+    <ArchiveBrowser
+      records={records}
+      initialFilters={initialFilters}
+      stats={getArchiveStats(records)}
+    />,
   );
 }
 
@@ -98,44 +83,70 @@ describe("ArchiveBrowser filtering", () => {
     replaceStateSpy.mockRestore();
   });
 
-  it("keeps the search form hidden until the launcher opens it", async () => {
-    const user = userEvent.setup();
-    renderArchive({
-      ...DEFAULT_ARCHIVE_FILTERS,
-      year: "2024",
-      tags: ["治愈"],
-    });
+  it("shows the search area inline on the page without opening anything", () => {
+    renderArchive({ ...DEFAULT_ARCHIVE_FILTERS, year: "2024" });
 
-    expect(
-      screen.queryByRole("dialog", { name: "搜索与筛选" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText("找到 1 部")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "打开搜索" }));
-
-    expect(
-      screen.getByRole("dialog", { name: "搜索与筛选" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("search")).toBeInTheDocument();
+    expect(screen.getByLabelText("搜索标题或感想")).toBeInTheDocument();
     expect(screen.getByLabelText("年份")).toHaveValue("2024");
-    expect(screen.getByLabelText("关键词")).toHaveFocus();
-    expect(screen.getByRole("checkbox", { name: "治愈" })).toBeChecked();
+    expect(screen.getByText("找到 2 部")).toBeInTheDocument();
+    // 弹窗式搜索已移除：页面上不存在对话框，也不需要点击触发。
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "移除年份 2024" }),
     ).toBeInTheDocument();
+  });
+
+  it("filters as the user types without a search button or extra click", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+    expect(screen.getByText("找到 3 部")).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("搜索标题或感想"), "芙莉莲");
+
+    // 关键词经防抖写入筛选，无需点击任何搜索按钮。
+    expect(await screen.findByText("找到 1 部")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "移除标签 治愈" }),
+      screen.getByRole("button", { name: "查看《葬送的芙莉莲》详情" }),
     ).toBeInTheDocument();
   });
 
-  it("combines filters and clears them without fetching", async () => {
+  it("matches the original title and comment but no longer matches tags", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+    const input = screen.getByLabelText("搜索标题或感想");
+
+    await user.type(input, "乐队");
+    expect(await screen.findByText("找到 1 部")).toBeInTheDocument();
+
+    // “奇幻”只存在于 anime-3 的标签里，标签已退出搜索范围。
+    await user.clear(input);
+    await user.type(input, "奇幻");
+    expect(await screen.findByText("找到 0 部")).toBeInTheDocument();
+  });
+
+  it("clears the keyword with the inline clear button", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+
+    const input = screen.getByLabelText("搜索标题或感想");
+    await user.type(input, "露营");
+    expect(await screen.findByText("找到 1 部")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "清除关键词" }));
+
+    expect(input).toHaveValue("");
+    expect(await screen.findByText("找到 3 部")).toBeInTheDocument();
+  });
+
+  it("narrows by year and minimum rating, then clears everything", async () => {
     const user = userEvent.setup();
     const fetchSpy = vi.fn();
     vi.stubGlobal("fetch", fetchSpy);
     renderArchive();
-    await user.click(screen.getByRole("button", { name: "打开搜索" }));
 
     await user.selectOptions(screen.getByLabelText("年份"), "2024");
-    await user.selectOptions(screen.getByLabelText("最低评分"), "9");
+    await user.selectOptions(screen.getByLabelText("评分"), "9");
     expect(screen.getByText("找到 1 部")).toBeInTheDocument();
 
     await user.click(
@@ -145,13 +156,34 @@ describe("ArchiveBrowser filtering", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("switches season with a one-click chip and restores 全部", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+
+    await user.click(screen.getByRole("button", { name: "1月" }));
+    expect(screen.getByText("找到 1 部")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1月" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(
+      screen.getByRole("button", { name: "移除季度 春" }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      within(screen.getByRole("group", { name: "季度" })).getByRole("button", {
+        name: "全部",
+      }),
+    );
+    expect(screen.getByText("找到 3 部")).toBeInTheDocument();
+  });
+
   it("debounces keyword URL updates through browser history without navigation", async () => {
     vi.useFakeTimers();
     renderArchive();
     replaceStateSpy.mockClear();
-    fireEvent.click(screen.getByRole("button", { name: "打开搜索" }));
 
-    fireEvent.change(screen.getByLabelText("关键词"), {
+    fireEvent.change(screen.getByLabelText("搜索标题或感想"), {
       target: { value: "音乐" },
     });
     expect(replaceStateSpy).not.toHaveBeenCalled();
@@ -160,64 +192,12 @@ describe("ArchiveBrowser filtering", () => {
       await vi.advanceTimersByTimeAsync(250);
     });
 
-    expect(replaceStateSpy).toHaveBeenLastCalledWith(
-      null,
-      "",
-      "/?q=%E9%9F%B3%E4%B9%90",
-    );
-    expect(screen.getByText("找到 1 部")).toBeInTheDocument();
+    // “音乐”只出现在标签里：标签已退出搜索范围，因此不再命中任何记录。
+    expect(replaceStateSpy).toHaveBeenLastCalledWith(null, "", "/?q=%E9%9F%B3%E4%B9%90");
+    expect(screen.getByText("找到 0 部")).toBeInTheDocument();
 
     // URL 已与筛选一致时不再重复写入。
     expect(replaceStateSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it("closes the search panel with Escape and restores focus", async () => {
-    const user = userEvent.setup();
-    renderArchive();
-
-    const launcher = screen.getByRole("button", { name: "打开搜索" });
-    await user.click(launcher);
-    expect(screen.getByRole("dialog").parentElement).toBe(document.body);
-
-    await user.keyboard("{Escape}");
-
-    expect(
-      screen.queryByRole("dialog", { name: "搜索与筛选" }),
-    ).not.toBeInTheDocument();
-    expect(launcher).toHaveFocus();
-  });
-
-  it("closes from the backdrop but keeps selected filters when reopened", async () => {
-    const user = userEvent.setup();
-    renderArchive();
-
-    const launcher = screen.getByRole("button", { name: "打开搜索" });
-    await user.click(launcher);
-    await user.selectOptions(screen.getByLabelText("年份"), "2024");
-    fireEvent.click(
-      screen.getByRole("dialog", { name: "搜索与筛选" }),
-    );
-
-    expect(
-      screen.queryByRole("dialog", { name: "搜索与筛选" }),
-    ).not.toBeInTheDocument();
-
-    await user.click(launcher);
-    expect(screen.getByLabelText("年份")).toHaveValue("2024");
-  });
-
-  it("locks background scrolling until the close button is used", async () => {
-    const user = userEvent.setup();
-    document.body.style.overflow = "clip";
-    renderArchive();
-
-    await user.click(screen.getByRole("button", { name: "打开搜索" }));
-    expect(document.body.style.overflow).toBe("hidden");
-
-    await user.click(
-      screen.getByRole("button", { name: "关闭搜索与筛选" }),
-    );
-    expect(document.body.style.overflow).toBe("clip");
   });
 
   it("restores filters from the URL during browser history navigation", () => {
@@ -259,20 +239,6 @@ describe("ArchiveBrowser filtering", () => {
     expect(
       await screen.findByRole("dialog", { name: "摇曳露营" }),
     ).toBeInTheDocument();
-  });
-
-  it("shows the live result count inside the search panel", async () => {
-    const user = userEvent.setup();
-    renderArchive();
-
-    await user.click(screen.getByRole("button", { name: "打开搜索" }));
-    const panel = screen.getByRole("dialog", { name: "搜索与筛选" });
-
-    expect(panel).toHaveTextContent("当前条件：找到 3 部");
-
-    await user.selectOptions(screen.getByLabelText("年份"), "2024");
-
-    expect(panel).toHaveTextContent("当前条件：找到 2 部");
   });
 
   it("switches grouping and direction from the toolbar", async () => {
