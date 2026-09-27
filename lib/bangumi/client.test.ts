@@ -52,8 +52,27 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+// 客户端在无代理时走 global fetch、有代理时走 undiciFetch，
+// 测试分别 stub 了这两条路径。机器级 HTTPS_PROXY/HTTP_PROXY 若泄漏进来，
+// 请求会改走未被赋值的 undici mock，导致全部用例报 invalid_response。
+const PROXY_ENV_KEYS = [
+  "HTTPS_PROXY",
+  "https_proxy",
+  "HTTP_PROXY",
+  "http_proxy",
+] as const;
+
+type ProxyEnvKey = (typeof PROXY_ENV_KEYS)[number];
+
 describe("Bangumi client", () => {
+  let savedProxyEnv: Partial<Record<ProxyEnvKey, string>> = {};
+
   beforeEach(() => {
+    savedProxyEnv = {};
+    for (const key of PROXY_ENV_KEYS) {
+      savedProxyEnv[key] = process.env[key];
+      delete process.env[key];
+    }
     clearBangumiCacheForTests();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-07-29T00:00:00Z"));
@@ -67,6 +86,12 @@ describe("Bangumi client", () => {
     delete process.env.BANGUMI_ACCESS_TOKEN;
     delete process.env.BANGUMI_USER_AGENT;
     delete process.env.BANGUMI_PROXY;
+    for (const key of PROXY_ENV_KEYS) {
+      const saved = savedProxyEnv[key];
+      if (saved === undefined) delete process.env[key];
+      else process.env[key] = saved;
+    }
+    savedProxyEnv = {};
   });
 
   it("searches only safe anime results and maps them", async () => {
