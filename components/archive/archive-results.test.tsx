@@ -118,6 +118,32 @@ describe("ArchiveResults", () => {
     expect(screen.getAllByText("孤独摇滚！").length).toBeGreaterThan(0);
   });
 
+  it("shows at most two mark badges and folds the rest into +N", () => {
+    const manyMarks: Anime = {
+      ...records[0],
+      title: "标记展示样本",
+      marks: ["rewatch", "source", "special", "remaster"],
+    };
+
+    renderResults({ records: [manyMarks] });
+
+    expect(screen.getByText("多刷")).toBeInTheDocument();
+    expect(screen.getByText("看过原作")).toBeInTheDocument();
+    // 超过两个时其余折叠，且不逐个渲染。
+    expect(screen.getByText("+2")).toBeInTheDocument();
+    expect(screen.queryByText("剧场版·特别篇")).not.toBeInTheDocument();
+  });
+
+  it("keeps legacy records without marks renderable and unmarked", () => {
+    const legacyRecord = { ...records[0] } as Anime;
+    delete legacyRecord.marks;
+
+    renderResults({ records: [legacyRecord] });
+
+    expect(screen.getAllByText("孤独摇滚！").length).toBeGreaterThan(0);
+    expect(screen.queryByText("未标记")).not.toBeInTheDocument();
+  });
+
   it("renders a recoverable no-result state", async () => {
     const user = userEvent.setup();
     const onClearFilters = vi.fn();

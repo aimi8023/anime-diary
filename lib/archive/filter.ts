@@ -1,4 +1,5 @@
 import type { Anime } from "@/lib/types";
+import { normalizeMarks } from "@/lib/anime/marks";
 import { formatSeasonLabel } from "@/lib/season-label";
 import type {
   ArchiveCardGroup,
@@ -15,6 +16,7 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   q: "",
   year: "",
   season: "",
+  marks: [],
   rating: null,
   group: "season",
   direction: "desc",
@@ -29,6 +31,7 @@ export function countActiveArchiveFilters(
     Number(Boolean(filters.q)) +
     Number(Boolean(filters.year)) +
     Number(Boolean(filters.season)) +
+    filters.marks.length +
     Number(filters.rating !== null)
   );
 }
@@ -59,6 +62,12 @@ export function parseArchiveFilters(
   const seasonValue = readParam(params, "season")?.trim() ?? "";
   const groupValue = readParam(params, "group")?.trim() ?? "";
   const dirValue = readParam(params, "dir")?.trim() ?? "";
+  const marks = normalizeMarks(
+    (readParam(params, "mark") ?? "")
+      .split(",")
+      .map((mark) => mark.trim())
+      .filter(Boolean),
+  );
 
   return {
     q: readParam(params, "q")?.trim() ?? "",
@@ -66,6 +75,7 @@ export function parseArchiveFilters(
     season: ["春", "夏", "秋", "冬"].includes(seasonValue)
       ? (seasonValue as ArchiveFilters["season"])
       : "",
+    marks,
     rating: parseRating(readParam(params, "rating")),
     // 兼容旧版参数：group=year 与旧 sort 值都归入季度维度。
     group: groupValue === "rating" ? "rating" : "season",
@@ -80,6 +90,7 @@ export function serializeArchiveFilters(
   if (filters.q) params.set("q", filters.q);
   if (filters.year) params.set("year", filters.year);
   if (filters.season) params.set("season", filters.season);
+  if (filters.marks.length > 0) params.set("mark", filters.marks.join(","));
   if (filters.rating !== null) params.set("rating", String(filters.rating));
   if (filters.group !== "season") params.set("group", filters.group);
   if (filters.direction !== "desc") params.set("dir", filters.direction);
@@ -148,6 +159,13 @@ export function filterAnime(
       const parts = seasonParts(anime.season);
       if (filters.year && parts.year !== filters.year) return false;
       if (filters.season && !anime.season.endsWith(filters.season)) {
+        return false;
+      }
+      // 多选标记按 AND 收敛：选中的每一个标记都必须命中。
+      if (
+        filters.marks.length > 0 &&
+        !filters.marks.every((mark) => (anime.marks ?? []).includes(mark))
+      ) {
         return false;
       }
       if (filters.rating !== null && anime.rating < filters.rating) {

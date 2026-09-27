@@ -69,9 +69,17 @@ describe("archive active filter count", () => {
         q: "音乐",
         year: "2024",
         season: "夏",
+        marks: ["rewatch"],
         rating: 8,
       }),
-    ).toBe(4);
+    ).toBe(5);
+    // 多选标记按个数计入活动筛选数。
+    expect(
+      countActiveArchiveFilters({
+        ...DEFAULT_ARCHIVE_FILTERS,
+        marks: ["rewatch", "source"],
+      }),
+    ).toBe(2);
   });
 });
 
@@ -84,6 +92,7 @@ describe("archive filter URL state", () => {
         season: "夏",
         // 旧版 tag 参数已退出筛选范围，必须被忽略而不是报错。
         tag: "治愈,日常",
+        mark: "source,rewatch,source",
         rating: "8.3",
         sort: "title",
       }),
@@ -91,10 +100,19 @@ describe("archive filter URL state", () => {
       q: "音乐",
       year: "2024",
       season: "夏",
+      // 去重并按内置顺序排列，未知标记被丢弃。
+      marks: ["rewatch", "source"],
       rating: 8.5,
       group: "season",
       direction: "desc",
     });
+  });
+
+  it("drops unknown marks from the URL instead of failing", () => {
+    expect(
+      parseArchiveFilters({ mark: "rewatch,not-a-mark," }),
+    ).toMatchObject({ marks: ["rewatch"] });
+    expect(parseArchiveFilters({})).toMatchObject({ marks: [] });
   });
 
   it("parses group and direction values", () => {
@@ -162,6 +180,13 @@ describe("archive filter URL state", () => {
     expect(
       serializeArchiveFilters({
         ...DEFAULT_ARCHIVE_FILTERS,
+        marks: ["rewatch", "special"],
+      }).toString(),
+    ).toBe("mark=rewatch%2Cspecial");
+
+    expect(
+      serializeArchiveFilters({
+        ...DEFAULT_ARCHIVE_FILTERS,
         group: "rating",
         direction: "asc",
       }).toString(),
@@ -191,11 +216,34 @@ describe("archive filtering and grouping", () => {
         q: "",
         year: "2024",
         season: "夏",
+        marks: [],
         rating: 8,
         group: "season",
         direction: "desc",
       }).map((anime) => anime.id),
     ).toEqual(["anime-1", "anime-2"]);
+  });
+
+  it("filters by mark and requires every selected mark", () => {
+    const marked: Anime[] = [
+      { ...records[0], id: "m-1", title: "甲", marks: ["rewatch"] },
+      { ...records[1], id: "m-2", title: "乙", marks: ["rewatch", "source"] },
+      { ...records[2], id: "m-3", title: "丙", marks: ["source"] },
+      // 存量记录没有 marks 字段，必须视为无标记而不是报错。
+      { ...records[3], id: "m-4", title: "丁", marks: undefined },
+    ];
+    const byMark = (marks: string[]) =>
+      filterAnime(marked, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        marks,
+      })
+        .map((anime) => anime.id)
+        .sort();
+
+    expect(byMark(["rewatch"])).toEqual(["m-1", "m-2"]);
+    // 多选取交集：同时要“多刷”和“看过原作”只剩乙。
+    expect(byMark(["rewatch", "source"])).toEqual(["m-2"]);
+    expect(byMark(["special"])).toEqual([]);
   });
 
   it("orders the season dimension by broadcast season without mutating input", () => {

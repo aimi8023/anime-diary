@@ -13,6 +13,7 @@ const first: Anime = {
   comment: "",
   episodes: 12,
   tags: ["音乐"],
+  marks: [],
   bangumiId: 352821,
   createdAt: "2026-01-01T00:00:00.000Z",
 };

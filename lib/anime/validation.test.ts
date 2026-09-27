@@ -12,6 +12,7 @@ const validInput = {
   comment: "很喜欢",
   episodes: 12,
   tags: ["音乐", "青春"],
+  marks: ["rewatch"],
   bangumiId: 352821,
   bangumiUrl: "https://bgm.tv/subject/352821",
   originalTitle: "ぼっち・ざ・ろっく！",
@@ -56,7 +57,44 @@ describe("parseAnimeCreateInput", () => {
         comment: "",
         episodes: 0,
         tags: [],
+        marks: [],
       },
+    });
+  });
+
+  it("accepts built-in marks, dedupes them and sorts by the built-in order", () => {
+    expect(
+      parseAnimeCreateInput({
+        ...validInput,
+        marks: ["source", "rewatch", "source"],
+      }),
+    ).toMatchObject({
+      ok: true,
+      data: { marks: ["rewatch", "source"] },
+    });
+  });
+
+  it("rejects marks outside the built-in vocabulary", () => {
+    const result = parseAnimeCreateInput({
+      ...validInput,
+      marks: ["rewatch", "随便写的"],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issues[0].path).toBe("marks");
+    expect(result.issues[0].message).toContain("rewatch");
+  });
+
+  it("rejects a marks value that is not an array", () => {
+    const result = parseAnimeCreateInput({
+      ...validInput,
+      marks: "rewatch",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issues[0]).toEqual({
+      path: "marks",
+      message: "标记必须是数组",
     });
   });
 

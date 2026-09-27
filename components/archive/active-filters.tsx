@@ -3,12 +3,13 @@ import type {
   ArchiveFilters,
   ArchiveGroup,
 } from "@/lib/archive/types";
+import { archiveMarkLabel } from "@/lib/anime/marks";
 
 interface ActiveFiltersProps {
   filters: ArchiveFilters;
   resultCount: number;
   onClear: () => void;
-  onRemove: (key: keyof ArchiveFilters) => void;
+  onRemove: (key: keyof ArchiveFilters, value?: string) => void;
   onGroupChange: (group: ArchiveGroup) => void;
   onDirectionChange: (direction: ArchiveDirection) => void;
   onOpenYearArchive: () => void;
@@ -24,6 +25,7 @@ function hasActiveFilters(filters: ArchiveFilters) {
     filters.q !== "" ||
     filters.year !== "" ||
     filters.season !== "" ||
+    filters.marks.length > 0 ||
     filters.rating !== null
   );
 }
@@ -40,6 +42,7 @@ export default function ActiveFilters({
   const chips: Array<{
     key: keyof ArchiveFilters;
     label: string;
+    value?: string;
   }> = [];
   if (filters.q) chips.push({ key: "q", label: `关键词 ${filters.q}` });
   if (filters.year) {
@@ -47,6 +50,13 @@ export default function ActiveFilters({
   }
   if (filters.season) {
     chips.push({ key: "season", label: `季度 ${filters.season}` });
+  }
+  for (const mark of filters.marks) {
+    chips.push({
+      key: "marks",
+      label: `${archiveMarkLabel(mark)}`,
+      value: mark,
+    });
   }
   if (filters.rating !== null) {
     chips.push({
@@ -87,8 +97,8 @@ export default function ActiveFilters({
         <button
           aria-label={`移除${chip.label}`}
           className="ui-chip ui-chip-active min-h-9 px-3 text-xs"
-          key={`${chip.key}-${chip.label}`}
-          onClick={() => onRemove(chip.key)}
+          key={`${chip.key}-${chip.value ?? chip.label}`}
+          onClick={() => onRemove(chip.key, chip.value)}
           type="button"
         >
           {chip.label}

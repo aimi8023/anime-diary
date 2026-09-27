@@ -30,6 +30,7 @@ const records: Anime[] = [
     comment: "乐队成长",
     episodes: 12,
     tags: ["音乐", "日常"],
+    marks: ["rewatch"],
     createdAt: "2024-07-01T00:00:00.000Z",
   },
   {
@@ -41,6 +42,7 @@ const records: Anime[] = [
     comment: "适合放松",
     episodes: 12,
     tags: ["日常", "治愈"],
+    marks: [],
     createdAt: "2024-08-01T00:00:00.000Z",
   },
   {
@@ -52,6 +54,7 @@ const records: Anime[] = [
     comment: "时间与记忆",
     episodes: 28,
     tags: ["奇幻", "治愈"],
+    marks: ["rewatch", "source"],
     createdAt: "2025-01-01T00:00:00.000Z",
   },
 ];
@@ -198,6 +201,34 @@ describe("ArchiveBrowser filtering", () => {
 
     // URL 已与筛选一致时不再重复写入。
     expect(replaceStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("narrows by mark chips and removes them one by one", async () => {
+    const user = userEvent.setup();
+    renderArchive();
+
+    // 六个标记按钮常驻搜索区，与季度快切同排。
+    const markGroup = screen.getByRole("group", { name: "标记" });
+    await user.click(within(markGroup).getByRole("button", { name: "多刷" }));
+    // 孤独摇滚与葬送的芙莉莲都带“多刷”。
+    expect(screen.getByText("找到 2 部")).toBeInTheDocument();
+    expect(replaceStateSpy).toHaveBeenLastCalledWith(null, "", "/?mark=rewatch");
+
+    // 多选取交集：只有同时带“多刷”和“看过原作”的芙莉莲留下。
+    await user.click(
+      within(markGroup).getByRole("button", { name: "看过原作" }),
+    );
+    expect(screen.getByText("找到 1 部")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "查看《葬送的芙莉莲》详情" }),
+    ).toBeInTheDocument();
+
+    // 工具栏的标记 chip 可单独移除，不影响其他条件。
+    await user.click(screen.getByRole("button", { name: "移除看过原作" }));
+    expect(screen.getByText("找到 2 部")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "移除看过原作" }),
+    ).not.toBeInTheDocument();
   });
 
   it("restores filters from the URL during browser history navigation", () => {

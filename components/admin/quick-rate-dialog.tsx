@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import type { Anime } from "@/lib/types";
+import { ARCHIVE_MARKS } from "@/lib/anime/marks";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 import StarRating from "@/components/star-rating";
 import { useFocusTrap } from "@/components/use-focus-trap";
@@ -25,6 +26,7 @@ export default function QuickRateDialog({
   const panelRef = useRef<HTMLDivElement>(null);
   const [rating, setRating] = useState(anime?.rating ?? 0);
   const [comment, setComment] = useState(anime?.comment ?? "");
+  const [marks, setMarks] = useState<string[]>(anime?.marks ?? []);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,7 +60,7 @@ export default function QuickRateDialog({
       const response = await fetch(`/api/anime/${anime.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, comment: comment.trim() }),
+        body: JSON.stringify({ rating, comment: comment.trim(), marks }),
       });
       if (!response.ok) {
         throw new Error(await readApiError(response, "保存失败"));
@@ -150,6 +152,40 @@ export default function QuickRateDialog({
             <InlineFeedback tone="error">{error}</InlineFeedback>
           </div>
         )}
+
+        <fieldset className="mt-4">
+          <legend className="mb-2 text-xs font-bold text-[var(--ink-muted)]">
+            标记（可选，可多选）
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {ARCHIVE_MARKS.map((mark) => {
+              const checked = marks.includes(mark.id);
+              return (
+                <label
+                  className={`ui-chip cursor-pointer px-3 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-pink-300 ${
+                    checked ? "ui-chip-active" : ""
+                  }`}
+                  key={mark.id}
+                  title={mark.hint}
+                >
+                  <input
+                    checked={checked}
+                    className="sr-only"
+                    onChange={() =>
+                      setMarks((current) =>
+                        current.includes(mark.id)
+                          ? current.filter((item) => item !== mark.id)
+                          : [...current, mark.id],
+                      )
+                    }
+                    type="checkbox"
+                  />
+                  {mark.label}
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
         <div className="mt-5 flex justify-end gap-2">
           <button

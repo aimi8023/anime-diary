@@ -1,4 +1,5 @@
 import type { Anime } from "@/lib/types";
+import { ARCHIVE_MARKS } from "@/lib/anime/marks";
 import type {
   BackupIssue,
   BackupParseResult,
@@ -9,6 +10,7 @@ export const MAX_BACKUP_BYTES = 5 * 1024 * 1024;
 const MAX_STRING_LENGTH = 10_000;
 const MAX_TAGS = 100;
 const MAX_TAG_LENGTH = 100;
+const MARK_IDS = new Set<string>(ARCHIVE_MARKS.map((mark) => mark.id));
 
 export function validateBackupSize(
   bytes: number,
@@ -121,6 +123,25 @@ function validateAnime(value: unknown, index: number): BackupIssue[] {
         "tags 必须是有效的非空字符串数组",
         index,
         "tags",
+      ),
+    );
+  }
+
+  // marks 是 2026-09 之后新增的字段：缺失视为空数组，出现则必须是内置标记。
+  if (
+    value.marks !== undefined &&
+    (!Array.isArray(value.marks) ||
+      value.marks.length > ARCHIVE_MARKS.length ||
+      value.marks.some(
+        (mark) => typeof mark !== "string" || !MARK_IDS.has(mark),
+      ))
+  ) {
+    issues.push(
+      issue(
+        "invalid_marks",
+        "marks 必须是由内置标记组成的数组",
+        index,
+        "marks",
       ),
     );
   }

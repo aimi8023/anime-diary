@@ -14,6 +14,7 @@ export interface ArchiveFilters {
   q: string;
   year: string;
   season: "" | "春" | "夏" | "秋" | "冬";
+  marks: string[];
   rating: number | null;
   group: ArchiveGroup;
   direction: ArchiveDirection;

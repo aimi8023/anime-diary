@@ -131,6 +131,15 @@ export default function ArchiveBrowser({
     setFilters((current) => ({ ...current, ...patch }));
   }
 
+  function toggleMark(mark: string) {
+    setFilters((current) => ({
+      ...current,
+      marks: current.marks.includes(mark)
+        ? current.marks.filter((item) => item !== mark)
+        : [...current.marks, mark],
+    }));
+  }
+
   function clearFilters() {
     setQueryDraft("");
     // 排列维度与方向是浏览偏好，清除筛选时保持不变。
@@ -141,9 +150,15 @@ export default function ArchiveBrowser({
     }));
   }
 
-  function removeFilter(key: keyof ArchiveFilters) {
+  function removeFilter(key: keyof ArchiveFilters, value?: string) {
     if (key === "q") setQueryDraft("");
     setFilters((current) => {
+      if (key === "marks") {
+        return {
+          ...current,
+          marks: current.marks.filter((mark) => mark !== value),
+        };
+      }
       const defaults = DEFAULT_ARCHIVE_FILTERS;
       return { ...current, [key]: defaults[key] };
     });
@@ -156,6 +171,7 @@ export default function ArchiveBrowser({
         filters={filters}
         onFilterChange={updateFilters}
         onQueryChange={setQueryDraft}
+        onToggleMark={toggleMark}
         options={options}
         queryDraft={queryDraft}
       />

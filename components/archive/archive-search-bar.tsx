@@ -4,6 +4,7 @@ import type {
   ArchiveFilters,
   ArchiveOptions,
 } from "@/lib/archive/types";
+import { ARCHIVE_MARKS } from "@/lib/anime/marks";
 import { seasonMonthLabel } from "@/lib/season-label";
 
 interface ArchiveSearchBarProps {
@@ -12,6 +13,7 @@ interface ArchiveSearchBarProps {
   queryDraft: string;
   onQueryChange: (value: string) => void;
   onFilterChange: (patch: Partial<ArchiveFilters>) => void;
+  onToggleMark: (mark: string) => void;
 }
 
 const seasons: Array<ArchiveFilters["season"]> = ["春", "夏", "秋", "冬"];
@@ -30,6 +32,7 @@ export default function ArchiveSearchBar({
   queryDraft,
   onQueryChange,
   onFilterChange,
+  onToggleMark,
 }: ArchiveSearchBarProps) {
   return (
     <section
@@ -161,6 +164,40 @@ export default function ArchiveSearchBar({
             ))}
           </select>
         </div>
+      </div>
+
+      <div
+        aria-label="标记"
+        className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2 border-t border-white/70 pt-3"
+        role="group"
+      >
+        <span className="text-xs font-bold text-[var(--ink-muted)]">标记</span>
+        <div className="flex flex-wrap gap-1.5">
+          {ARCHIVE_MARKS.map((mark) => {
+            const active = filters.marks.includes(mark.id);
+            return (
+              <button
+                aria-pressed={active}
+                className={`min-h-8 rounded-full border px-3 text-xs font-bold transition-colors ${
+                  active
+                    ? "border-[rgba(219,79,135,0.38)] bg-[var(--accent-soft)] text-[var(--accent-strong)]"
+                    : "border-white/80 bg-white/55 text-[var(--ink-muted)] hover:bg-white/80"
+                }`}
+                key={mark.id}
+                onClick={() => onToggleMark(mark.id)}
+                title={mark.hint}
+                type="button"
+              >
+                {mark.label}
+              </button>
+            );
+          })}
+        </div>
+        {filters.marks.length > 1 && (
+          <span className="text-[11px] text-[var(--ink-subtle)]">
+            同时选中多个按“且”筛选
+          </span>
+        )}
       </div>
     </section>
   );

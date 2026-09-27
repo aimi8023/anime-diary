@@ -64,6 +64,7 @@ describe("QuickRateDialog", () => {
       screen.getByLabelText("感想（可选）"),
       "乐队成长的故事",
     );
+    await user.click(screen.getByRole("checkbox", { name: "多刷" }));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() => {
@@ -74,7 +75,11 @@ describe("QuickRateDialog", () => {
       "/api/anime/anime-1",
       expect.objectContaining({
         method: "PUT",
-        body: JSON.stringify({ rating: 10, comment: "乐队成长的故事" }),
+        body: JSON.stringify({
+          rating: 10,
+          comment: "乐队成长的故事",
+          marks: ["rewatch"],
+        }),
       }),
     );
   });

@@ -6,6 +6,11 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Anime } from "@/lib/types";
 import CoverImage from "@/components/cover-image";
+import {
+  archiveMarkHint,
+  archiveMarkLabel,
+  toDisplayMarks,
+} from "@/lib/anime/marks";
 import { formatSeasonLabel } from "@/lib/season-label";
 import { useFocusTrap } from "@/components/use-focus-trap";
 
@@ -114,6 +119,7 @@ export default function AnimeDetailDialog({
   if (!anime) return null;
   if (typeof document === "undefined") return null;
   const tags = Array.isArray(anime.tags) ? anime.tags : [];
+  const marks = toDisplayMarks(anime.marks);
 
   function closeFromBackdrop(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) onClose();
@@ -319,6 +325,26 @@ export default function AnimeDetailDialog({
                   </div>
                 )}
               </dl>
+
+              {marks.length > 0 && (
+                <div
+                  aria-label="标记"
+                  className="flex flex-wrap items-center gap-2"
+                >
+                  <span className="text-xs font-bold text-[var(--ink-subtle)]">
+                    标记
+                  </span>
+                  {marks.map((mark) => (
+                    <span
+                      className="rounded-full border border-[rgba(219,79,135,0.3)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-bold text-[var(--accent-strong)]"
+                      key={mark}
+                      title={archiveMarkHint(mark)}
+                    >
+                      {archiveMarkLabel(mark)}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">

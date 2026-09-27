@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { AnimeInput } from "@/lib/types";
+import { ARCHIVE_MARKS } from "@/lib/anime/marks";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 
 const SEASONS = [
@@ -49,6 +50,7 @@ export default function AnimeForm({
   const [comment, setComment] = useState(initial?.comment || "");
   const [episodes, setEpisodes] = useState(initial?.episodes ?? 0);
   const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
+  const [marks, setMarks] = useState<string[]>(initial?.marks ?? []);
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -62,7 +64,8 @@ export default function AnimeForm({
     rating !== (initial?.rating ?? 5) ||
     comment !== (initial?.comment || "") ||
     episodes !== (initial?.episodes ?? 0) ||
-    JSON.stringify(tags) !== JSON.stringify(initial?.tags ?? []);
+    JSON.stringify(tags) !== JSON.stringify(initial?.tags ?? []) ||
+    JSON.stringify(marks) !== JSON.stringify(initial?.marks ?? []);
 
   const dirtyReportedRef = useRef(false);
   useEffect(() => {
@@ -90,6 +93,7 @@ export default function AnimeForm({
         comment: comment.trim(),
         episodes,
         tags,
+        marks,
         bangumiId: initial?.bangumiId,
         bangumiUrl: initial?.bangumiUrl,
         originalTitle: initial?.originalTitle,
@@ -102,8 +106,15 @@ export default function AnimeForm({
     }
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+  const toggleMark = (mark: string) => {
+    setMarks((current) =>
+      current.includes(mark)
+        ? current.filter((item) => item !== mark)
+        : [...current, mark],
+    );
+  };
+
+  const handleAddTag = () => {    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       setTags([...tags, tagInput.trim()]);
       setTagInput("");
     }
@@ -362,6 +373,38 @@ export default function AnimeForm({
           </div>
         )}
       </div>
+
+      {/* Marks */}
+      <fieldset>
+        <legend className="mb-2 block text-sm font-bold text-[var(--ink)]">
+          标记
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          {ARCHIVE_MARKS.map((mark) => {
+            const checked = marks.includes(mark.id);
+            return (
+              <label
+                className={`ui-chip cursor-pointer px-3 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-pink-300 ${
+                  checked ? "ui-chip-active" : ""
+                }`}
+                key={mark.id}
+                title={mark.hint}
+              >
+                <input
+                  checked={checked}
+                  className="sr-only"
+                  onChange={() => toggleMark(mark.id)}
+                  type="checkbox"
+                />
+                {mark.label}
+              </label>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-[11px] text-[var(--ink-subtle)]">
+          标记会显示在公开档案的海报卡片上，也可以被访客筛选。
+        </p>
+      </fieldset>
 
       {/* Comment */}
       <div>

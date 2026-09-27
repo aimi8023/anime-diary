@@ -2,7 +2,11 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { Anime } from "@/lib/types";
+import { archiveMarkLabel, toDisplayMarks } from "@/lib/anime/marks";
 import CoverImage from "@/components/cover-image";
+
+/** 卡片角落最多显示的标记数，其余折叠成 +N。 */
+const MAX_VISIBLE_MARKS = 2;
 
 interface ArchiveAnimeCardProps {
   anime: Anime;
@@ -19,6 +23,9 @@ export default function ArchiveAnimeCard({
   seasonLabel,
 }: ArchiveAnimeCardProps) {
   const reduceMotion = useReducedMotion();
+  const marks = toDisplayMarks(anime.marks);
+  const visibleMarks = marks.slice(0, MAX_VISIBLE_MARKS);
+  const hiddenMarkCount = marks.length - visibleMarks.length;
 
   return (
     <motion.article
@@ -60,6 +67,26 @@ export default function ArchiveAnimeCard({
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#211d35]/30 to-transparent" />
+          {marks.length > 0 && (
+            <span className="absolute left-2 top-2 flex max-w-[70%] flex-wrap gap-1">
+              {visibleMarks.map((mark) => (
+                <span
+                  className="rounded-full border border-white/80 bg-[rgba(255,255,255,0.9)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--accent-strong)] shadow-sm"
+                  key={mark}
+                >
+                  {archiveMarkLabel(mark)}
+                </span>
+              ))}
+              {hiddenMarkCount > 0 && (
+                <span
+                  aria-label={`另有 ${hiddenMarkCount} 个标记`}
+                  className="rounded-full border border-white/80 bg-[rgba(255,255,255,0.9)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--ink-muted)] shadow-sm"
+                >
+                  +{hiddenMarkCount}
+                </span>
+              )}
+            </span>
+          )}
           {seasonLabel && (
             <span className="absolute bottom-2 left-2 rounded-full bg-[#211d35]/72 px-2 py-0.5 text-[10px] font-bold text-white">
               {seasonLabel}

@@ -70,6 +70,13 @@ function normalizeStoredData(data: Anime[]): Anime[] {
       tags: Array.isArray(cloned.tags)
         ? cloned.tags.filter((tag): tag is string => typeof tag === "string")
         : [],
+      // marks 晚于大部分存量记录存在，读取边界补齐空数组。
+      // 这里只做类型兜底而不丢弃未知取值：词表调整后老标记仍要能显示。
+      marks: Array.isArray(cloned.marks)
+        ? cloned.marks.filter(
+            (mark): mark is string => typeof mark === "string",
+          )
+        : [],
     };
   });
 }

@@ -1,4 +1,5 @@
 import type { AnimeInput } from "@/lib/types";
+import { ARCHIVE_MARKS, normalizeMarks } from "./marks";
 
 export interface InputIssue {
   path: string;
@@ -17,6 +18,7 @@ const supportedFields = [
   "comment",
   "episodes",
   "tags",
+  "marks",
   "bangumiId",
   "bangumiUrl",
   "originalTitle",
@@ -25,6 +27,8 @@ const supportedFields = [
 
 type SupportedField = (typeof supportedFields)[number];
 type UnknownRecord = Record<string, unknown>;
+
+const MARK_IDS = new Set<string>(ARCHIVE_MARKS.map((mark) => mark.id));
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -235,6 +239,34 @@ function validateInput(
         }
       });
       data.tags = normalizedTags;
+    }
+  }
+
+  if (mode === "create" || hasOwn(value, "marks")) {
+    const raw = value.marks;
+    if (raw === undefined && mode === "create") {
+      data.marks = [];
+    } else if (!Array.isArray(raw)) {
+      issues.push({ path: "marks", message: "标记必须是数组" });
+    } else {
+      if (raw.length > ARCHIVE_MARKS.length) {
+        issues.push({
+          path: "marks",
+          message: `标记最多 ${ARCHIVE_MARKS.length} 个`,
+        });
+      }
+      const unknown = raw.filter(
+        (mark) => typeof mark !== "string" || !MARK_IDS.has(mark),
+      );
+      if (unknown.length > 0) {
+        issues.push({
+          path: "marks",
+          message: `标记只能是：${[...MARK_IDS].join("、")}`,
+        });
+      } else {
+        // 去重并按内置顺序排列，与展示和筛选保持同一口径。
+        data.marks = normalizeMarks(raw);
+      }
     }
   }
 
