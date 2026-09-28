@@ -115,6 +115,26 @@ export default function AdminPage() {
         await readApiError(res, editing ? "更新失败" : "添加失败"),
       );
     }
+    // 标记属于整部作品：从完整表单保存时也要同步到同作品的其他条目，
+    // 否则会出现「快速打标同步了、编辑表单没同步」的行为不一致。
+    const seriesName = data.series?.trim();
+    if (seriesName) {
+      const siblings = animeList.filter(
+        (item) =>
+          item.id !== (editing?.id ?? data.bangumiId) &&
+          item.series?.trim() === seriesName,
+      );
+      await Promise.allSettled(
+        siblings.map((item) =>
+          fetch(`/api/anime/${item.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            // 只同步标记，不覆盖各条目自己的评分与感想。
+            body: JSON.stringify({ marks: data.marks ?? [] }),
+          }),
+        ),
+      );
+    }
     setEditing(null);
     setPrefill(null);
     setEntryMode("bangumi");

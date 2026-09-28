@@ -18,7 +18,21 @@ import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
 import ArchiveSearchBar from "./archive-search-bar";
-import { groupIntoWorks } from "@/lib/archive/works";
+import { groupIntoWorks, workKey } from "@/lib/archive/works";
+
+/** 作品内条目按播出档期从早到晚。 */
+function compareEntrySeason(a: Anime, b: Anime): number {
+  const rank = (season: string) => {
+    const match = season.match(/^(\d{4})(春|夏|秋|冬)$/);
+    if (!match) return 0;
+    const order = { 春: 1, 夏: 4, 秋: 7, 冬: 10 }[match[2]] ?? 0;
+    return Number(match[1]) * 100 + order;
+  };
+  return (
+    rank(a.season) - rank(b.season) ||
+    a.title.localeCompare(b.title, "zh-CN")
+  );
+}
 
 interface ArchiveBrowserProps {
   records: Anime[];
@@ -49,6 +63,17 @@ export default function ArchiveBrowser({
   );
   const selectedAnime =
     selectedIndex >= 0 ? filteredRecords[selectedIndex] : null;
+  // 同作品的其他条目取自全量记录：即使当前筛选（如年份）只命中其中一季，
+  // 作品详情也应当完整。
+  const selectedSiblings = useMemo(() => {
+    if (!selectedAnime) return [];
+    const key = workKey(selectedAnime);
+    return records
+      .filter(
+        (item) => item.id !== selectedAnime.id && workKey(item) === key,
+      )
+      .sort(compareEntrySeason);
+  }, [records, selectedAnime]);
 
   const navigateSelection = useCallback(
     (delta: 1 | -1) => {
@@ -224,12 +249,14 @@ export default function ArchiveBrowser({
         onNavigate={
           filteredRecords.length > 1 ? navigateSelection : undefined
         }
+        onSelectSibling={(entry) => setSelectedId(entry.id)}
         position={
           selectedAnime
             ? { index: selectedIndex, total: filteredRecords.length }
             : null
         }
         sharePath={selectedAnime ? `/?anime=${selectedAnime.id}` : null}
+        siblings={selectedSiblings}
       />
   </div>
 );

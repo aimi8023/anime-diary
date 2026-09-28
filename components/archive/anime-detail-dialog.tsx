@@ -16,6 +16,8 @@ import { useFocusTrap } from "@/components/use-focus-trap";
 
 interface AnimeDetailDialogProps {
   anime: Anime | null;
+  /** 同作品（同一 series）的其他条目；作品视图点开时一并展示。 */
+  siblings?: Anime[];
   onClose: () => void;
   /** 在当前筛选结果中移动相对步长；不提供时隐藏切换控件。 */
   onNavigate?: (delta: 1 | -1) => void;
@@ -23,14 +25,18 @@ interface AnimeDetailDialogProps {
   position?: { index: number; total: number } | null;
   /** 单条记录分享路径（如 /?anime=id）；提供时显示复制链接按钮。 */
   sharePath?: string | null;
+  /** 切换到同作品的其他条目。 */
+  onSelectSibling?: (anime: Anime) => void;
 }
 
 export default function AnimeDetailDialog({
   anime,
+  siblings = [],
   onClose,
   onNavigate,
   position,
   sharePath,
+  onSelectSibling,
 }: AnimeDetailDialogProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -119,7 +125,12 @@ export default function AnimeDetailDialog({
   if (!anime) return null;
   if (typeof document === "undefined") return null;
   const tags = Array.isArray(anime.tags) ? anime.tags : [];
-  const marks = toDisplayMarks(anime.marks);
+  // 标记按作品并集展示：同作品里任意一条打过的标记，在这部的详情里都成立。
+  // 正常情况下保存已同步到各条目，这里求并集是为了兼容归集前的老数据。
+  const marks = toDisplayMarks([
+    ...(anime.marks ?? []),
+    ...siblings.flatMap((entry) => entry.marks ?? []),
+  ]);
 
   function closeFromBackdrop(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) onClose();
@@ -325,6 +336,56 @@ export default function AnimeDetailDialog({
                   </div>
                 )}
               </dl>
+
+              {/* 作品视图点开一部作品时，把同作品的所有条目一并列出。 */}
+              {siblings.length > 0 && (
+                <div>
+                  <p className="mb-2 text-xs font-bold text-[var(--ink-subtle)]">
+                    同作品 · 共 {siblings.length + 1} 个条目
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {[anime, ...siblings].map((entry) => {
+                      const isCurrent = entry.id === anime.id;
+                      return (
+                        <button
+                          aria-current={isCurrent ? "true" : undefined}
+                          className={`w-[92px] shrink-0 rounded-xl border p-1 text-left transition ${
+                            isCurrent
+                              ? "border-[rgba(219,79,135,0.45)] bg-[var(--accent-soft)]"
+                              : "border-white/80 bg-white/65 hover:bg-white/90"
+                          }`}
+                          disabled={isCurrent || !onSelectSibling}
+                          key={entry.id}
+                          onClick={() => onSelectSibling?.(entry)}
+                          type="button"
+                        >
+                          <span className="relative block aspect-[2/3] overflow-hidden rounded-lg">
+                            {entry.cover ? (
+                              <CoverImage
+                                alt=""
+                                className="object-cover"
+                                fallbackLabel={entry.title}
+                                sizes="92px"
+                                src={entry.cover}
+                              />
+                            ) : (
+                              <span className="flex h-full items-center justify-center text-lg font-black text-[var(--ink-subtle)]">
+                                {entry.title.charAt(0) || "◌"}
+                              </span>
+                            )}
+                            <span className="absolute right-1 top-1 rounded-full bg-white/90 px-1 py-0.5 text-[9px] font-black text-[var(--warning)]">
+                              {entry.rating > 0 ? `★${entry.rating}` : "—"}
+                            </span>
+                          </span>
+                          <span className="mt-1 block text-[10px] font-bold leading-3.5 text-[var(--ink-muted)]">
+                            {formatSeasonLabel(entry.season)}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {marks.length > 0 && (
                 <div

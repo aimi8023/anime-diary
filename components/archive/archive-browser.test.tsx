@@ -231,6 +231,71 @@ describe("ArchiveBrowser filtering", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("hides the sibling section for a single-entry work", async () => {
+    const user = userEvent.setup();
+    renderArchive({ ...DEFAULT_ARCHIVE_FILTERS, scope: "work" });
+
+    await user.click(
+      screen.getByRole("button", { name: "查看《葬送的芙莉莲》详情" }),
+    );
+
+    const dialog = await screen.findByRole("dialog", { name: "葬送的芙莉莲" });
+    expect(within(dialog).queryByText(/同作品 · 共/)).not.toBeInTheDocument();
+  });
+
+  it("switches the detail dialog to a sibling entry", async () => {
+    const user = userEvent.setup();
+    // 自建一个两条目的作品，避免改动共享夹具影响其他用例。
+    const work: Anime[] = [
+      {
+        ...records[2],
+        id: "w-1",
+        title: "葬送的芙莉莲",
+        season: "2023冬",
+        series: "葬送的芙莉莲",
+        marks: ["rewatch"],
+      },
+      {
+        ...records[2],
+        id: "w-2",
+        title: "葬送的芙莉莲 第二季",
+        season: "2026春",
+        series: "葬送的芙莉莲",
+        marks: ["sequel"],
+      },
+    ];
+    render(
+      <ArchiveBrowser
+        records={work}
+        initialFilters={{ ...DEFAULT_ARCHIVE_FILTERS, scope: "work" }}
+        stats={getArchiveStats(work)}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "查看《葬送的芙莉莲》详情" }),
+    );
+    // 作品卡以最新条目为代表，所以先打开第二季。
+    const dialog = await screen.findByRole("dialog", {
+      name: "葬送的芙莉莲 第二季",
+    });
+
+    // 作品详情列出全部条目，计数含当前这条。
+    expect(within(dialog).getByText("同作品 · 共 2 个条目")).toBeInTheDocument();
+    // 标记按作品并集展示：第一季的「多刷」在这一部作品上也生效。
+    expect(within(dialog).getByText("多刷")).toBeInTheDocument();
+    expect(within(dialog).getByText("等续作")).toBeInTheDocument();
+
+    // 切到同作品的第一季。
+    await user.click(
+      within(dialog).getByRole("button", { name: /2023年10月/ }),
+    );
+
+    expect(
+      await screen.findByRole("dialog", { name: "葬送的芙莉莲" }),
+    ).toBeInTheDocument();
+  });
+
   it("restores filters from the URL during browser history navigation", () => {
     renderArchive();
 
