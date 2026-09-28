@@ -35,6 +35,12 @@ yarn-error.log*
 .env*
 !.env.local.example
 
+# 本地批量入库工具的中间产物：Bangumi 抓取页、匹配报告、
+# 云端快照与整份档案/导入副本。只保留 *.mjs 工具本身。
+/scripts/*.html
+/scripts/*.json
+/scripts/*.txt
+
 # vercel
 .vercel
 

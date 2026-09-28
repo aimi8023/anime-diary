@@ -99,7 +99,42 @@ lib/
 
 proxy.ts                             页面和 API 认证边界
 app/globals.css                      视觉令牌与共享语义类
+
+scripts/                             本地批量入库工具（不入运行时）
+├── year-gallery.mjs                 按年抓 Bangumi 四季候选
+├── season-gallery.mjs               按季度抓放送列表
+├── add-anime.mjs                    按 picks.json 写入 data/anime.json
+├── update-anime.mjs                 按 updates.json 补评分/感想
+├── sync-merge.mjs                   拉云端并合并本地新增，生成导入文件
+├── match-bangumi.mjs                标题与 Bangumi 条目匹配
+├── apply-bangumi-match.mjs          落库匹配结果
+├── fetch-season.mjs / season-notable.mjs   单季度辅助工具
+└── *.html / *.json                  一次性中间产物，已被 .gitignore 忽略
 ```
+
+## 本地批量入库流程
+
+管理后台的季度批量入库适合一次补一个季度；当初 276 条存量记录是走 `scripts/` 的离线流程灌进去的。该流程只用于管理员本人维护数据，不参与线上运行：
+
+```text
+node scripts/year-gallery.mjs 2023      # 抓全年候选 → year-2023-map.json
+                                     # 人工挑片，写 picks.json（rating 先留 0）
+node scripts/add-anime.mjs scripts/picks.json
+                                     # 拉条目详情写入 data/anime.json
+                                     # 之后写 updates.json（评分 + 感想）
+node scripts/update-anime.mjs scripts/updates.json
+node scripts/sync-merge.mjs            # 拉云端 → 合并本地新增
+                                     # 生成 scripts/import-to-prod.json
+                                     # 再到 /admin 备份恢复手动导入
+```
+
+必须遵守的约束：
+
+- **生产数据在 Redis，本地 `data/anime.json` 只是暂存与镜像。** 脚本默认读取线上站点，因此配了 `KV_REST_API_*` 的本地开发环境同样看到云端数据，改本地 JSON 不会立刻反映在 `npm run dev` 里；
+- `sync-merge.mjs` 是**云端优先**合并：已在云端的记录一律以云端为准，本地只贡献“云端没有的新增”。所以补评分必须在同步上云之前完成，否则会被下一次的同步覆盖；
+- 导入前必须确认预览里的**删除数为 0**，非 0 立即停手；
+- 脚本的字段映射和校验分别对齐 `lib/bangumi/mapper.ts` 与 `lib/anime/validation.ts`，规则变更时两边要同步；
+- 所有抓取页、匹配报告和档案副本都是一次性的中间产物，已在 `.gitignore` 中排除，不要提交。
 
 ## 数据模型与校验
 
@@ -331,6 +366,7 @@ Redis 键：
 
 - 番剧输入规则只改 `lib/anime/validation.ts`，备份导入镜像规则只改 `lib/backups/validation.ts`，两者同步放开；
 - 内置标记词表只改 `lib/anime/marks.ts`，校验、筛选、后台表单和公开展示都从那里读取；
+- `scripts/` 只用于管理员维护数据，不得被任何页面、接口或构建步骤引用；
 - 公开筛选、URL、分组和统计只改 `lib/archive/`；
 - API 错误和同源规则只改 `lib/http/`；
 - 登录限流只改 `lib/auth/rate-limit.ts`；
