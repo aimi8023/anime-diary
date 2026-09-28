@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { Anime } from "@/lib/types";
 import {
   countActiveArchiveFilters,
-  countArchiveScopes,
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
   filterAnimeByWorks,
@@ -250,80 +249,64 @@ describe("archive filtering and grouping", () => {
     ).toEqual(["w-1"]);
   });
 
-  it("splits the archive into solo works and grouped works by scope", () => {
+  it("keeps every record in the solo view and merges only in the work view", () => {
     const mixed: Anime[] = [
       { ...records[0], id: "s-1", title: "独作", series: undefined },
       { ...records[1], id: "g-1", title: "甲", series: "甲作品" },
       { ...records[2], id: "g-2", title: "甲 第二季", series: "甲作品" },
     ];
-    const ids = (scope: "solo" | "work") =>
-      filterAnimeByWorks(mixed, {
-        ...DEFAULT_ARCHIVE_FILTERS,
-        scope,
-      })
-        .map((anime) => anime.id)
-        .sort();
+    const base = { ...DEFAULT_ARCHIVE_FILTERS, marks: [] as string[] };
+    // 两个视图看到的是同一批记录：scope 只影响渲染方式，不参与过滤。
+    const soloIds = filterAnimeByWorks(mixed, { ...base, scope: "solo" })
+      .map((a) => a.id)
+      .sort();
+    const workIds = filterAnimeByWorks(mixed, { ...base, scope: "work" })
+      .map((a) => a.id)
+      .sort();
 
-    // 单作是默认分类，只保留没有 series 的记录。
-    expect(DEFAULT_ARCHIVE_FILTERS.scope).toBe("solo");
-    expect(ids("solo")).toEqual(["s-1"]);
-    expect(ids("work")).toEqual(["g-1", "g-2"]);
-  });
+    expect(soloIds).toEqual(["g-1", "g-2", "s-1"]);
+    expect(workIds).toEqual(soloIds);
 
-  it("keeps a lone series entry visible in the work scope", () => {
-    // 只带 series 还没有同作品兄弟的记录，不能在两个分类里都消失。
-    const lone: Anime[] = [
-      { ...records[0], id: "l-1", title: "刚归集", series: "未来作品集" },
-    ];
-    expect(
-      filterAnimeByWorks(lone, {
-        ...DEFAULT_ARCHIVE_FILTERS,
-        scope: "work",
-      }).map((anime) => anime.id),
-    ).toEqual(["l-1"]);
-    expect(
-      filterAnimeByWorks(lone, {
-        ...DEFAULT_ARCHIVE_FILTERS,
-        scope: "solo",
-      }),
-    ).toEqual([]);
+    // 差别只体现在合并：276 条记录会得到 213 + 26 = 239 部作品。
+    expect(groupIntoWorks(mixed).map((w) => w.key).sort()).toEqual([
+      "s-1",
+      "甲作品",
+    ]);
   });
 
   it("orders works by latest season or by highest rating", () => {
     const works = groupIntoWorks([
       { ...records[0], id: "a", series: "甲作品", rating: 7 },
-      { ...records[1], id: "a2", series: "甲作品", rating: 9, season: "2025春" },
-      { ...records[2], id: "b", series: "乙作品", rating: 10, season: "2020冬" },
+      {
+        ...records[1],
+        id: "a2",
+        series: "甲作品",
+        rating: 9,
+        season: "2025春",
+      },
+      {
+        ...records[2],
+        id: "b",
+        series: "乙作品",
+        rating: 10,
+        season: "2020冬",
+      },
     ]);
 
+    // 季度维度按最新档期：甲作品最新是 2025春，排在乙作品(2020冬)前。
     const bySeason = groupWorksByOrder(works, {
       group: "season",
       direction: "desc",
     });
     expect(bySeason[0].works.map((w) => w.key)).toEqual(["甲作品"]);
 
+    // 评分维度按最高分：甲作品最高 9（不是平均分），乙作品 10 在前。
     const byRating = groupWorksByOrder(works, {
       group: "rating",
       direction: "desc",
     });
-    // 甲作品最高分 9（不是平均分），乙作品 10 排在前面。
     expect(byRating[0].label).toBe("★ 10.0");
     expect(byRating[0].works.map((w) => w.key)).toEqual(["乙作品"]);
-  });
-
-  it("counts both scopes before the top-level scope is applied", () => {
-    const mixed: Anime[] = [
-      { ...records[0], id: "s-1", title: "独作", series: undefined },
-      { ...records[1], id: "g-1", title: "甲", series: "甲作品" },
-      { ...records[2], id: "g-2", title: "甲 第二季", series: "甲作品" },
-    ];
-    // 即使当前停在单作分类，作品计数也必须反映真实可用数量。
-    expect(
-      countArchiveScopes(mixed, { ...DEFAULT_ARCHIVE_FILTERS, scope: "solo" }),
-    ).toEqual({ solo: 1, work: 1 });
-    expect(
-      countArchiveScopes(mixed, { ...DEFAULT_ARCHIVE_FILTERS, scope: "work" }),
-    ).toEqual({ solo: 1, work: 1 });
   });
 
   it("requires every active condition to hold at once", () => {

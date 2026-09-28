@@ -2,12 +2,7 @@ import type { Anime } from "@/lib/types";
 import { normalizeMarks } from "@/lib/anime/marks";
 import { formatSeasonLabel } from "@/lib/season-label";
 import type { ArchiveWork } from "./works";
-import {
-  onlyGroupedWorks,
-  onlySoloRecords,
-  workKey,
-  workKeysMatchingMarks,
-} from "./works";
+import { workKey, workKeysMatchingMarks } from "./works";
 import type {
   ArchiveCardGroup,
   ArchiveDirection,
@@ -189,49 +184,21 @@ export function filterAnime(
 }
 
 /**
- * 条目级条件（关键词、年份、季度、最低评分）之后、顶层分类之前的中间结果。
- * 标记在这一层生效：作品里任意条目带标记即整部作品保留。
- */
-function entriesWithinMarks(data: Anime[], filters: ArchiveFilters): Anime[] {
-  const entryMatches = filterAnime(data, { ...filters, marks: [] });
-  if (filters.marks.length === 0) return entryMatches;
-  const matched = workKeysMatchingMarks(entryMatches, filters.marks);
-  return entryMatches.filter((anime) => matched.has(workKey(anime)));
-}
-
-/**
- * 两个分类各自的命中数。必须在顶层分类收敛之前统计，否则「作品」分类下
- * 永远只能看到已经筛成单作的结果，计数会恒为 0。
- */
-export function countArchiveScopes(
-  data: Anime[],
-  filters: ArchiveFilters,
-): { solo: number; work: number } {
-  const scoped = entriesWithinMarks(data, filters);
-  return {
-    solo: onlySoloRecords(scoped).length,
-    work: onlyGroupedWorks(scoped).length,
-  };
-}
-
-/**
- * 作品层筛选：顶层分类决定看哪一类，其余条件都作用到作品上——
- * 作品里任意条目命中，整部作品都保留。
+ * 条目级条件（关键词、年份、季度、最低评分）之后的结果。
+ * 标记在这一层生效：作品里任意条目带标记即整部作品都保留，
+ * 因此这一层必须拿到全量 data，不能只用已经过滤过的子集。
  *
- * 返回值仍是以条目为单位的数组，供统计与详情导航使用。
+ * 顶层分类（单作/作品）不参与过滤——它是同一批数据的两种显示方式：
+ * 单作一条记录一张卡，作品按 series 合并。切换只影响渲染。
  */
 export function filterAnimeByWorks(
   data: Anime[],
   filters: ArchiveFilters,
 ): Anime[] {
-  const scoped = entriesWithinMarks(data, filters);
-  if (filters.scope === "solo") return onlySoloRecords(scoped);
-  const keep = new Set(
-    onlyGroupedWorks(scoped).flatMap((work) =>
-      work.records.map((anime) => anime.id),
-    ),
-  );
-  return scoped.filter((anime) => keep.has(anime.id));
+  const entryMatches = filterAnime(data, { ...filters, marks: [] });
+  if (filters.marks.length === 0) return entryMatches;
+  const matched = workKeysMatchingMarks(entryMatches, filters.marks);
+  return entryMatches.filter((anime) => matched.has(workKey(anime)));
 }
 
 /**

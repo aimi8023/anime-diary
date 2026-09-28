@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Anime } from "@/lib/types";
 import {
-  countArchiveScopes,
   DEFAULT_ARCHIVE_FILTERS,
   filterAnimeByWorks,
   getArchiveOptions,
@@ -19,7 +18,7 @@ import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
 import ArchiveSearchBar from "./archive-search-bar";
-import { onlyGroupedWorks } from "@/lib/archive/works";
+import { groupIntoWorks } from "@/lib/archive/works";
 
 interface ArchiveBrowserProps {
   records: Anime[];
@@ -37,21 +36,14 @@ export default function ArchiveBrowser({
   // 只记住选中 id：筛选结果变化时自动派生记录与相邻关系。
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const options = useMemo(() => getArchiveOptions(records), [records]);
-  // 作品层筛选：条件与标记都作用在作品上，所以要拿全量 records。
+  // 筛选结果以条目为单位；标记按作品层生效，所以要拿全量 records。
   const filteredRecords = useMemo(
     () => filterAnimeByWorks(records, filters),
     [filters, records],
   );
-  // 「作品」分类下一部作品一张卡。
-  const works = useMemo(
-    () => (filters.scope === "work" ? onlyGroupedWorks(filteredRecords) : []),
-    [filteredRecords, filters.scope],
-  );
-  // 两个分类的命中数：必须在分类收敛之前统计。
-  const scopeCounts = useMemo(
-    () => countArchiveScopes(records, filters),
-    [filters, records],
-  );
+  // 同一批数据的两种显示：单作一条一卡，作品按 series 合并。
+  // 没有 series 的记录自己就是一部作品，因此单作 276 条会得到 239 部作品。
+  const works = useMemo(() => groupIntoWorks(filteredRecords), [filteredRecords]);
   const selectedIndex = filteredRecords.findIndex(
     (anime) => anime.id === selectedId,
   );
@@ -196,8 +188,8 @@ export default function ArchiveBrowser({
         resultCount={
           filters.scope === "work" ? works.length : filteredRecords.length
         }
-        soloCount={scopeCounts.solo}
-        workCount={scopeCounts.work}
+        soloCount={filteredRecords.length}
+        workCount={works.length}
       />
 
       {records.length === 0 ? (
@@ -222,7 +214,7 @@ export default function ArchiveBrowser({
             onClearFilters={clearFilters}
             onSelect={(anime) => setSelectedId(anime.id)}
             records={filteredRecords}
-            works={works}
+            works={filters.scope === "work" ? works : []}
           />
         </section>
       )}

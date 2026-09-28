@@ -101,23 +101,6 @@ export function groupIntoWorks(records: Anime[]): ArchiveWork[] {
   );
 }
 
-/**
- * 「作品」分类：带 series 的记录按作品集聚合。
- *
- * 注意不按条目数过滤：一条记录也可能刚被归进作品集、还没有同作品的其他条目。
- * 若要求两条以上，这类记录会在单作与作品两个分类里都看不到，等于凭空消失。
- */
-export function onlyGroupedWorks(records: Anime[]): ArchiveWork[] {
-  return groupIntoWorks(records).filter(
-    (work) => (work.records[0].series?.trim() ?? "").length > 0,
-  );
-}
-
-/** 「单作」分类：没有 series 的独立条目。 */
-export function onlySoloRecords(records: Anime[]): Anime[] {
-  return records.filter((anime) => (anime.series?.trim() ?? "").length === 0);
-}
-
 /** 作品视图里展示的标记：并集，未知的旧标记也保留。 */
 export function workDisplayMarks(work: ArchiveWork): string[] {
   return toDisplayMarks(work.records.flatMap((anime) => anime.marks ?? []));
