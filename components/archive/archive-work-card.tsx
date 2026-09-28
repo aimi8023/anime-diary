@@ -25,8 +25,8 @@ export default function ArchiveWorkCard({
   onSelect,
 }: ArchiveWorkCardProps) {
   const reduceMotion = useReducedMotion();
-  // 以最早一条为代表：封面和标题都来自它。
-  const primary = work.records[0];
+  // 以最新一条为代表：作品代表它最新的播出状态。
+  const primary = work.records[work.records.length - 1];
   const marks = toDisplayMarks(
     work.records.flatMap((anime) => anime.marks ?? []),
   );
@@ -97,17 +97,17 @@ export default function ArchiveWorkCard({
 
           <span
             className={`absolute right-2 top-2 rounded-full border border-white/80 px-2 py-0.5 text-[11px] font-black shadow-sm ${
-              work.averageRating !== null
+              work.maxRating !== null
                 ? "bg-[rgba(255,248,228,0.92)] text-[var(--warning)]"
                 : "bg-[rgba(255,255,255,0.85)] text-[var(--ink-subtle)]"
             }`}
           >
-            {work.averageRating !== null ? `★ ${work.averageRating}` : "未评分"}
+            {work.maxRating !== null ? `★ ${work.maxRating}` : "未评分"}
           </span>
 
           {work.isGrouped && (
             <span className="absolute bottom-2 left-2 rounded-full bg-[#211d35]/72 px-2 py-0.5 text-[10px] font-bold text-white">
-              {work.records.length} 条目
+              {work.records.length} 条目 · {work.latestSeasonLabel}
             </span>
           )}
         </div>

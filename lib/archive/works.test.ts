@@ -86,19 +86,29 @@ describe("groupIntoWorks", () => {
     ]);
   });
 
-  it("unions marks across entries and averages only rated ones", () => {
+  it("unions marks across entries and takes the highest rating and latest season", () => {
     const work = groupIntoWorks(records).find((w) => w.key === "无职转生");
     expect(work?.marks).toEqual(["rewatch", "sequel"]);
-    expect(work?.averageRating).toBe(9.7);
+    // 评分取最高分：10 / 10 / 9 → 10。
+    expect(work?.maxRating).toBe(10);
     expect(work?.ratedCount).toBe(3);
+    // 时间取最新档期。
+    expect(work?.latestSeason).toBe("2024夏");
+    expect(work?.latestSeasonLabel).toBe("2024年4月");
     expect(work?.seasonLabels).toEqual(["2021年1月", "2021年7月", "2024年4月"]);
   });
 
-  it("reports no average when nothing in the work is rated", () => {
+  it("reports no rating when nothing in the work is rated", () => {
     const unrated = records.map((r) => ({ ...r, rating: 0, marks: [] }));
     const work = groupIntoWorks(unrated).find((w) => w.key === "无职转生");
-    expect(work?.averageRating).toBeNull();
+    expect(work?.maxRating).toBeNull();
     expect(work?.ratedCount).toBe(0);
+  });
+
+  it("sorts works by their latest season", () => {
+    const works = groupIntoWorks(records);
+    // 芙莉莲最新 2023冬，早于无职转生的 2024夏。
+    expect(works.map((w) => w.latestSeason)).toEqual(["2023冬", "2024夏"]);
   });
 
   it("does not mutate the input array or its records", () => {

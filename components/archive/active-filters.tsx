@@ -2,6 +2,7 @@ import type {
   ArchiveDirection,
   ArchiveFilters,
   ArchiveGroup,
+  ArchiveScope,
 } from "@/lib/archive/types";
 import { archiveMarkLabel } from "@/lib/anime/marks";
 
@@ -12,12 +13,22 @@ interface ActiveFiltersProps {
   onRemove: (key: keyof ArchiveFilters, value?: string) => void;
   onGroupChange: (group: ArchiveGroup) => void;
   onDirectionChange: (direction: ArchiveDirection) => void;
-  onOpenYearArchive: () => void;
+  onScopeChange: (scope: ArchiveScope) => void;
+  /** 作品分类下的作品数（单作分类下为条目数）。 */
+  soloCount: number;
+  workCount: number;
 }
 
 const groupOptions: Array<{ value: ArchiveGroup; label: string }> = [
   { value: "season", label: "季度" },
   { value: "rating", label: "评分" },
+];
+
+const scopeOptions: Array<{
+  value: ArchiveScope;
+  label: string;
+}> = [
+  { value: "solo", label: "单作" },
   { value: "work", label: "作品" },
 ];
 
@@ -38,7 +49,9 @@ export default function ActiveFilters({
   onRemove,
   onGroupChange,
   onDirectionChange,
-  onOpenYearArchive,
+  onScopeChange,
+  soloCount,
+  workCount,
 }: ActiveFiltersProps) {
   const chips: Array<{
     key: keyof ArchiveFilters;
@@ -68,31 +81,42 @@ export default function ActiveFilters({
 
   return (
     <div className="mb-8 flex min-h-11 flex-wrap items-center gap-2 rounded-2xl px-1">
-      <button
-        className="ui-button ui-button-secondary min-h-9 px-3 py-2 text-xs"
-        onClick={onOpenYearArchive}
-        type="button"
+      <div
+        aria-label="分类"
+        className="flex items-center gap-1.5"
+        role="group"
       >
-        <svg
-          aria-hidden="true"
-          className="h-3.5 w-3.5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M4 19V9m5 10V5m5 14v-7m5 7V8"
-            strokeLinecap="round"
-          />
-        </svg>
-        年度档案
-      </button>
-      <p
-        aria-live="polite"
-        className="text-sm font-bold text-[var(--ink)]"
-      >
-        找到 {resultCount} 部
+        <span className="text-xs font-semibold text-[var(--ink-subtle)]">
+          分类
+        </span>
+        <div className="flex gap-1 rounded-full border border-white/80 bg-white/55 p-1">
+          {scopeOptions.map((option) => {
+            const active = filters.scope === option.value;
+            const count = option.value === "solo" ? soloCount : workCount;
+            return (
+              <button
+                aria-pressed={active}
+                className={`min-h-8 rounded-full px-3 text-xs font-bold transition-colors ${
+                  active
+                    ? "bg-white text-[var(--accent-strong)] shadow-sm"
+                    : "text-[var(--ink-muted)] hover:bg-white/70"
+                }`}
+                key={option.value}
+                onClick={() => onScopeChange(option.value)}
+                type="button"
+              >
+                {option.label}
+                <span className="ml-1 tabular-nums text-[10px] opacity-70">
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <p aria-live="polite" className="text-sm font-bold text-[var(--ink)]">
+        {filters.scope === "work" ? "找到" : "找到"} {resultCount}{" "}
+        {filters.scope === "work" ? "部作品" : "部"}
       </p>
       {chips.map((chip) => (
         <button

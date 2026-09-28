@@ -23,11 +23,15 @@ export interface ArchiveWork {
   isGrouped: boolean;
   /** 各条目的标记并集，按内置顺序。 */
   marks: string[];
-  /** 已评分条目的平均分；没有已评分条目时为 null。 */
-  averageRating: number | null;
-  /** 已评分条目数 / 总条目数，用于区分“未评分”与“均分 0”。 */
+  /** 该作品拿过的最高分；没有已评分条目时为 null。 */
+  maxRating: number | null;
+  /** 已评分条目数 / 总条目数。 */
   ratedCount: number;
-  /** 各条目档期的展示串，如 “2016年4月 · 2020年7月”。 */
+  /** 作品时间取最新一条的档期，作为排序与展示口径。 */
+  latestSeason: string;
+  /** 最新档期的展示串，如 “2024年4月”。 */
+  latestSeasonLabel: string;
+  /** 各条目档期的展示串，从早到晚。 */
   seasonLabels: string[];
 }
 
@@ -70,6 +74,8 @@ export function groupIntoWorks(records: Anime[]): ArchiveWork[] {
     );
     // 标记取并集：同一部作品里任意一条打了就算这部作品打过。
     const marks = normalizeMarks(sorted.flatMap((anime) => anime.marks ?? []));
+    // 时间口径取最新一条：作品代表它最新的播出状态。
+    const latest = sorted[sorted.length - 1];
 
     works.push({
       key,
@@ -78,20 +84,38 @@ export function groupIntoWorks(records: Anime[]): ArchiveWork[] {
       records: sorted,
       isGrouped: grouped,
       marks,
-      averageRating:
+      // 评分口径取最高分：一部作品记住它最好的一次。
+      maxRating:
         rated.length > 0
-          ? Math.round(
-              (rated.reduce((sum, anime) => sum + anime.rating, 0) /
-                rated.length) *
-                10,
-            ) / 10
+          ? Math.max(...rated.map((anime) => anime.rating))
           : null,
       ratedCount: rated.length,
+      latestSeason: latest.season,
+      latestSeasonLabel: formatSeasonLabel(latest.season),
       seasonLabels: sorted.map((anime) => formatSeasonLabel(anime.season)),
     });
   }
 
-  return works.sort((a, b) => compareBySeasonAsc(a.records[0], b.records[0]));
+  return works.sort((a, b) =>
+    compareBySeasonAsc(a.records[a.records.length - 1], b.records[b.records.length - 1]),
+  );
+}
+
+/**
+ * 「作品」分类：带 series 的记录按作品集聚合。
+ *
+ * 注意不按条目数过滤：一条记录也可能刚被归进作品集、还没有同作品的其他条目。
+ * 若要求两条以上，这类记录会在单作与作品两个分类里都看不到，等于凭空消失。
+ */
+export function onlyGroupedWorks(records: Anime[]): ArchiveWork[] {
+  return groupIntoWorks(records).filter(
+    (work) => (work.records[0].series?.trim() ?? "").length > 0,
+  );
+}
+
+/** 「单作」分类：没有 series 的独立条目。 */
+export function onlySoloRecords(records: Anime[]): Anime[] {
+  return records.filter((anime) => (anime.series?.trim() ?? "").length === 0);
 }
 
 /** 作品视图里展示的标记：并集，未知的旧标记也保留。 */

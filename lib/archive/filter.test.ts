@@ -2,17 +2,18 @@ import { describe, expect, it } from "vitest";
 import type { Anime } from "@/lib/types";
 import {
   countActiveArchiveFilters,
+  countArchiveScopes,
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
   filterAnimeByWorks,
   getArchiveOptions,
   getArchiveStats,
-  getYearlyRecap,
   groupArchive,
-  groupArchiveWorks,
+  groupWorksByOrder,
   parseArchiveFilters,
   serializeArchiveFilters,
 } from "./filter";
+import { groupIntoWorks } from "./works";
 
 const records: Anime[] = [
   {
@@ -105,6 +106,7 @@ describe("archive filter URL state", () => {
       // 去重并按内置顺序排列，未知标记被丢弃。
       marks: ["rewatch", "source"],
       rating: 8.5,
+      scope: "solo",
       group: "season",
       direction: "desc",
     });
@@ -217,11 +219,12 @@ describe("archive filtering and grouping", () => {
     const workRecords: Anime[] = [
       { ...records[0], id: "w-1", title: "甲", series: "甲作品", marks: ["rewatch"] },
       { ...records[1], id: "w-2", title: "甲 第二季", series: "甲作品" },
-      { ...records[2], id: "w-3", title: "乙", marks: ["sequel"] },
+      { ...records[2], id: "w-3", title: "乙", series: "乙作品", marks: ["sequel"] },
     ];
     const byMark = (marks: string[]) =>
       filterAnimeByWorks(workRecords, {
         ...DEFAULT_ARCHIVE_FILTERS,
+        scope: "work",
         marks,
       })
         .map((anime) => anime.id)
@@ -240,28 +243,87 @@ describe("archive filtering and grouping", () => {
     expect(
       filterAnimeByWorks(workRecords, {
         ...DEFAULT_ARCHIVE_FILTERS,
+        scope: "work",
         marks: ["rewatch"],
         year: "2024",
       }).map((anime) => anime.id),
     ).toEqual(["w-1"]);
   });
 
-  it("returns a single group for the work dimension and reverses with direction", () => {
-    const workRecords: Anime[] = [
-      { ...records[0], id: "w-1", title: "甲", season: "2024夏", series: "甲作品" },
-      { ...records[1], id: "w-2", title: "乙", season: "2025春" },
+  it("splits the archive into solo works and grouped works by scope", () => {
+    const mixed: Anime[] = [
+      { ...records[0], id: "s-1", title: "独作", series: undefined },
+      { ...records[1], id: "g-1", title: "甲", series: "甲作品" },
+      { ...records[2], id: "g-2", title: "甲 第二季", series: "甲作品" },
     ];
+    const ids = (scope: "solo" | "work") =>
+      filterAnimeByWorks(mixed, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        scope,
+      })
+        .map((anime) => anime.id)
+        .sort();
 
-    // desc 为新→旧：乙(2025春) 在前，甲作品(2024夏) 在后。
-    const desc = groupArchiveWorks(workRecords, { group: "work", direction: "desc" });
-    expect(desc).toHaveLength(1);
-    expect(desc[0].works.map((w) => w.key)).toEqual(["w-2", "甲作品"]);
+    // 单作是默认分类，只保留没有 series 的记录。
+    expect(DEFAULT_ARCHIVE_FILTERS.scope).toBe("solo");
+    expect(ids("solo")).toEqual(["s-1"]);
+    expect(ids("work")).toEqual(["g-1", "g-2"]);
+  });
 
-    const asc = groupArchiveWorks(workRecords, { group: "work", direction: "asc" });
-    expect(asc[0].works.map((w) => w.key)).toEqual(["甲作品", "w-2"]);
+  it("keeps a lone series entry visible in the work scope", () => {
+    // 只带 series 还没有同作品兄弟的记录，不能在两个分类里都消失。
+    const lone: Anime[] = [
+      { ...records[0], id: "l-1", title: "刚归集", series: "未来作品集" },
+    ];
+    expect(
+      filterAnimeByWorks(lone, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        scope: "work",
+      }).map((anime) => anime.id),
+    ).toEqual(["l-1"]);
+    expect(
+      filterAnimeByWorks(lone, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        scope: "solo",
+      }),
+    ).toEqual([]);
+  });
 
-    // 非作品维度不返回分组。
-    expect(groupArchiveWorks(workRecords, { group: "season", direction: "desc" })).toEqual([]);
+  it("orders works by latest season or by highest rating", () => {
+    const works = groupIntoWorks([
+      { ...records[0], id: "a", series: "甲作品", rating: 7 },
+      { ...records[1], id: "a2", series: "甲作品", rating: 9, season: "2025春" },
+      { ...records[2], id: "b", series: "乙作品", rating: 10, season: "2020冬" },
+    ]);
+
+    const bySeason = groupWorksByOrder(works, {
+      group: "season",
+      direction: "desc",
+    });
+    expect(bySeason[0].works.map((w) => w.key)).toEqual(["甲作品"]);
+
+    const byRating = groupWorksByOrder(works, {
+      group: "rating",
+      direction: "desc",
+    });
+    // 甲作品最高分 9（不是平均分），乙作品 10 排在前面。
+    expect(byRating[0].label).toBe("★ 10.0");
+    expect(byRating[0].works.map((w) => w.key)).toEqual(["乙作品"]);
+  });
+
+  it("counts both scopes before the top-level scope is applied", () => {
+    const mixed: Anime[] = [
+      { ...records[0], id: "s-1", title: "独作", series: undefined },
+      { ...records[1], id: "g-1", title: "甲", series: "甲作品" },
+      { ...records[2], id: "g-2", title: "甲 第二季", series: "甲作品" },
+    ];
+    // 即使当前停在单作分类，作品计数也必须反映真实可用数量。
+    expect(
+      countArchiveScopes(mixed, { ...DEFAULT_ARCHIVE_FILTERS, scope: "solo" }),
+    ).toEqual({ solo: 1, work: 1 });
+    expect(
+      countArchiveScopes(mixed, { ...DEFAULT_ARCHIVE_FILTERS, scope: "work" }),
+    ).toEqual({ solo: 1, work: 1 });
   });
 
   it("requires every active condition to hold at once", () => {
@@ -272,6 +334,7 @@ describe("archive filtering and grouping", () => {
         season: "夏",
         marks: [],
         rating: 8,
+        scope: "solo",
         group: "season",
         direction: "desc",
       }).map((anime) => anime.id),
@@ -412,23 +475,6 @@ describe("archive filtering and grouping", () => {
     expect(last.records.map((anime) => anime.id)).toEqual(["anime-0"]);
   });
 
-  it("excludes unrated records from yearly averages and top work", () => {
-    const mixed: Anime[] = [
-      { ...records[2] },
-      { ...records[2], id: "anime-x", title: "未评分", rating: 0 },
-    ];
-
-    const [recap] = getYearlyRecap(mixed);
-    expect(recap.total).toBe(2);
-    expect(recap.averageRating).toBe(9.5);
-    expect(recap.topAnime?.title).toBe(records[2].title);
-
-    const [allUnrated] = getYearlyRecap([
-      { ...records[2], id: "anime-y", rating: 0 },
-    ]);
-    expect(allUnrated.averageRating).toBeNull();
-    expect(allUnrated.topAnime).toBeNull();
-  });
 
   it("returns unique browse options and archive statistics", () => {
     expect(getArchiveOptions(records)).toEqual({
@@ -453,121 +499,3 @@ describe("archive filtering and grouping", () => {
   });
 });
 
-describe("getYearlyRecap", () => {
-  const recapRecords: Anime[] = [
-    {
-      id: "a",
-      title: "甲",
-      season: "2024夏",
-      cover: "",
-      rating: 9,
-      comment: "",
-      episodes: 12,
-      tags: ["日常", "治愈"],
-      createdAt: "2024-07-01T00:00:00.000Z",
-    },
-    {
-      id: "b",
-      title: "乙",
-      season: "2024冬",
-      cover: "",
-      rating: 8,
-      comment: "",
-      episodes: 12,
-      tags: ["日常"],
-      createdAt: "2024-01-01T00:00:00.000Z",
-    },
-    {
-      id: "c",
-      title: "丙",
-      season: "2023秋",
-      cover: "",
-      rating: 9,
-      comment: "",
-      episodes: 24,
-      tags: ["奇幻"],
-      createdAt: "2023-10-01T00:00:00.000Z",
-    },
-    {
-      id: "d",
-      title: "缺季度",
-      season: "其他",
-      cover: "",
-      rating: 10,
-      comment: "",
-      episodes: 1,
-      tags: [],
-      createdAt: "2024-02-01T00:00:00.000Z",
-    },
-  ];
-
-  it("aggregates per year and excludes records without a season year", () => {
-    expect(getYearlyRecap(recapRecords)).toEqual([
-      {
-        year: "2024",
-        total: 2,
-        averageRating: 8.5,
-        topAnime: { title: "甲", rating: 9 },
-        topTags: ["日常", "治愈"],
-        episodesTotal: 24,
-        topRatedCount: 1,
-        seasonCounts: [
-          { season: "夏", count: 1 },
-          { season: "冬", count: 1 },
-        ],
-      },
-      {
-        year: "2023",
-        total: 1,
-        averageRating: 9,
-        topAnime: { title: "丙", rating: 9 },
-        topTags: ["奇幻"],
-        episodesTotal: 24,
-        topRatedCount: 1,
-        seasonCounts: [{ season: "秋", count: 1 }],
-      },
-    ]);
-  });
-
-  it("breaks rating ties by title order and caps tags at three", () => {
-    const tied: Anime[] = [
-      {
-        id: "t2",
-        title: "乙",
-        season: "2025春",
-        cover: "",
-        rating: 9,
-        comment: "",
-        episodes: 1,
-        tags: ["A", "B", "C", "D"],
-        createdAt: "2025-04-01T00:00:00.000Z",
-      },
-      {
-        id: "t1",
-        title: "甲",
-        season: "2025夏",
-        cover: "",
-        rating: 9,
-        comment: "",
-        episodes: 1,
-        tags: ["A"],
-        createdAt: "2025-07-01T00:00:00.000Z",
-      },
-    ];
-
-    const recap = getYearlyRecap(tied);
-    // 平分时取标题顺序靠前的作品。
-    expect(recap[0].topAnime).toEqual({ title: "甲", rating: 9 });
-    expect(recap[0].topTags).toEqual(["A", "B", "C"]);
-    expect(recap[0].episodesTotal).toBe(2);
-    expect(recap[0].topRatedCount).toBe(2);
-    expect(recap[0].seasonCounts).toEqual([
-      { season: "春", count: 1 },
-      { season: "夏", count: 1 },
-    ]);
-  });
-
-  it("returns an empty recap for empty data", () => {
-    expect(getYearlyRecap([])).toEqual([]);
-  });
-});

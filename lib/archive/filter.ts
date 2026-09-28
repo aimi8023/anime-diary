@@ -1,7 +1,13 @@
 import type { Anime } from "@/lib/types";
 import { normalizeMarks } from "@/lib/anime/marks";
 import { formatSeasonLabel } from "@/lib/season-label";
-import { groupIntoWorks, workKey, workKeysMatchingMarks } from "./works";
+import type { ArchiveWork } from "./works";
+import {
+  onlyGroupedWorks,
+  onlySoloRecords,
+  workKey,
+  workKeysMatchingMarks,
+} from "./works";
 import type {
   ArchiveCardGroup,
   ArchiveDirection,
@@ -10,8 +16,6 @@ import type {
   ArchiveOptions,
   ArchiveSearchParams,
   ArchiveStats,
-  ArchiveWorkGroup,
-  YearRecap,
 } from "./types";
 
 export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
@@ -20,6 +24,7 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   season: "",
   marks: [],
   rating: null,
+  scope: "solo",
   group: "season",
   direction: "desc",
 };
@@ -70,6 +75,7 @@ export function parseArchiveFilters(
       .map((mark) => mark.trim())
       .filter(Boolean),
   );
+  const scopeValue = readParam(params, "scope")?.trim() ?? "";
 
   return {
     q: readParam(params, "q")?.trim() ?? "",
@@ -79,10 +85,10 @@ export function parseArchiveFilters(
       : "",
     marks,
     rating: parseRating(readParam(params, "rating")),
+    // 单作是默认分类：绝大多数记录本身就是一部完整作品。
+    scope: scopeValue === "work" ? "work" : "solo",
     // 兼容旧版参数：group=year 与旧 sort 值都归入季度维度。
-    group: ["rating", "work"].includes(groupValue)
-      ? (groupValue as ArchiveGroup)
-      : "season",
+    group: groupValue === "rating" ? "rating" : "season",
     direction: dirValue === "asc" ? "asc" : "desc",
   };
 }
@@ -96,6 +102,8 @@ export function serializeArchiveFilters(
   if (filters.season) params.set("season", filters.season);
   if (filters.marks.length > 0) params.set("mark", filters.marks.join(","));
   if (filters.rating !== null) params.set("rating", String(filters.rating));
+  // 单作是默认值，不写入 URL。
+  if (filters.scope !== "solo") params.set("scope", filters.scope);
   if (filters.group !== "season") params.set("group", filters.group);
   if (filters.direction !== "desc") params.set("dir", filters.direction);
   return params;
@@ -181,25 +189,55 @@ export function filterAnime(
 }
 
 /**
- * 标记按作品层筛选：只要一部作品里任意一条带该标记，整部作品的条目都保留。
- * 因此这一层必须拿到全量 data，不能只用已经过滤过的结果。
- * 其余条件（关键词、年份、季度、最低评分）仍然是条目级的。
+ * 条目级条件（关键词、年份、季度、最低评分）之后、顶层分类之前的中间结果。
+ * 标记在这一层生效：作品里任意条目带标记即整部作品保留。
+ */
+function entriesWithinMarks(data: Anime[], filters: ArchiveFilters): Anime[] {
+  const entryMatches = filterAnime(data, { ...filters, marks: [] });
+  if (filters.marks.length === 0) return entryMatches;
+  const matched = workKeysMatchingMarks(entryMatches, filters.marks);
+  return entryMatches.filter((anime) => matched.has(workKey(anime)));
+}
+
+/**
+ * 两个分类各自的命中数。必须在顶层分类收敛之前统计，否则「作品」分类下
+ * 永远只能看到已经筛成单作的结果，计数会恒为 0。
+ */
+export function countArchiveScopes(
+  data: Anime[],
+  filters: ArchiveFilters,
+): { solo: number; work: number } {
+  const scoped = entriesWithinMarks(data, filters);
+  return {
+    solo: onlySoloRecords(scoped).length,
+    work: onlyGroupedWorks(scoped).length,
+  };
+}
+
+/**
+ * 作品层筛选：顶层分类决定看哪一类，其余条件都作用到作品上——
+ * 作品里任意条目命中，整部作品都保留。
+ *
+ * 返回值仍是以条目为单位的数组，供统计与详情导航使用。
  */
 export function filterAnimeByWorks(
   data: Anime[],
   filters: ArchiveFilters,
 ): Anime[] {
-  const entryMatches = filterAnime(data, { ...filters, marks: [] });
-  if (filters.marks.length === 0) return entryMatches;
-  const matched = workKeysMatchingMarks(data, filters.marks);
-  return entryMatches.filter((anime) => matched.has(workKey(anime)));
+  const scoped = entriesWithinMarks(data, filters);
+  if (filters.scope === "solo") return onlySoloRecords(scoped);
+  const keep = new Set(
+    onlyGroupedWorks(scoped).flatMap((work) =>
+      work.records.map((anime) => anime.id),
+    ),
+  );
+  return scoped.filter((anime) => keep.has(anime.id));
 }
 
 /**
  * 把筛选结果切成横向卡片行：
  * - 季度维度：一行一个播出档期（“2024年4月”“2024年1月”…，“其他”始终最后）；
  * - 评分维度：一行一个评分档（10.0、9.5、9.0…），不按档期分割。
- * 「按作品」维度由 groupArchiveWorks 单独处理。
  * 不修改调用方数组。
  */
 export function groupArchive(
@@ -243,21 +281,54 @@ export function groupArchive(
       records: [...bucket.records].sort((a, b) =>
         compareByGroup(a, b, filters.group, filters.direction),
       ),
+      works: [],
     }));
 }
 
 /**
- * 「按作品」视图：不分行，整批作品作为一个分组返回。
- * 升序按最早档期从早到晚，降序相反。
+ * 「作品」分类下的排列：一部作品一组。
+ * 季度维度按最新档期，评分维度按最高分，方向与工具栏一致。
  */
-export function groupArchiveWorks(
-  data: Anime[],
+export function groupWorksByOrder(
+  works: ArchiveWork[],
   filters: Pick<ArchiveFilters, "group" | "direction">,
-): ArchiveWorkGroup[] {
-  if (filters.group !== "work") return [];
-  const works = groupIntoWorks(data);
-  if (filters.direction === "asc") return [{ key: "works", label: "作品", works }];
-  return [{ key: "works", label: "作品", works: [...works].reverse() }];
+): ArchiveCardGroup[] {
+  const flip = filters.direction === "asc" ? 1 : -1;
+  const buckets = new Map<string, { sortKey: number; works: ArchiveWork[] }>();
+
+  for (const work of works) {
+    const key = filters.group === "rating" ? `★${work.maxRating ?? "未评分"}` : work.latestSeason;
+    const sortKey =
+      filters.group === "rating"
+        ? (work.maxRating ?? -1)
+        : seasonSortKey(work.latestSeason);
+    const bucket = buckets.get(key) ?? { sortKey, works: [] };
+    bucket.works.push(work);
+    buckets.set(key, bucket);
+  }
+
+  return Array.from(buckets.entries())
+    .sort(([, a], [, b]) => {
+      if (a.sortKey === 0) return 1;
+      if (b.sortKey === 0) return -1;
+      return (a.sortKey - b.sortKey) * flip;
+    })
+    .map(([key, bucket]) => ({
+      key,
+      label:
+        filters.group === "rating"
+          ? key === "★未评分"
+            ? "未评分"
+            : `★ ${Number(key.slice(1)).toFixed(1)}`
+          : formatSeasonLabel(key),
+      // 每组内再按作品名排，保证同一行内顺序稳定。
+      records: bucket.works
+        .sort((a, b) => a.name.localeCompare(b.name, "zh-CN"))
+        .map((work) => work.records[0]),
+      works: bucket.works.sort((a, b) =>
+        a.name.localeCompare(b.name, "zh-CN"),
+      ),
+    }));
 }
 
 export function getArchiveOptions(data: Anime[]): ArchiveOptions {  const years = Array.from(
@@ -278,103 +349,4 @@ export function getArchiveStats(data: Anime[]): ArchiveStats {
     earliestYear: years.length > 0 ? years[years.length - 1] : null,
     latestYear: years[0] ?? null,
   };
-}
-
-/**
- * 年度回顾：按年聚合部数、平均分、最高分作品与高频标签。
- * 季度缺失（“其他”）的记录不参与年度聚合；不修改调用方数组。
- */
-export function getYearlyRecap(data: Anime[]): YearRecap[] {
-  const byYear = new Map<string, Anime[]>();
-  for (const anime of data) {
-    const { year } = seasonParts(anime.season);
-    if (year === "其他") continue;
-    const records = byYear.get(year) ?? [];
-    records.push(anime);
-    byYear.set(year, records);
-  }
-
-  return Array.from(byYear.entries())
-    .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-    .map(([year, records]) => {
-      const total = records.length;
-      // 未评分（rating 0）不参与均分统计。
-      const ratedRecords = records.filter(
-        (anime) => Number.isFinite(anime.rating) && anime.rating > 0,
-      );
-      const ratingSum = ratedRecords.reduce(
-        (sum, anime) => sum + anime.rating,
-        0,
-      );
-      const averageRating =
-        ratedRecords.length > 0
-          ? Math.round((ratingSum / ratedRecords.length) * 10) / 10
-          : null;
-
-      const episodesTotal = records.reduce(
-        (sum, anime) =>
-          sum + (Number.isInteger(anime.episodes) && anime.episodes > 0
-            ? anime.episodes
-            : 0),
-        0,
-      );
-      const topRatedCount = records.filter(
-        (anime) => Number.isFinite(anime.rating) && anime.rating >= 9,
-      ).length;
-
-      const countsBySeason = new Map<string, number>();
-      for (const anime of records) {
-        const match = anime.season.match(/^(?:\d{4})([春夏秋冬])$/);
-        const seasonName = match?.[1];
-        if (!seasonName) continue;
-        countsBySeason.set(
-          seasonName,
-          (countsBySeason.get(seasonName) ?? 0) + 1,
-        );
-      }
-      const seasonCounts = (["春", "夏", "秋", "冬"] as const)
-        .filter((season) => countsBySeason.has(season))
-        .map((season) => ({
-          season,
-          count: countsBySeason.get(season) ?? 0,
-        }));
-
-      const topAnime = records.reduce<Anime | null>((best, anime) => {
-        if (!Number.isFinite(anime.rating) || anime.rating <= 0) return best;
-        if (!best) return anime;
-        if (anime.rating > best.rating) return anime;
-        if (
-          anime.rating === best.rating &&
-          anime.title.localeCompare(best.title, "zh-CN") < 0
-        ) {
-          return anime;
-        }
-        return best;
-      }, null);
-
-      const tagCounts = new Map<string, number>();
-      for (const anime of records) {
-        for (const tag of anime.tags ?? []) {
-          tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
-        }
-      }
-      const topTags = Array.from(tagCounts.entries())
-        .sort(([tagA, countA], [tagB, countB]) =>
-          countB - countA || tagA.localeCompare(tagB, "zh-CN"))
-        .slice(0, 3)
-        .map(([tag]) => tag);
-
-      return {
-        year,
-        total,
-        averageRating,
-        topAnime: topAnime
-          ? { title: topAnime.title, rating: topAnime.rating }
-          : null,
-        topTags,
-        episodesTotal,
-        topRatedCount,
-        seasonCounts,
-      };
-    });
 }

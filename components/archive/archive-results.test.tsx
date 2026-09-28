@@ -47,6 +47,7 @@ function renderResults(
       onClearFilters={vi.fn()}
       onSelect={onSelect}
       records={overrides.records ?? records}
+      works={[]}
     />,
   );
   return { container, onSelect };
@@ -153,6 +154,7 @@ describe("ArchiveResults", () => {
         onClearFilters={onClearFilters}
         onSelect={vi.fn()}
         records={[]}
+        works={[]}
       />,
     );
 

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Anime } from "@/lib/types";
 import {
+  countArchiveScopes,
   DEFAULT_ARCHIVE_FILTERS,
   filterAnimeByWorks,
   getArchiveOptions,
@@ -18,7 +19,7 @@ import ArchiveHero from "./archive-hero";
 import AnimeDetailDialog from "./anime-detail-dialog";
 import ArchiveResults from "./archive-results";
 import ArchiveSearchBar from "./archive-search-bar";
-import YearDrawer from "./year-drawer";
+import { onlyGroupedWorks } from "@/lib/archive/works";
 
 interface ArchiveBrowserProps {
   records: Anime[];
@@ -36,12 +37,21 @@ export default function ArchiveBrowser({
   // 只记住选中 id：筛选结果变化时自动派生记录与相邻关系。
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const options = useMemo(() => getArchiveOptions(records), [records]);
-  // 标记按作品层筛选，所以要拿全量 records 参与判断。
+  // 作品层筛选：条件与标记都作用在作品上，所以要拿全量 records。
   const filteredRecords = useMemo(
     () => filterAnimeByWorks(records, filters),
     [filters, records],
   );
-  const [yearDrawerOpen, setYearDrawerOpen] = useState(false);
+  // 「作品」分类下一部作品一张卡。
+  const works = useMemo(
+    () => (filters.scope === "work" ? onlyGroupedWorks(filteredRecords) : []),
+    [filteredRecords, filters.scope],
+  );
+  // 两个分类的命中数：必须在分类收敛之前统计。
+  const scopeCounts = useMemo(
+    () => countArchiveScopes(records, filters),
+    [filters, records],
+  );
   const selectedIndex = filteredRecords.findIndex(
     (anime) => anime.id === selectedId,
   );
@@ -181,9 +191,13 @@ export default function ArchiveBrowser({
         onClear={clearFilters}
         onDirectionChange={(direction) => updateFilters({ direction })}
         onGroupChange={(group) => updateFilters({ group })}
-        onOpenYearArchive={() => setYearDrawerOpen(true)}
         onRemove={removeFilter}
-        resultCount={filteredRecords.length}
+        onScopeChange={(scope) => updateFilters({ scope })}
+        resultCount={
+          filters.scope === "work" ? works.length : filteredRecords.length
+        }
+        soloCount={scopeCounts.solo}
+        workCount={scopeCounts.work}
       />
 
       {records.length === 0 ? (
@@ -208,6 +222,7 @@ export default function ArchiveBrowser({
             onClearFilters={clearFilters}
             onSelect={(anime) => setSelectedId(anime.id)}
             records={filteredRecords}
+            works={works}
           />
         </section>
       )}
@@ -224,22 +239,6 @@ export default function ArchiveBrowser({
         }
         sharePath={selectedAnime ? `/?anime=${selectedAnime.id}` : null}
       />
-      <YearDrawer
-        onClose={() => setYearDrawerOpen(false)}
-        onSelect={(anime) => {
-          // 抽屉里的作品可能不在当前筛选结果中，先还原筛选再打开详情。
-          setQueryDraft("");
-          setFilters((current) => ({
-            ...DEFAULT_ARCHIVE_FILTERS,
-            group: current.group,
-            direction: current.direction,
-          }));
-          setYearDrawerOpen(false);
-          setSelectedId(anime.id);
-        }}
-        open={yearDrawerOpen}
-        records={records}
-      />
-    </div>
-  );
+  </div>
+);
 }

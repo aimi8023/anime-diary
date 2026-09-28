@@ -2,13 +2,16 @@
 
 import type { Anime } from "@/lib/types";
 import type { ArchiveCardGroup, ArchiveFilters } from "@/lib/archive/types";
-import { groupArchive, groupArchiveWorks } from "@/lib/archive/filter";
+import { groupArchive, groupWorksByOrder } from "@/lib/archive/filter";
+import type { ArchiveWork } from "@/lib/archive/works";
 import { formatSeasonLabel } from "@/lib/season-label";
 import ArchiveAnimeCard from "./archive-anime-card";
 import ArchiveWorkCard from "./archive-work-card";
 
 interface ArchiveResultsProps {
   records: Anime[];
+  /** 「作品」分类下已聚合好的作品；单作分类传空数组。 */
+  works: ArchiveWork[];
   filters: ArchiveFilters;
   onSelect: (anime: Anime) => void;
   onClearFilters: () => void;
@@ -20,6 +23,7 @@ const GRID_CLASS =
 
 export default function ArchiveResults({
   records,
+  works,
   filters,
   onSelect,
   onClearFilters,
@@ -50,22 +54,19 @@ export default function ArchiveResults({
     );
   }
 
-  const groups: ArchiveCardGroup[] = groupArchive(records, filters);
-  const showSeasonLabel = filters.group === "rating";
-
-  // 「按作品」维度：一部作品一张卡，不再按季度或评分分行。
-  if (filters.group === "work") {
-    const workGroups = groupArchiveWorks(records, filters);
+  // 「作品」分类：一部作品一张卡，排列仍可用季度或评分。
+  if (filters.scope === "work") {
+    const workGroups = groupWorksByOrder(works, filters);
     return (
       <div className="space-y-10">
         {workGroups.map((group) => (
           <section aria-label={group.label} key={group.key}>
             <div className="mb-3 flex items-baseline gap-2">
               <h3 className="text-base font-black tracking-tight text-[var(--ink)]">
-                {group.works.length} 部作品
+                {group.label}
               </h3>
               <span className="text-xs text-[var(--ink-subtle)]">
-                共 {records.length} 个条目
+                {group.works.length} 部作品
               </span>
             </div>
             <div className={GRID_CLASS}>
@@ -83,6 +84,9 @@ export default function ArchiveResults({
       </div>
     );
   }
+
+  const groups: ArchiveCardGroup[] = groupArchive(records, filters);
+  const showSeasonLabel = filters.group === "rating";
 
   return (
     <div className="space-y-10">

@@ -1,7 +1,13 @@
 import type { Anime } from "@/lib/types";
+import type { ArchiveWork } from "./works";
 
-/** 档案的排列维度：按播出季度（1/4/7/10 月档期）、按评分分段、按作品聚合。 */
-export type ArchiveGroup = "season" | "rating" | "work";
+/** 档案的排列维度：按播出季度（1/4/7/10 月档期）、按评分分段。 */
+export type ArchiveGroup = "season" | "rating";
+/**
+ * 顶层分类：单作 = 没有归集的独立作品；作品 = 归集了分季/上下半/剧场版的作品。
+ * 每个番都是作品，区别只在于它是一条还是多条归在一起。
+ */
+export type ArchiveScope = "solo" | "work";
 /** 组间与组内的排列方向。 */
 export type ArchiveDirection = "asc" | "desc";
 
@@ -16,22 +22,17 @@ export interface ArchiveFilters {
   season: "" | "春" | "夏" | "秋" | "冬";
   marks: string[];
   rating: number | null;
+  scope: ArchiveScope;
   group: ArchiveGroup;
   direction: ArchiveDirection;
 }
 
-/** 排列后的一个横向卡片行。 */
+/** 排列后的一个横向卡片行。`works` 只在「作品」分类下非空。 */
 export interface ArchiveCardGroup {
   key: string;
   label: string;
   records: Anime[];
-}
-
-/** 「按作品」视图下的一组：同一部作品的全部条目。 */
-export interface ArchiveWorkGroup {
-  key: string;
-  label: string;
-  works: import("@/lib/archive/works").ArchiveWork[];
+  works: ArchiveWork[];
 }
 
 export interface ArchiveStats {
@@ -43,21 +44,4 @@ export interface ArchiveStats {
 
 export interface ArchiveOptions {
   years: string[];
-}
-
-export interface YearRecap {
-  year: string;
-  total: number;
-  /** 年度平均分，保留一位小数；该年没有已评分记录时为 null。 */
-  averageRating: number | null;
-  /** 年度最高分作品；并列时取标题顺序靠前者。 */
-  topAnime: { title: string; rating: number } | null;
-  /** 出现最多的标签，至多 3 个；并列时按标题顺序。 */
-  topTags: string[];
-  /** 年度总话数（不含未知话数）。 */
-  episodesTotal: number;
-  /** 9 分及以上的记录数。 */
-  topRatedCount: number;
-  /** 各季度部数，按春/夏/秋/冬排列，只含有记录的季度。 */
-  seasonCounts: Array<{ season: string; count: number }>;
 }
