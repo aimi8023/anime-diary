@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import type { AnimeInput } from "@/lib/types";
 import { ARCHIVE_MARKS } from "@/lib/anime/marks";
+import { suggestSeries } from "@/lib/anime/series-match";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 
 const SEASONS = [
@@ -55,6 +56,25 @@ export default function AnimeForm({
   const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
   const [marks, setMarks] = useState<string[]>(initial?.marks ?? []);
   const [series, setSeries] = useState(initial?.series ?? "");
+  // 猜中的候选被用户忽略后就不再提示，避免每次改动标题都弹回来。
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<string[]>([]);
+  const [showSeriesPicker, setShowSeriesPicker] = useState(false);
+  const [seriesQuery, setSeriesQuery] = useState("");
+  const knownSeriesOptions = useMemo(
+    () => [...new Set(knownSeries.map((name) => name.trim()).filter(Boolean))],
+    [knownSeries],
+  );
+
+  // 大多数新增记录本身就是一部完整作品，所以默认「独立作品」什么都不用填。
+  // 只有标题看起来像已有作品时才提示一键归集。
+  const seriesSuggestions = useMemo(
+    () =>
+      suggestSeries(
+        title,
+        knownSeriesOptions.map((name) => ({ name, memberCount: 1 })),
+      ).filter((match) => !dismissedSuggestions.includes(match.series)),
+    [title, knownSeriesOptions, dismissedSuggestions],
+  );
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -148,9 +168,6 @@ export default function AnimeForm({
   const availableSuggestedTags = [
     ...new Set(suggestedTags.map((tag) => tag.trim()).filter(Boolean)),
   ].filter((tag) => !tags.includes(tag));
-  const knownSeriesOptions = [
-    ...new Set(knownSeries.map((name) => name.trim()).filter(Boolean)),
-  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -385,29 +402,112 @@ export default function AnimeForm({
 
       {/* Series */}
       <div>
-        <label
-          className="mb-2 block text-sm font-bold text-[var(--ink)]"
-          htmlFor="anime-form-series"
-        >
-          作品集
-        </label>
-        <input
-          className={inputClass}
-          id="anime-form-series"
-          list="anime-form-series-options"
-          onChange={(e) => setSeries(e.target.value)}
-          placeholder="留空表示这是一部完整作品"
-          type="text"
-          value={series}
-        />
-        <datalist id="anime-form-series-options">
-          {knownSeriesOptions.map((name) => (
-            <option key={name} value={name} />
-          ))}
-        </datalist>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <span className="text-sm font-bold text-[var(--ink)]">作品集</span>
+          {series ? (
+            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-[rgba(219,79,135,0.3)] bg-[var(--accent-soft)] px-3 text-xs font-bold text-[var(--accent-strong)]">
+              {series}
+              <button
+                aria-label="改为独立作品"
+                className="text-[var(--accent-strong)]"
+                onClick={() => setSeries("")}
+                type="button"
+              >
+                ×
+              </button>
+            </span>
+          ) : (
+            <span className="text-xs text-[var(--ink-muted)]">
+              独立作品（默认）
+            </span>
+          )}
+          <button
+            className="ui-button ui-button-secondary min-h-8 px-3 text-xs"
+            onClick={() => setShowSeriesPicker((open) => !open)}
+            type="button"
+          >
+            {showSeriesPicker ? "收起" : "手动选择"}
+          </button>
+        </div>
+
+        {/* 标题像已有作品时给出的一键归集：点一下即可，不用自己打名字。 */}
+        {!series && seriesSuggestions.length > 0 && (
+          <div className="mb-2 rounded-xl border border-[rgba(219,79,135,0.24)] bg-[var(--accent-soft)] p-3">
+            <p className="text-xs font-semibold text-[var(--accent-strong)]">
+              疑似已有同作品：
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {seriesSuggestions.map((match) => (
+                <button
+                  className="ui-chip ui-chip-active px-3 text-xs"
+                  key={match.series}
+                  onClick={() => setSeries(match.series)}
+                  type="button"
+                >
+                  归入《{match.series}》
+                </button>
+              ))}
+              <button
+                className="ui-chip px-3 text-xs"
+                onClick={() =>
+                  setDismissedSuggestions((current) => [
+                    ...current,
+                    ...seriesSuggestions.map((m) => m.series),
+                  ])
+                }
+                type="button"
+              >
+                都不是，独立作品
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showSeriesPicker && (
+          <div className="rounded-xl border border-white/85 bg-white/70 p-3">
+            <input
+              aria-label="搜索作品集"
+              className={inputClass}
+              onChange={(e) => setSeriesQuery(e.target.value)}
+              placeholder="搜索已有作品集…"
+              type="search"
+              value={seriesQuery}
+            />
+            <div className="mt-2 flex max-h-40 flex-wrap gap-1.5 overflow-y-auto">
+              {knownSeriesOptions
+                .filter((name) =>
+                  seriesQuery.trim()
+                    ? name.includes(seriesQuery.trim())
+                    : true,
+                )
+                .map((name) => (
+                  <button
+                    className="ui-chip px-3 text-xs"
+                    key={name}
+                    onClick={() => {
+                      setSeries(name);
+                      setShowSeriesPicker(false);
+                      setSeriesQuery("");
+                    }}
+                    type="button"
+                  >
+                    {name}
+                  </button>
+                ))}
+              {knownSeriesOptions.filter((name) =>
+                seriesQuery.trim() ? name.includes(seriesQuery.trim()) : true,
+              ).length === 0 && (
+                <p className="text-xs text-[var(--ink-subtle)]">
+                  没有匹配的作品集
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         <p className="mt-2 text-[11px] text-[var(--ink-subtle)]">
-          分季、上下半、剧场版填同一个作品集名，它们会在“按作品”视图里合并，
-          标记也会按整部作品生效。改名请保持各条一致。
+          分季、上下半、剧场版归入同一个作品集，它们会在“作品”视图里合并，
+          标记也按整部作品生效。不归集就是一部独立作品。
         </p>
       </div>
 
