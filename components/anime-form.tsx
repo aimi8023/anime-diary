@@ -23,6 +23,8 @@ function seasonValue(year: number, season: string): string {
 interface AnimeFormProps {
   initial?: Partial<AnimeInput> | null;
   suggestedTags?: string[];
+  /** 已存在的作品集名，用于输入框的候选下拉。 */
+  knownSeries?: string[];
   submitLabel?: string;
   onSave: (data: AnimeInput) => Promise<void>;
   onCancel: () => void;
@@ -33,6 +35,7 @@ interface AnimeFormProps {
 export default function AnimeForm({
   initial,
   suggestedTags = [],
+  knownSeries = [],
   submitLabel,
   onSave,
   onCancel,
@@ -51,6 +54,7 @@ export default function AnimeForm({
   const [episodes, setEpisodes] = useState(initial?.episodes ?? 0);
   const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
   const [marks, setMarks] = useState<string[]>(initial?.marks ?? []);
+  const [series, setSeries] = useState(initial?.series ?? "");
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -65,7 +69,8 @@ export default function AnimeForm({
     comment !== (initial?.comment || "") ||
     episodes !== (initial?.episodes ?? 0) ||
     JSON.stringify(tags) !== JSON.stringify(initial?.tags ?? []) ||
-    JSON.stringify(marks) !== JSON.stringify(initial?.marks ?? []);
+    JSON.stringify(marks) !== JSON.stringify(initial?.marks ?? []) ||
+    series.trim() !== (initial?.series ?? "");
 
   const dirtyReportedRef = useRef(false);
   useEffect(() => {
@@ -94,6 +99,7 @@ export default function AnimeForm({
         episodes,
         tags,
         marks,
+        series: series.trim(),
         bangumiId: initial?.bangumiId,
         bangumiUrl: initial?.bangumiUrl,
         originalTitle: initial?.originalTitle,
@@ -142,6 +148,9 @@ export default function AnimeForm({
   const availableSuggestedTags = [
     ...new Set(suggestedTags.map((tag) => tag.trim()).filter(Boolean)),
   ].filter((tag) => !tags.includes(tag));
+  const knownSeriesOptions = [
+    ...new Set(knownSeries.map((name) => name.trim()).filter(Boolean)),
+  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -372,6 +381,34 @@ export default function AnimeForm({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Series */}
+      <div>
+        <label
+          className="mb-2 block text-sm font-bold text-[var(--ink)]"
+          htmlFor="anime-form-series"
+        >
+          作品集
+        </label>
+        <input
+          className={inputClass}
+          id="anime-form-series"
+          list="anime-form-series-options"
+          onChange={(e) => setSeries(e.target.value)}
+          placeholder="留空表示这是一部完整作品"
+          type="text"
+          value={series}
+        />
+        <datalist id="anime-form-series-options">
+          {knownSeriesOptions.map((name) => (
+            <option key={name} value={name} />
+          ))}
+        </datalist>
+        <p className="mt-2 text-[11px] text-[var(--ink-subtle)]">
+          分季、上下半、剧场版填同一个作品集名，它们会在“按作品”视图里合并，
+          标记也会按整部作品生效。改名请保持各条一致。
+        </p>
       </div>
 
       {/* Marks */}

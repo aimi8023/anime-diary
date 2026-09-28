@@ -128,6 +128,22 @@ function validateAnime(value: unknown, index: number): BackupIssue[] {
   }
 
   // marks 是 2026-09 之后新增的字段：缺失视为空数组，出现则必须是内置标记。
+  // series 同样是后加字段：缺失表示独立作品，出现时必须是非空短字符串。
+  if (
+    value.series !== undefined &&
+    value.series !== null &&
+    !isFiniteString(value.series, false)
+  ) {
+    issues.push(
+      issue(
+        "invalid_series",
+        "series 必须是非空字符串",
+        index,
+        "series",
+      ),
+    );
+  }
+
   if (
     value.marks !== undefined &&
     (!Array.isArray(value.marks) ||

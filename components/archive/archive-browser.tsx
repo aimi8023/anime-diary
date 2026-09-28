@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Anime } from "@/lib/types";
 import {
   DEFAULT_ARCHIVE_FILTERS,
-  filterAnime,
+  filterAnimeByWorks,
   getArchiveOptions,
   parseArchiveFilters,
   serializeArchiveFilters,
@@ -36,8 +36,9 @@ export default function ArchiveBrowser({
   // 只记住选中 id：筛选结果变化时自动派生记录与相邻关系。
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const options = useMemo(() => getArchiveOptions(records), [records]);
+  // 标记按作品层筛选，所以要拿全量 records 参与判断。
   const filteredRecords = useMemo(
-    () => filterAnime(records, filters),
+    () => filterAnimeByWorks(records, filters),
     [filters, records],
   );
   const [yearDrawerOpen, setYearDrawerOpen] = useState(false);

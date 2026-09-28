@@ -19,6 +19,7 @@ const supportedFields = [
   "episodes",
   "tags",
   "marks",
+  "series",
   "bangumiId",
   "bangumiUrl",
   "originalTitle",
@@ -266,6 +267,27 @@ function validateInput(
       } else {
         // 去重并按内置顺序排列，与展示和筛选保持同一口径。
         data.marks = normalizeMarks(raw);
+      }
+    }
+  }
+
+  if (hasOwn(value, "series")) {
+    const raw = value.series;
+    if (raw === undefined || raw === null) {
+      // 显式清空表示拆成独立作品。
+      data.series = undefined;
+    } else if (typeof raw !== "string") {
+      issues.push({ path: "series", message: "作品集必须是字符串" });
+    } else {
+      const normalized = raw.trim();
+      if (normalized.length > 120) {
+        issues.push({
+          path: "series",
+          message: "作品集名称不能超过 120 个字符",
+        });
+      } else {
+        // 空串视为没有归集，归一化成 undefined 以免产生空分组。
+        data.series = normalized.length > 0 ? normalized : undefined;
       }
     }
   }

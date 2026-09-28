@@ -75,6 +75,15 @@ export default function AdminPage() {
     const query = searchQuery.trim().toLowerCase();
     return !query || anime.title.toLowerCase().includes(query);
   });
+
+  // 作品集候选项：让新增分季时能直接选中已有作品集。
+  const knownSeries = [
+    ...new Set(
+      animeList
+        .map((anime) => anime.series?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ].sort((a, b) => a.localeCompare(b, "zh-CN"));
   const unratedCount = animeList.filter((anime) => anime.rating === 0).length;
 
   const handleSave = async (data: AnimeInput) => {
@@ -361,6 +370,7 @@ export default function AdminPage() {
             <AnimeForm
               key={editing.id}
               initial={editing}
+              knownSeries={knownSeries}
               submitLabel="更新记录"
               onCancel={handleCancel}
               onDirtyChange={setFormDirty}
@@ -452,6 +462,7 @@ export default function AdminPage() {
                   <AnimeForm
                     key={prefill ? `bangumi-${prefill.bangumiId}` : "manual"}
                     initial={prefill}
+                    knownSeries={knownSeries}
                     suggestedTags={prefill?.suggestedTags ?? []}
                     submitLabel="添加记录"
                     onCancel={handleCancel}
@@ -514,6 +525,16 @@ export default function AdminPage() {
         key={quickRating?.id ?? "quick-rate-closed"}
         onClose={() => setQuickRating(null)}
         onSaved={fetchList}
+        siblings={
+          quickRating
+            ? animeList.filter(
+                (anime) =>
+                  anime.id !== quickRating.id &&
+                  (anime.series ?? "") === (quickRating.series ?? "") &&
+                  (anime.series ?? "").length > 0,
+              )
+            : []
+        }
       />
     </div>
   );

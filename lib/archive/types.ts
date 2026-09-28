@@ -1,7 +1,7 @@
 import type { Anime } from "@/lib/types";
 
-/** 档案的排列维度：按播出季度（1/4/7/10 月档期）、按评分分段。 */
-export type ArchiveGroup = "season" | "rating";
+/** 档案的排列维度：按播出季度（1/4/7/10 月档期）、按评分分段、按作品聚合。 */
+export type ArchiveGroup = "season" | "rating" | "work";
 /** 组间与组内的排列方向。 */
 export type ArchiveDirection = "asc" | "desc";
 
@@ -25,6 +25,13 @@ export interface ArchiveCardGroup {
   key: string;
   label: string;
   records: Anime[];
+}
+
+/** 「按作品」视图下的一组：同一部作品的全部条目。 */
+export interface ArchiveWorkGroup {
+  key: string;
+  label: string;
+  works: import("@/lib/archive/works").ArchiveWork[];
 }
 
 export interface ArchiveStats {

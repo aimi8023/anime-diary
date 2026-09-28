@@ -1,6 +1,7 @@
 import type { Anime } from "@/lib/types";
 import { normalizeMarks } from "@/lib/anime/marks";
 import { formatSeasonLabel } from "@/lib/season-label";
+import { groupIntoWorks, workKey, workKeysMatchingMarks } from "./works";
 import type {
   ArchiveCardGroup,
   ArchiveDirection,
@@ -9,6 +10,7 @@ import type {
   ArchiveOptions,
   ArchiveSearchParams,
   ArchiveStats,
+  ArchiveWorkGroup,
   YearRecap,
 } from "./types";
 
@@ -78,7 +80,9 @@ export function parseArchiveFilters(
     marks,
     rating: parseRating(readParam(params, "rating")),
     // 兼容旧版参数：group=year 与旧 sort 值都归入季度维度。
-    group: groupValue === "rating" ? "rating" : "season",
+    group: ["rating", "work"].includes(groupValue)
+      ? (groupValue as ArchiveGroup)
+      : "season",
     direction: dirValue === "asc" ? "asc" : "desc",
   };
 }
@@ -161,13 +165,6 @@ export function filterAnime(
       if (filters.season && !anime.season.endsWith(filters.season)) {
         return false;
       }
-      // 多选标记按 AND 收敛：选中的每一个标记都必须命中。
-      if (
-        filters.marks.length > 0 &&
-        !filters.marks.every((mark) => (anime.marks ?? []).includes(mark))
-      ) {
-        return false;
-      }
       if (filters.rating !== null && anime.rating < filters.rating) {
         return false;
       }
@@ -184,9 +181,25 @@ export function filterAnime(
 }
 
 /**
+ * 标记按作品层筛选：只要一部作品里任意一条带该标记，整部作品的条目都保留。
+ * 因此这一层必须拿到全量 data，不能只用已经过滤过的结果。
+ * 其余条件（关键词、年份、季度、最低评分）仍然是条目级的。
+ */
+export function filterAnimeByWorks(
+  data: Anime[],
+  filters: ArchiveFilters,
+): Anime[] {
+  const entryMatches = filterAnime(data, { ...filters, marks: [] });
+  if (filters.marks.length === 0) return entryMatches;
+  const matched = workKeysMatchingMarks(data, filters.marks);
+  return entryMatches.filter((anime) => matched.has(workKey(anime)));
+}
+
+/**
  * 把筛选结果切成横向卡片行：
  * - 季度维度：一行一个播出档期（“2024年4月”“2024年1月”…，“其他”始终最后）；
  * - 评分维度：一行一个评分档（10.0、9.5、9.0…），不按档期分割。
+ * 「按作品」维度由 groupArchiveWorks 单独处理。
  * 不修改调用方数组。
  */
 export function groupArchive(
@@ -211,7 +224,6 @@ export function groupArchive(
     bucket.records.push(anime);
     buckets.set(key, bucket);
   }
-
   return Array.from(buckets.entries())
     .sort(([, a], [, b]) => {
       if (a.sortKey === 0) return 1;
@@ -234,8 +246,21 @@ export function groupArchive(
     }));
 }
 
-export function getArchiveOptions(data: Anime[]): ArchiveOptions {
-  const years = Array.from(
+/**
+ * 「按作品」视图：不分行，整批作品作为一个分组返回。
+ * 升序按最早档期从早到晚，降序相反。
+ */
+export function groupArchiveWorks(
+  data: Anime[],
+  filters: Pick<ArchiveFilters, "group" | "direction">,
+): ArchiveWorkGroup[] {
+  if (filters.group !== "work") return [];
+  const works = groupIntoWorks(data);
+  if (filters.direction === "asc") return [{ key: "works", label: "作品", works }];
+  return [{ key: "works", label: "作品", works: [...works].reverse() }];
+}
+
+export function getArchiveOptions(data: Anime[]): ArchiveOptions {  const years = Array.from(
     new Set(
       data
         .map((anime) => seasonParts(anime.season).year)

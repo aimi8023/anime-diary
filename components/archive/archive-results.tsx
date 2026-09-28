@@ -2,9 +2,10 @@
 
 import type { Anime } from "@/lib/types";
 import type { ArchiveCardGroup, ArchiveFilters } from "@/lib/archive/types";
-import { groupArchive } from "@/lib/archive/filter";
+import { groupArchive, groupArchiveWorks } from "@/lib/archive/filter";
 import { formatSeasonLabel } from "@/lib/season-label";
 import ArchiveAnimeCard from "./archive-anime-card";
+import ArchiveWorkCard from "./archive-work-card";
 
 interface ArchiveResultsProps {
   records: Anime[];
@@ -51,6 +52,37 @@ export default function ArchiveResults({
 
   const groups: ArchiveCardGroup[] = groupArchive(records, filters);
   const showSeasonLabel = filters.group === "rating";
+
+  // 「按作品」维度：一部作品一张卡，不再按季度或评分分行。
+  if (filters.group === "work") {
+    const workGroups = groupArchiveWorks(records, filters);
+    return (
+      <div className="space-y-10">
+        {workGroups.map((group) => (
+          <section aria-label={group.label} key={group.key}>
+            <div className="mb-3 flex items-baseline gap-2">
+              <h3 className="text-base font-black tracking-tight text-[var(--ink)]">
+                {group.works.length} 部作品
+              </h3>
+              <span className="text-xs text-[var(--ink-subtle)]">
+                共 {records.length} 个条目
+              </span>
+            </div>
+            <div className={GRID_CLASS}>
+              {group.works.map((work, index) => (
+                <ArchiveWorkCard
+                  index={index}
+                  key={work.key}
+                  onSelect={onSelect}
+                  work={work}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">

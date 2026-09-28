@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import type { Anime } from "@/lib/types";
-import { ARCHIVE_MARKS } from "@/lib/anime/marks";
+import { ARCHIVE_MARKS, normalizeMarks } from "@/lib/anime/marks";
 import InlineFeedback from "@/components/feedback/inline-feedback";
 import StarRating from "@/components/star-rating";
 import { useFocusTrap } from "@/components/use-focus-trap";
@@ -12,12 +12,15 @@ import { readApiError } from "@/lib/http/client";
 
 interface QuickRateDialogProps {
   anime: Anime | null;
+  /** 同一作品集下的其他条目；标记会按作品整体保存到它们身上。 */
+  siblings?: Anime[];
   onClose: () => void;
   onSaved: () => void;
 }
 
 export default function QuickRateDialog({
   anime,
+  siblings = [],
   onClose,
   onSaved,
 }: QuickRateDialogProps) {
@@ -26,7 +29,14 @@ export default function QuickRateDialog({
   const panelRef = useRef<HTMLDivElement>(null);
   const [rating, setRating] = useState(anime?.rating ?? 0);
   const [comment, setComment] = useState(anime?.comment ?? "");
-  const [marks, setMarks] = useState<string[]>(anime?.marks ?? []);
+  const isWork = (anime?.series?.trim() ?? "").length > 0;
+  // 标记初始值取整部作品的并集：同作品任意一条打过就算打过。
+  const [marks, setMarks] = useState<string[]>(
+    () =>
+      normalizeMarks(
+        [anime, ...siblings].flatMap((item) => item?.marks ?? []),
+      ),
+  );
   // 未评分时这是“补评分”，已评分时主要用于快速补标记与感想。
   const needsRating = (anime?.rating ?? 0) === 0;
   const [saving, setSaving] = useState(false);
@@ -58,15 +68,47 @@ export default function QuickRateDialog({
     if (!anime || rating <= 0 || saving) return;
     setSaving(true);
     setError("");
+    const nextMarks = normalizeMarks(marks);
     try {
+      // 当前条目保存评分、感想与标记。
       const response = await fetch(`/api/anime/${anime.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, comment: comment.trim(), marks }),
+        body: JSON.stringify({
+          rating,
+          comment: comment.trim(),
+          marks: nextMarks,
+        }),
       });
       if (!response.ok) {
         throw new Error(await readApiError(response, "保存失败"));
       }
+
+      // 标记属于整部作品：其余条目只同步标记，不动它们的评分和感想。
+      const stale = siblings.filter(
+        (item) =>
+          JSON.stringify(normalizeMarks(item.marks ?? [])) !==
+          JSON.stringify(nextMarks),
+      );
+      const synced = await Promise.allSettled(
+        stale.map((item) =>
+          fetch(`/api/anime/${item.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ marks: nextMarks }),
+          }).then(async (res) => {
+            if (!res.ok) throw new Error(await readApiError(res, "保存失败"));
+            return res;
+          }),
+        ),
+      );
+      const failed = synced.filter((result) => result.status === "rejected");
+      if (failed.length > 0) {
+        throw new Error(
+          `本条已保存，但 ${failed.length} 个同作品条目同步标记失败，请重试`,
+        );
+      }
+
       onSaved();
       onClose();
     } catch (saveError) {
@@ -122,8 +164,7 @@ export default function QuickRateDialog({
           <legend className="mb-2 text-xs font-bold text-[var(--ink-muted)]">
             标记（可选，可多选）
           </legend>
-          <div className="flex flex-wrap gap-2">
-            {ARCHIVE_MARKS.map((mark) => {
+          <div className="flex flex-wrap gap-2">            {ARCHIVE_MARKS.map((mark) => {
               const checked = marks.includes(mark.id);
               return (
                 <label
@@ -150,6 +191,12 @@ export default function QuickRateDialog({
               );
             })}
           </div>
+          {isWork && siblings.length > 0 && (
+            <p className="mt-2 text-[11px] text-[var(--ink-subtle)]">
+              标记按整部作品保存：会同步到同作品的另外 {siblings.length}{" "}
+              个条目，评分与感想只改本条。
+            </p>
+          )}
         </fieldset>
 
         <div className="mt-4">

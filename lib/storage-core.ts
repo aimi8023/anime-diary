@@ -77,6 +77,11 @@ function normalizeStoredData(data: Anime[]): Anime[] {
             (mark): mark is string => typeof mark === "string",
           )
         : [],
+      // series 空串归一成 undefined，避免出现一个空名字的作品集。
+      series:
+        typeof cloned.series === "string" && cloned.series.trim().length > 0
+          ? cloned.series.trim()
+          : undefined,
     };
   });
 }

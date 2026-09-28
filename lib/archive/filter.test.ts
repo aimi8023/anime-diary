@@ -4,10 +4,12 @@ import {
   countActiveArchiveFilters,
   DEFAULT_ARCHIVE_FILTERS,
   filterAnime,
+  filterAnimeByWorks,
   getArchiveOptions,
   getArchiveStats,
   getYearlyRecap,
   groupArchive,
+  groupArchiveWorks,
   parseArchiveFilters,
   serializeArchiveFilters,
 } from "./filter";
@@ -210,6 +212,58 @@ describe("archive filtering and grouping", () => {
     ).toEqual(ids);
   });
 
+  it("filters by mark at the work level, not the entry level", () => {
+    // 同一作品的三个条目里只有第一条打了“多刷”，但整部作品都应保留。
+    const workRecords: Anime[] = [
+      { ...records[0], id: "w-1", title: "甲", series: "甲作品", marks: ["rewatch"] },
+      { ...records[1], id: "w-2", title: "甲 第二季", series: "甲作品" },
+      { ...records[2], id: "w-3", title: "乙", marks: ["sequel"] },
+    ];
+    const byMark = (marks: string[]) =>
+      filterAnimeByWorks(workRecords, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        marks,
+      })
+        .map((anime) => anime.id)
+        .sort();
+
+    expect(byMark(["rewatch"])).toEqual(["w-1", "w-2"]);
+    expect(byMark(["sequel"])).toEqual(["w-3"]);
+    expect(byMark([])).toEqual(["w-1", "w-2", "w-3"]);
+  });
+
+  it("still applies entry-level conditions inside a mark-selected work", () => {
+    const workRecords: Anime[] = [
+      { ...records[0], id: "w-1", title: "甲", season: "2024夏", series: "甲作品", marks: ["rewatch"] },
+      { ...records[1], id: "w-2", title: "甲 第二季", season: "2025春", series: "甲作品" },
+    ];
+    expect(
+      filterAnimeByWorks(workRecords, {
+        ...DEFAULT_ARCHIVE_FILTERS,
+        marks: ["rewatch"],
+        year: "2024",
+      }).map((anime) => anime.id),
+    ).toEqual(["w-1"]);
+  });
+
+  it("returns a single group for the work dimension and reverses with direction", () => {
+    const workRecords: Anime[] = [
+      { ...records[0], id: "w-1", title: "甲", season: "2024夏", series: "甲作品" },
+      { ...records[1], id: "w-2", title: "乙", season: "2025春" },
+    ];
+
+    // desc 为新→旧：乙(2025春) 在前，甲作品(2024夏) 在后。
+    const desc = groupArchiveWorks(workRecords, { group: "work", direction: "desc" });
+    expect(desc).toHaveLength(1);
+    expect(desc[0].works.map((w) => w.key)).toEqual(["w-2", "甲作品"]);
+
+    const asc = groupArchiveWorks(workRecords, { group: "work", direction: "asc" });
+    expect(asc[0].works.map((w) => w.key)).toEqual(["甲作品", "w-2"]);
+
+    // 非作品维度不返回分组。
+    expect(groupArchiveWorks(workRecords, { group: "season", direction: "desc" })).toEqual([]);
+  });
+
   it("requires every active condition to hold at once", () => {
     expect(
       filterAnime(records, {
@@ -232,8 +286,9 @@ describe("archive filtering and grouping", () => {
       // 存量记录没有 marks 字段，必须视为无标记而不是报错。
       { ...records[3], id: "m-4", title: "丁", marks: undefined },
     ];
+    // 标记是作品层维度，必须走 filterAnimeByWorks。
     const byMark = (marks: string[]) =>
-      filterAnime(marked, {
+      filterAnimeByWorks(marked, {
         ...DEFAULT_ARCHIVE_FILTERS,
         marks,
       })

@@ -68,6 +68,14 @@ export default function AnimeList({
                 {formatSeasonLabel(anime.season)}
               </span>
               {anime.episodes > 0 && <span>{anime.episodes}话</span>}
+              {anime.series && (
+                <span
+                  className="rounded-full border border-white/80 bg-white/60 px-2 py-1 font-bold text-[var(--info)]"
+                  title={`与同作品集《${anime.series}》的条目合并展示`}
+                >
+                  作品集：{anime.series}
+                </span>
+              )}
               <span
                 className={`rounded-full px-2 py-1 font-bold ${
                   anime.rating > 0
