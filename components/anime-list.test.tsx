@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import AnimeList from "./anime-list";
 
@@ -53,5 +54,54 @@ describe("AnimeList", () => {
 
     expect(screen.getByText("还没有添加任何番剧，点击添加记录开始吧"))
       .toBeInTheDocument();
+  });
+
+  it("offers the quick action to rated records so marks need no full edit", async () => {
+    const user = userEvent.setup();
+    const onQuickRate = vi.fn();
+    render(
+      <AnimeList
+        animeList={[anime]}
+        deleting={null}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onQuickRate={onQuickRate}
+      />,
+    );
+
+    const quickButton = screen.getByRole("button", {
+      name: "打标记《葬送的芙莉莲》",
+    });
+    expect(
+      screen.queryByRole("button", { name: "补评分《葬送的芙莉莲》" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(quickButton);
+    expect(onQuickRate).toHaveBeenCalledWith(anime);
+  });
+
+  it("keeps the补评分 label for unrated records and shows existing marks", () => {
+    render(
+      <AnimeList
+        animeList={[
+          { ...anime, id: "a2", title: "未评分番", rating: 0, marks: [] },
+          { ...anime, id: "a3", title: "已标记番", marks: ["rewatch", "source"] },
+        ]}
+        deleting={null}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onQuickRate={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "补评分《未评分番》" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "打标记《已标记番》" }),
+    ).toBeInTheDocument();
+    // 列表行直接回显已有标记，便于逐条核对进度。
+    expect(screen.getByText("多刷")).toBeInTheDocument();
+    expect(screen.getByText("看过原作")).toBeInTheDocument();
   });
 });

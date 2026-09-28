@@ -84,8 +84,47 @@ describe("QuickRateDialog", () => {
     );
   });
 
-  it("closes on escape", async () => {
+  it("adds marks to an already rated record without touching the score", async () => {
     const user = userEvent.setup();
+    const onSaved = vi.fn();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: "anime-2" }), { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <QuickRateDialog
+        anime={{ ...unrated, id: "anime-2", rating: 9, comment: "保留我" }}
+        onClose={vi.fn()}
+        onSaved={onSaved}
+      />,
+    );
+
+    // 已评分时对话框改称“打标记”，评分与感想带入原值。
+    expect(
+      screen.getByRole("dialog", { name: "打标记《孤独摇滚！》" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("感想（可选）")).toHaveValue("保留我");
+    expect(screen.getByRole("button", { name: "保存" })).toBeEnabled();
+
+    await user.click(screen.getByRole("checkbox", { name: "看过原作" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
+
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/anime/anime-2",
+      expect.objectContaining({
+        method: "PUT",
+        body: JSON.stringify({
+          rating: 9,
+          comment: "保留我",
+          marks: ["source"],
+        }),
+      }),
+    );
+  });
+
+  it("closes on escape", async () => {    const user = userEvent.setup();
     const onClose = vi.fn();
     vi.stubGlobal("fetch", vi.fn());
 

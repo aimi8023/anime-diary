@@ -27,6 +27,8 @@ export default function QuickRateDialog({
   const [rating, setRating] = useState(anime?.rating ?? 0);
   const [comment, setComment] = useState(anime?.comment ?? "");
   const [marks, setMarks] = useState<string[]>(anime?.marks ?? []);
+  // 未评分时这是“补评分”，已评分时主要用于快速补标记与感想。
+  const needsRating = (anime?.rating ?? 0) === 0;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -94,13 +96,15 @@ export default function QuickRateDialog({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="ui-kicker">QUICK RATE</p>
+            <p className="ui-kicker">
+              {needsRating ? "QUICK RATE" : "QUICK MARK"}
+            </p>
             <h2
               className="mt-1 truncate text-lg font-black text-[var(--ink)]"
               id="quick-rate-title"
               title={anime.title}
             >
-              补评分《{anime.title}》
+              {needsRating ? "补评分" : "打标记"}《{anime.title}》
             </h2>
           </div>
           <button
@@ -114,7 +118,41 @@ export default function QuickRateDialog({
           </button>
         </div>
 
-        <div className="mt-5">
+        <fieldset className="mt-5">
+          <legend className="mb-2 text-xs font-bold text-[var(--ink-muted)]">
+            标记（可选，可多选）
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {ARCHIVE_MARKS.map((mark) => {
+              const checked = marks.includes(mark.id);
+              return (
+                <label
+                  className={`ui-chip cursor-pointer px-3 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-pink-300 ${
+                    checked ? "ui-chip-active" : ""
+                  }`}
+                  key={mark.id}
+                  title={mark.hint}
+                >
+                  <input
+                    checked={checked}
+                    className="sr-only"
+                    onChange={() =>
+                      setMarks((current) =>
+                        current.includes(mark.id)
+                          ? current.filter((item) => item !== mark.id)
+                          : [...current, mark.id],
+                      )
+                    }
+                    type="checkbox"
+                  />
+                  {mark.label}
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <div className="mt-4">
           <p className="mb-2 text-xs font-bold text-[var(--ink-muted)]">
             个人评分
           </p>
@@ -152,40 +190,6 @@ export default function QuickRateDialog({
             <InlineFeedback tone="error">{error}</InlineFeedback>
           </div>
         )}
-
-        <fieldset className="mt-4">
-          <legend className="mb-2 text-xs font-bold text-[var(--ink-muted)]">
-            标记（可选，可多选）
-          </legend>
-          <div className="flex flex-wrap gap-2">
-            {ARCHIVE_MARKS.map((mark) => {
-              const checked = marks.includes(mark.id);
-              return (
-                <label
-                  className={`ui-chip cursor-pointer px-3 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-pink-300 ${
-                    checked ? "ui-chip-active" : ""
-                  }`}
-                  key={mark.id}
-                  title={mark.hint}
-                >
-                  <input
-                    checked={checked}
-                    className="sr-only"
-                    onChange={() =>
-                      setMarks((current) =>
-                        current.includes(mark.id)
-                          ? current.filter((item) => item !== mark.id)
-                          : [...current, mark.id],
-                      )
-                    }
-                    type="checkbox"
-                  />
-                  {mark.label}
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
 
         <div className="mt-5 flex justify-end gap-2">
           <button

@@ -3,6 +3,7 @@
 import type { Anime } from "@/lib/types";
 import CoverImage from "@/components/cover-image";
 import { formatSeasonLabel } from "@/lib/season-label";
+import { archiveMarkLabel, toDisplayMarks } from "@/lib/anime/marks";
 
 interface AnimeListProps {
   animeList: Anime[];
@@ -76,17 +77,29 @@ export default function AnimeList({
               >
                 {anime.rating > 0 ? `★ ${anime.rating}` : "未评分"}
               </span>
+              {toDisplayMarks(anime.marks).map((mark) => (
+                <span
+                  className="rounded-full border border-[rgba(219,79,135,0.28)] bg-[var(--accent-soft)] px-2 py-1 font-bold text-[var(--accent-strong)]"
+                  key={mark}
+                >
+                  {archiveMarkLabel(mark)}
+                </span>
+              ))}
             </div>
           </div>
 
           <div className="flex flex-shrink-0 items-center gap-1">
-            {anime.rating === 0 && onQuickRate && (
+            {onQuickRate && (
               <button
-                aria-label={`补评分《${anime.title}》`}
+                aria-label={
+                  anime.rating === 0
+                    ? `补评分《${anime.title}》`
+                    : `打标记《${anime.title}》`
+                }
                 onClick={() => onQuickRate(anime)}
                 className="ui-button ui-button-secondary min-w-11 px-3 text-xs"
               >
-                补评分
+                {anime.rating === 0 ? "补评分" : "打标记"}
               </button>
             )}
             <button
