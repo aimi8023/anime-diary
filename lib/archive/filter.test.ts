@@ -180,9 +180,9 @@ describe("archive filter URL state", () => {
     expect(
       serializeArchiveFilters({
         ...DEFAULT_ARCHIVE_FILTERS,
-        marks: ["rewatch", "special"],
+        marks: ["rewatch", "sequel"],
       }).toString(),
-    ).toBe("mark=rewatch%2Cspecial");
+    ).toBe("mark=rewatch%2Csequel");
 
     expect(
       serializeArchiveFilters({
@@ -241,9 +241,9 @@ describe("archive filtering and grouping", () => {
         .sort();
 
     expect(byMark(["rewatch"])).toEqual(["m-1", "m-2"]);
-    // 多选取交集：同时要“多刷”和“看过原作”只剩乙。
+    // 多选取交集：同时要“多刷”和“追原作”只剩乙。
     expect(byMark(["rewatch", "source"])).toEqual(["m-2"]);
-    expect(byMark(["special"])).toEqual([]);
+    expect(byMark(["sequel"])).toEqual([]);
   });
 
   it("orders the season dimension by broadcast season without mutating input", () => {

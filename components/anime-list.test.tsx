@@ -102,6 +102,6 @@ describe("AnimeList", () => {
     ).toBeInTheDocument();
     // 列表行直接回显已有标记，便于逐条核对进度。
     expect(screen.getByText("多刷")).toBeInTheDocument();
-    expect(screen.getByText("看过原作")).toBeInTheDocument();
+    expect(screen.getByText("追原作")).toBeInTheDocument();
   });
 });

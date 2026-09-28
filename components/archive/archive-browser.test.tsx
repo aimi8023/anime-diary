@@ -214,9 +214,9 @@ describe("ArchiveBrowser filtering", () => {
     expect(screen.getByText("找到 2 部")).toBeInTheDocument();
     expect(replaceStateSpy).toHaveBeenLastCalledWith(null, "", "/?mark=rewatch");
 
-    // 多选取交集：只有同时带“多刷”和“看过原作”的芙莉莲留下。
+    // 多选取交集：只有同时带“多刷”和“追原作”的芙莉莲留下。
     await user.click(
-      within(markGroup).getByRole("button", { name: "看过原作" }),
+      within(markGroup).getByRole("button", { name: "追原作" }),
     );
     expect(screen.getByText("找到 1 部")).toBeInTheDocument();
     expect(
@@ -224,10 +224,10 @@ describe("ArchiveBrowser filtering", () => {
     ).toBeInTheDocument();
 
     // 工具栏的标记 chip 可单独移除，不影响其他条件。
-    await user.click(screen.getByRole("button", { name: "移除看过原作" }));
+    await user.click(screen.getByRole("button", { name: "移除追原作" }));
     expect(screen.getByText("找到 2 部")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "移除看过原作" }),
+      screen.queryByRole("button", { name: "移除追原作" }),
     ).not.toBeInTheDocument();
   });
 

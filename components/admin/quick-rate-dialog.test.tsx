@@ -107,7 +107,7 @@ describe("QuickRateDialog", () => {
     expect(screen.getByLabelText("感想（可选）")).toHaveValue("保留我");
     expect(screen.getByRole("button", { name: "保存" })).toBeEnabled();
 
-    await user.click(screen.getByRole("checkbox", { name: "看过原作" }));
+    await user.click(screen.getByRole("checkbox", { name: "追原作" }));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() => expect(onSaved).toHaveBeenCalled());

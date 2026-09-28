@@ -122,16 +122,16 @@ describe("ArchiveResults", () => {
     const manyMarks: Anime = {
       ...records[0],
       title: "标记展示样本",
-      marks: ["rewatch", "source", "special", "remaster"],
+      marks: ["rewatch", "source", "sequel"],
     };
 
     renderResults({ records: [manyMarks] });
 
     expect(screen.getByText("多刷")).toBeInTheDocument();
-    expect(screen.getByText("看过原作")).toBeInTheDocument();
-    // 超过两个时其余折叠，且不逐个渲染。
-    expect(screen.getByText("+2")).toBeInTheDocument();
-    expect(screen.queryByText("剧场版·特别篇")).not.toBeInTheDocument();
+    expect(screen.getByText("追原作")).toBeInTheDocument();
+    // 第三个标记折叠成 +1，不逐个渲染。
+    expect(screen.getByText("+1")).toBeInTheDocument();
+    expect(screen.queryByText("等续作")).not.toBeInTheDocument();
   });
 
   it("keeps legacy records without marks renderable and unmarked", () => {
