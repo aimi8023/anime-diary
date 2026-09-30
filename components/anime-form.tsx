@@ -119,7 +119,9 @@ export default function AnimeForm({
         episodes,
         tags,
         marks,
-        series: series.trim(),
+        // 「每部番就是一部作品」：没指定作品集时用标题作作品名，
+        // 以后同作品的续季/剧场版才能通过标题相似度并进来。
+        series: series.trim() || title.trim(),
         bangumiId: initial?.bangumiId,
         bangumiUrl: initial?.bangumiUrl,
         originalTitle: initial?.originalTitle,
@@ -403,30 +405,24 @@ export default function AnimeForm({
       {/* Series */}
       <div>
         <div className="mb-2 flex flex-wrap items-center gap-2">
-          <span className="text-sm font-bold text-[var(--ink)]">作品集</span>
-          {series ? (
-            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-[rgba(219,79,135,0.3)] bg-[var(--accent-soft)] px-3 text-xs font-bold text-[var(--accent-strong)]">
-              {series}
-              <button
-                aria-label="改为独立作品"
-                className="text-[var(--accent-strong)]"
-                onClick={() => setSeries("")}
-                type="button"
-              >
-                ×
-              </button>
-            </span>
-          ) : (
-            <span className="text-xs text-[var(--ink-muted)]">
-              独立作品（默认）
-            </span>
-          )}
+          <span className="text-sm font-bold text-[var(--ink)]">作品</span>
+          <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-[rgba(219,79,135,0.3)] bg-[var(--accent-soft)] px-3 text-xs font-bold text-[var(--accent-strong)]">
+            {series || "（用标题）"}
+            <button
+              aria-label="改用自己的作品名"
+              className="text-[var(--accent-strong)]"
+              onClick={() => setSeries("")}
+              type="button"
+            >
+              ×
+            </button>
+          </span>
           <button
             className="ui-button ui-button-secondary min-h-8 px-3 text-xs"
             onClick={() => setShowSeriesPicker((open) => !open)}
             type="button"
           >
-            {showSeriesPicker ? "收起" : "手动选择"}
+            {showSeriesPicker ? "收起" : "归入已有作品"}
           </button>
         </div>
 
@@ -457,7 +453,7 @@ export default function AnimeForm({
                 }
                 type="button"
               >
-                都不是，独立作品
+                都不是，自成一部
               </button>
             </div>
           </div>
@@ -506,8 +502,9 @@ export default function AnimeForm({
         )}
 
         <p className="mt-2 text-[11px] text-[var(--ink-subtle)]">
-          分季、上下半、剧场版归入同一个作品集，它们会在“作品”视图里合并，
-          标记也按整部作品生效。不归集就是一部独立作品。
+          每部番就是一部作品，默认直接用自己的标题。以后录同一作品的前季、
+          续季、剧场版或 OVA 时，标题能被认出来就会自动并进来，标记也按
+          整部作品生效。
         </p>
       </div>
 

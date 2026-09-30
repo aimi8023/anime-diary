@@ -31,6 +31,22 @@ describe("normalizeSeriesTitle", () => {
 });
 
 describe("suggestSeries", () => {
+  it("finds a work for a new season even when the work holds one entry", () => {
+    // 每部番自成一个作品后，「作品集」里会有大量单条目作品，
+    // 续季仍应能找到父作品。
+    const soloWorks = [
+      { name: "孤独摇滚！", memberCount: 1 },
+      { name: "葬送的芙莉莲", memberCount: 1 },
+      { name: "药屋少女的呢喃", memberCount: 2 },
+    ];
+    expect(suggestSeries("药屋少女的呢喃 第二季", soloWorks)[0]?.series).toBe(
+      "药屋少女的呢喃",
+    );
+    expect(suggestSeries("孤独摇滚！ 剧场版", soloWorks)[0]?.series).toBe(
+      "孤独摇滚！",
+    );
+  });
+
   it("matches a plain new season by containment", () => {
     expect(suggestSeries("鬼灭之刃 游郭篇", known)[0]?.series).toBe("鬼灭之刃");
     expect(suggestSeries("鬼灭之刃 刀匠村篇", known)[0]?.series).toBe("鬼灭之刃");
