@@ -1,8 +1,13 @@
 // 本地辅助脚本：拉取某季并生成一个带封面的 HTML 画廊，方便看图挑选。
 // 用法: node scripts/season-gallery.mjs 2000 春 [--out scripts/season.html] [--proxy URL]
+//
+// 卡片上会标出「可归《XXX》」——用 lib/anime/series-match 实际跑一遍标题相似度，
+// 与录入表单的自动猜测是同一套逻辑。宁可页面上少标，也不要凭标题目测：
+// 标题带「第三季」不代表库里就有它的第一、二季。
 import { ProxyAgent, fetch as undiciFetch } from "undici";
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import path from "node:path";
+import { collectSeriesNames, suggestSeries } from "../lib/anime/series-match.ts";
 
 const API_BASE = "https://api.bgm.tv";
 const PAGE_SIZE = 20;
@@ -56,17 +61,21 @@ while (collected.length < FETCH_LIMIT) {
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // 读取本地已收录记录，用于给画廊卡片打“已收”角标（bangumiId + 归一化标题双重匹配）
+// 同时收集已有作品集，给未收录的候选算出“可归入哪部作品”。
 const DATA_FILE = path.join(process.cwd(), "data", "anime.json");
 const norm = (t) => String(t || "").trim().toLowerCase().replace(/[\s・·:：!！?？~〜\-—_()（）\[\]【]'’‘"”“。.,、]/g, "");
 const ownedIds = new Set();
 const ownedTitles = new Set();
+let seriesNames = [];
 if (existsSync(DATA_FILE)) {
   try {
-    for (const a of JSON.parse(readFileSync(DATA_FILE, "utf8"))) {
+    const archive = JSON.parse(readFileSync(DATA_FILE, "utf8"));
+    for (const a of archive) {
       if (a.bangumiId) ownedIds.add(a.bangumiId);
       if (a.title) ownedTitles.add(norm(a.title));
       if (a.originalTitle) ownedTitles.add(norm(a.originalTitle));
     }
+    seriesNames = collectSeriesNames(archive);
   } catch { /* 忽略 */ }
 }
 
@@ -75,9 +84,12 @@ const cells = collected.map((s, i) => {
   const cn = s.name_cn || "(无中文名)";
   const date = (s.date || "").slice(0, 10);
   const owned = ownedIds.has(s.id) || ownedTitles.has(norm(s.name_cn)) || ownedTitles.has(norm(s.name));
+  // 实际跑相似度，不靠标题目测。
+  const guess = owned ? null : suggestSeries(cn || s.name, seriesNames)[0] || null;
   return `<figure class="card${owned ? " owned" : ""}" data-num="${i + 1}" data-owned="${owned ? 1 : 0}" tabindex="0" role="checkbox" aria-checked="false">
   <div class="num">${i + 1}</div>
   ${owned ? `<div class="owned-badge">已收</div>` : ""}
+  ${guess ? `<div class="series-badge">可归《${esc(guess.series)}》</div>` : ""}
   <div class="check">✓</div>
   <div class="imgbox">${img ? `<img loading="lazy" referrerpolicy="no-referrer" src="${esc(img)}" alt="">` : `<div class="noimg">无封面</div>`}</div>
   <figcaption><div class="cn">${esc(cn)}</div><div class="jp">${esc(s.name)}</div><div class="meta">${esc(date)} · id:${s.id}</div></figcaption>
@@ -104,6 +116,7 @@ h1{font-size:20px;margin:0 0 4px}
 .card.owned .imgbox{opacity:.55}
 .card.owned{background:#f3f4f8}
 .owned-badge{position:absolute;bottom:70px;left:8px;z-index:2;background:#2e7d5b;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.series-badge{position:absolute;bottom:96px;left:8px;z-index:2;background:#bd2f6c;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.3);max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .grid.hide-owned .card.owned{display:none}
 .imgbox{aspect-ratio:2/3;background:#eceef3;display:flex;align-items:center;justify-content:center}
 .imgbox img{width:100%;height:100%;object-fit:cover;display:block}

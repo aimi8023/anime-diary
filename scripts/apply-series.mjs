@@ -19,14 +19,19 @@ const missing = [];
 const byName = new Map();
 
 for (const anime of data) {
-  const name = plan[String(anime.bangumiId)];
-  if (!name) {
-    anime.series = undefined;
+  const key = String(anime.bangumiId);
+  // 计划里没提到的条目保留它已有的 series——新记录可能由 picks.json 带着
+  // 归集信息写入，不能在这里被抹掉。计划里显式写空串表示解除归集。
+  if (!(key in plan)) {
+    const existing = anime.series?.trim();
+    if (existing) byName.set(existing, (byName.get(existing) ?? 0) + 1);
     continue;
   }
-  anime.series = String(name).trim();
+  const name = String(plan[key] ?? "").trim();
+  anime.series = name || undefined;
+  if (!name) continue;
   applied++;
-  byName.set(anime.series, (byName.get(anime.series) ?? 0) + 1);
+  byName.set(name, (byName.get(name) ?? 0) + 1);
 }
 
 for (const key of Object.keys(plan)) {

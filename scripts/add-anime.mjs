@@ -1,11 +1,12 @@
 // 本地辅助脚本：把挑选的番剧写入 data/anime.json。
-// 用法: node scripts/add-anime.mjs <picks.json> [--proxy URL] [--dry]
-// picks.json 是数组，每项: { bangumiId, rating, comment?, tags?, season?, episodes?, title? }
+// 用法: node scripts/add-anime.mjs <picks.json> [--proxy URL] [--dry] [--series <name>]
+// picks.json 是数组，每项: { bangumiId, rating, comment?, tags?, season?, episodes?, title?, series? }
 // 字段映射严格对齐 lib/bangumi/mapper.ts，校验对齐 lib/anime/validation.ts。
 import { ProxyAgent, fetch as undiciFetch } from "undici";
 import { nanoid } from "nanoid";
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { normalizeMarks } from "../lib/anime/marks.ts";
 
 const API_BASE = "https://api.bgm.tv";
 const DATA_FILE = path.join(process.cwd(), "data", "anime.json");
@@ -15,9 +16,12 @@ const args = process.argv.slice(2);
 const picksFile = args[0];
 let proxyUrl = process.env.BANGUMI_PROXY || "http://127.0.0.1:7897";
 let dry = false;
+let defaultSeries = "";
 for (let i = 1; i < args.length; i++) {
   if (args[i] === "--proxy") proxyUrl = args[++i];
   if (args[i] === "--dry") dry = true;
+  // 批量归集：本次所有条目共用同一个作品集名（单项里的 series 优先）。
+  if (args[i] === "--series") defaultSeries = String(args[++i] || "").trim();
 }
 if (!picksFile) {
   console.error("用法: node scripts/add-anime.mjs <picks.json> [--proxy URL] [--dry]");
@@ -81,6 +85,7 @@ for (const pick of picks) {
   if (existingTitles.has(normTitle(title)) || existingTitles.has(normTitle(s.name))) {
     skipped.push(`${bgmId} ${title} (标题已存在，疑似重复)`); continue;
   }
+  const series = String(pick.series ?? defaultSeries ?? "").trim();
   const rec = {
     id: nanoid(12),
     title,
@@ -90,6 +95,10 @@ for (const pick of picks) {
     comment: (pick.comment || "").trim(),
     episodes: pick.episodes ?? (Number.isFinite(s.eps) && s.eps > 0 ? Number(s.eps) : 0),
     tags: [...new Set((pick.tags || []).map((t) => String(t).trim()).filter(Boolean))],
+    // 「每部番就是一部作品」：没指定作品集时用标题作作品名，
+    // 以后同作品的续季/剧场版才能通过标题相似度并进来。
+    series: series || title,
+    marks: normalizeMarks(pick.marks ?? []),
     bangumiId: bgmId,
     bangumiUrl: `https://bgm.tv/subject/${bgmId}`,
     originalTitle: (s.name || "").trim(),
