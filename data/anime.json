@@ -1,5 +1,47 @@
 [
   {
+    "id": "6-mVPn98R9d5",
+    "title": "Grow Up Show ～向日葵马戏团～",
+    "season": "2026秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/0c/cf/570583_d3QZD.jpg",
+    "rating": 9,
+    "comment": "本季最佳原创，谁说穷就做不好动画啊，剧情好胜过一切啊",
+    "episodes": 13,
+    "tags": [
+      "原创",
+      "马戏团"
+    ],
+    "marks": [],
+    "bangumiId": 570583,
+    "bangumiUrl": "https://bgm.tv/subject/570583",
+    "originalTitle": "グロウアップショウ ～ひまわりのサーカス団～",
+    "airDate": "2026-07-04",
+    "createdAt": "2026-09-28T14:35:41.101Z",
+    "series": "Grow Up Show ～向日葵马戏团～"
+  },
+  {
+    "id": "elVjIm_h1jZ7",
+    "title": "无职转生 第三季 ～到了异世界就拿出真本事～",
+    "season": "2026秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/1f/9e/501963_bXlEP.jpg",
+    "rating": 10,
+    "comment": "太好看了吧，期待艾莉丝回归，啊啊啊啊等太久了",
+    "episodes": 14,
+    "tags": [
+      "异世界",
+      "无职转生"
+    ],
+    "marks": [
+      "sequel"
+    ],
+    "series": "无职转生～到了异世界就拿出真本事～",
+    "bangumiId": 501963,
+    "bangumiUrl": "https://bgm.tv/subject/501963",
+    "originalTitle": "無職転生Ⅲ ～異世界行ったら本気だす～",
+    "airDate": "2026-07-04",
+    "createdAt": "2026-09-28T13:39:37.655Z"
+  },
+  {
     "id": "pGCHozxRGQYb",
     "title": "花织即使是转生也想打架",
     "season": "2026秋",
@@ -17,7 +59,8 @@
     "originalTitle": "花織さんは転生しても喧嘩がしたい",
     "airDate": "2026-07-11",
     "createdAt": "2026-09-27T17:04:39.704Z",
-    "marks": []
+    "marks": [],
+    "series": "花织即使是转生也想打架"
   },
   {
     "id": "ldyfhR2wA6EH",
@@ -37,7 +80,8 @@
     "originalTitle": "夫婦以上、恋人未満。",
     "airDate": "2022-10-09",
     "createdAt": "2026-09-27T11:32:15.853Z",
-    "marks": []
+    "marks": [],
+    "series": "夫妇以上，恋人未满。"
   },
   {
     "id": "HTMNgOc6fD1f",
@@ -70,7 +114,8 @@
     "originalTitle": "はめつのおうこく",
     "airDate": "2023-10-06",
     "createdAt": "2026-09-27T11:23:41.540Z",
-    "marks": []
+    "marks": [],
+    "series": "破灭之国"
   },
   {
     "id": "rq3JWEEsUZjh",
@@ -86,7 +131,8 @@
     "originalTitle": "カミエラビ",
     "airDate": "2023-10-04",
     "createdAt": "2026-09-27T11:23:41.270Z",
-    "marks": []
+    "marks": [],
+    "series": "神选"
   },
   {
     "id": "LdfE-yM5Ozkr",
@@ -119,7 +165,8 @@
     "originalTitle": "アリスとテレスのまぼろし工場",
     "airDate": "2023-09-15",
     "createdAt": "2026-09-27T11:23:40.700Z",
-    "marks": []
+    "marks": [],
+    "series": "爱丽丝和特蕾丝的幻影工厂"
   },
   {
     "id": "csN9QjdaVump",
@@ -135,7 +182,8 @@
     "originalTitle": "僕らの雨いろプロトコル",
     "airDate": "2023-10-07",
     "createdAt": "2026-09-27T11:23:40.431Z",
-    "marks": []
+    "marks": [],
+    "series": "我们的雨色协议"
   },
   {
     "id": "iHF8RKfECnR8",
@@ -151,7 +199,8 @@
     "originalTitle": "経験済みなキミと、経験ゼロなオレが、お付き合いする話。",
     "airDate": "2023-10-06",
     "createdAt": "2026-09-27T11:23:40.160Z",
-    "marks": []
+    "marks": [],
+    "series": "经验丰富的你和经验为零的我交往的故事"
   },
   {
     "id": "8_9hEyrdCysf",
@@ -167,7 +216,8 @@
     "originalTitle": "ティアムーン帝国物語～断頭台から始まる、姫の転生逆転ストーリー～",
     "airDate": "2023-10-07",
     "createdAt": "2026-09-27T11:23:39.881Z",
-    "marks": []
+    "marks": [],
+    "series": "迪阿姆帝国物语～从断头台开始的，公主转生逆转传～"
   },
   {
     "id": "3hoF3N0_0VY-",
@@ -183,7 +233,8 @@
     "originalTitle": "聖剣学院の魔剣使い",
     "airDate": "2023-10-02",
     "createdAt": "2026-09-27T11:23:39.598Z",
-    "marks": []
+    "marks": [],
+    "series": "圣剑学院的魔剑使"
   },
   {
     "id": "4YD01GL0z8Ko",
@@ -218,7 +269,8 @@
     "originalTitle": "PLUTO",
     "airDate": "2023-10-26",
     "createdAt": "2026-09-27T11:23:08.491Z",
-    "marks": []
+    "marks": [],
+    "series": "冥王"
   },
   {
     "id": "kgwWpVtppA0c",
@@ -234,7 +286,8 @@
     "originalTitle": "アンデッドアンラック",
     "airDate": "2023-10-06",
     "createdAt": "2026-09-27T11:23:08.240Z",
-    "marks": []
+    "marks": [],
+    "series": "不死不幸"
   },
   {
     "id": "XNHqckqgw0Qk",
@@ -250,7 +303,8 @@
     "originalTitle": "16bitセンセーション ANOTHER LAYER",
     "airDate": "2023-10-04",
     "createdAt": "2026-09-27T11:23:07.971Z",
-    "marks": []
+    "marks": [],
+    "series": "16bit的感动 ANOTHER LAYER"
   },
   {
     "id": "yrLYxNWkLmEM",
@@ -266,7 +320,8 @@
     "originalTitle": "シャングリラ・フロンティア～クソゲーハンター、神ゲーに挑まんとす～",
     "airDate": "2023-10-01",
     "createdAt": "2026-09-27T11:23:07.681Z",
-    "marks": []
+    "marks": [],
+    "series": "香格里拉边境"
   },
   {
     "id": "kynK_HO7Ck29",
@@ -333,7 +388,8 @@
     "originalTitle": "幻日のヨハネ -SUNSHINE in the MIRROR-",
     "airDate": "2023-07-02",
     "createdAt": "2026-09-27T11:23:06.490Z",
-    "marks": []
+    "marks": [],
+    "series": "幻日夜羽 -镜中晖光-"
   },
   {
     "id": "87Ee8cr51YbP",
@@ -349,7 +405,8 @@
     "originalTitle": "ライアー・ライアー",
     "airDate": "2023-07-08",
     "createdAt": "2026-09-27T11:23:06.211Z",
-    "marks": []
+    "marks": [],
+    "series": "谎言游戏"
   },
   {
     "id": "jnzj-MZEDHVI",
@@ -365,7 +422,8 @@
     "originalTitle": "七つの魔剣が支配する",
     "airDate": "2023-07-07",
     "createdAt": "2026-09-27T11:23:05.930Z",
-    "marks": []
+    "marks": [],
+    "series": "七魔剑支配天下"
   },
   {
     "id": "CqaNzZMkfptR",
@@ -381,7 +439,8 @@
     "originalTitle": "夢見る男子は現実主義者",
     "airDate": "2023-07-03",
     "createdAt": "2026-09-27T11:23:05.650Z",
-    "marks": []
+    "marks": [],
+    "series": "满怀美梦的少年是现实主义者"
   },
   {
     "id": "F4OEVDK9v4PJ",
@@ -414,7 +473,8 @@
     "originalTitle": "わたしの幸せな結婚",
     "airDate": "2023-07-05",
     "createdAt": "2026-09-27T11:23:05.093Z",
-    "marks": []
+    "marks": [],
+    "series": "我的幸福婚姻"
   },
   {
     "id": "t5lNHUqBpOAG",
@@ -430,7 +490,8 @@
     "originalTitle": "Helck",
     "airDate": "2023-07-11",
     "createdAt": "2026-09-27T11:23:04.831Z",
-    "marks": []
+    "marks": [],
+    "series": "勇者赫鲁库"
   },
   {
     "id": "XfuH6_6z_w8w",
@@ -480,7 +541,8 @@
     "originalTitle": "アンデッドガール・マーダーファルス",
     "airDate": "2023-07-05",
     "createdAt": "2026-09-27T11:23:04.031Z",
-    "marks": []
+    "marks": [],
+    "series": "不死少女 杀人笑剧"
   },
   {
     "id": "peOaqU4i8haH",
@@ -513,7 +575,9 @@
     "originalTitle": "無職転生Ⅱ ～異世界行ったら本気だす～",
     "airDate": "2023-07-02",
     "createdAt": "2026-09-27T11:23:03.471Z",
-    "marks": [],
+    "marks": [
+      "sequel"
+    ],
     "series": "无职转生～到了异世界就拿出真本事～"
   },
   {
@@ -547,7 +611,8 @@
     "originalTitle": "山田くんとLv999の恋をする",
     "airDate": "2023-04-01",
     "createdAt": "2026-09-27T11:23:03.101Z",
-    "marks": []
+    "marks": [],
+    "series": "和山田谈场Lv999的恋爱"
   },
   {
     "id": "XtOJafCf-AA4",
@@ -597,7 +662,8 @@
     "originalTitle": "地獄楽",
     "airDate": "2023-04-01",
     "createdAt": "2026-09-27T11:23:02.293Z",
-    "marks": []
+    "marks": [],
+    "series": "地狱乐"
   },
   {
     "id": "nM1h3sEgt5EO",
@@ -664,7 +730,8 @@
     "originalTitle": "天国大魔境",
     "airDate": "2023-04-01",
     "createdAt": "2026-09-27T11:23:01.214Z",
-    "marks": []
+    "marks": [],
+    "series": "天国大魔境"
   },
   {
     "id": "7rOJmYh1zvsd",
@@ -731,7 +798,8 @@
     "originalTitle": "お隣の天使様にいつの間にか駄目人間にされていた件",
     "airDate": "2023-01-07",
     "createdAt": "2026-09-27T11:23:00.151Z",
-    "marks": []
+    "marks": [],
+    "series": "关于邻家的天使大人不知不觉把我惯成了废人这档子事"
   },
   {
     "id": "XO5IksOWOp75",
@@ -764,7 +832,8 @@
     "originalTitle": "転生王女と天才令嬢の魔法革命",
     "airDate": "2023-01-04",
     "createdAt": "2026-09-27T11:22:59.603Z",
-    "marks": []
+    "marks": [],
+    "series": "转生公主与天才千金的魔法革命"
   },
   {
     "id": "dk5ea_IrY1Zw",
@@ -780,7 +849,8 @@
     "originalTitle": "お兄ちゃんはおしまい！",
     "airDate": "2023-01-05",
     "createdAt": "2026-09-27T11:22:59.338Z",
-    "marks": []
+    "marks": [],
+    "series": "别当欧尼酱了！"
   },
   {
     "id": "_zKbeIO6yCRp",
@@ -796,7 +866,8 @@
     "originalTitle": "後宮の烏",
     "airDate": "2022-10-01",
     "createdAt": "2026-09-26T17:33:36.160Z",
-    "marks": []
+    "marks": [],
+    "series": "后宫之乌"
   },
   {
     "id": "xRUvL5_zkZvD",
@@ -846,7 +917,8 @@
     "originalTitle": "夏へのトンネル、さよならの出口",
     "airDate": "2022-09-09",
     "createdAt": "2026-09-26T17:33:35.389Z",
-    "marks": []
+    "marks": [],
+    "series": "通往夏天的隧道，再见的出口"
   },
   {
     "id": "ymVAF-9WqwCi",
@@ -862,7 +934,8 @@
     "originalTitle": "すずめの戸締まり",
     "airDate": "2022-11-11",
     "createdAt": "2026-09-26T17:33:35.139Z",
-    "marks": []
+    "marks": [],
+    "series": "铃芽之旅"
   },
   {
     "id": "QgI0Sv4sV7g_",
@@ -912,7 +985,8 @@
     "originalTitle": "チェンソーマン",
     "airDate": "2022-10-11",
     "createdAt": "2026-09-26T17:33:34.343Z",
-    "marks": []
+    "marks": [],
+    "series": "链锯人"
   },
   {
     "id": "N1-Oyzb3xDfg",
@@ -945,7 +1019,8 @@
     "originalTitle": "よふかしのうた",
     "airDate": "2022-07-07",
     "createdAt": "2026-09-26T17:33:33.999Z",
-    "marks": []
+    "marks": [],
+    "series": "彻夜之歌"
   },
   {
     "id": "47P2BmoLlUX0",
@@ -961,7 +1036,8 @@
     "originalTitle": "異世界おじさん",
     "airDate": "2022-07-06",
     "createdAt": "2026-09-26T17:33:33.751Z",
-    "marks": []
+    "marks": [],
+    "series": "异世界舅舅"
   },
   {
     "id": "KCZOstEYbn3X",
@@ -977,7 +1053,8 @@
     "originalTitle": "処刑少女の生きる道",
     "airDate": "2022-04-01",
     "createdAt": "2026-09-26T17:33:33.499Z",
-    "marks": []
+    "marks": [],
+    "series": "处刑少女的生存之道"
   },
   {
     "id": "SHOcsxES8eeM",
@@ -993,7 +1070,8 @@
     "originalTitle": "可愛いだけじゃない式守さん",
     "airDate": "2022-04-09",
     "createdAt": "2026-09-26T17:33:33.240Z",
-    "marks": []
+    "marks": [],
+    "series": "式守同学不只可爱而已"
   },
   {
     "id": "lXi8ZFdvLEam",
@@ -1009,7 +1087,8 @@
     "originalTitle": "パリピ孔明",
     "airDate": "2022-04-05",
     "createdAt": "2026-09-26T17:33:32.990Z",
-    "marks": []
+    "marks": [],
+    "series": "派对浪客诸葛孔明"
   },
   {
     "id": "129EIFggq8dt",
@@ -1025,7 +1104,8 @@
     "originalTitle": "であいもん",
     "airDate": "2022-04-06",
     "createdAt": "2026-09-26T17:33:32.731Z",
-    "marks": []
+    "marks": [],
+    "series": "相合之物"
   },
   {
     "id": "kSKaFIQydRwf",
@@ -1041,7 +1121,8 @@
     "originalTitle": "サマータイムレンダ",
     "airDate": "2022-04-14",
     "createdAt": "2026-09-26T17:33:32.471Z",
-    "marks": []
+    "marks": [],
+    "series": "夏日重现"
   },
   {
     "id": "iu-f7sjl0dAE",
@@ -1091,7 +1172,8 @@
     "originalTitle": "天才王子の赤字国家再生術",
     "airDate": "2022-01-11",
     "createdAt": "2026-09-26T17:33:31.680Z",
-    "marks": []
+    "marks": [],
+    "series": "天才王子的赤字国家振兴术"
   },
   {
     "id": "O6CtLCECvDmZ",
@@ -1158,7 +1240,8 @@
     "originalTitle": "その着せ替え人形は恋をする",
     "airDate": "2022-01-08",
     "createdAt": "2026-09-26T17:33:30.632Z",
-    "marks": []
+    "marks": [],
+    "series": "更衣人偶坠入爱河"
   },
   {
     "id": "iNRLAgkNRHvU",
@@ -1174,7 +1257,8 @@
     "originalTitle": "サマーゴースト",
     "airDate": "2021-11-12",
     "createdAt": "2026-09-26T15:53:04.738Z",
-    "marks": []
+    "marks": [],
+    "series": "夏日幽灵"
   },
   {
     "id": "Ny034c2OSclt",
@@ -1258,7 +1342,8 @@
     "originalTitle": "出会って5秒でバトル",
     "airDate": "2021-07-12",
     "createdAt": "2026-09-26T15:53:03.117Z",
-    "marks": []
+    "marks": [],
+    "series": "见面之后5秒开始战斗"
   },
   {
     "id": "e72LHxib5MOV",
@@ -1274,7 +1359,8 @@
     "originalTitle": "白い砂のアクアトープ",
     "airDate": "2021-07-08",
     "createdAt": "2026-09-26T15:53:02.846Z",
-    "marks": []
+    "marks": [],
+    "series": "白沙的水族馆"
   },
   {
     "id": "rgXoUWp3mCXb",
@@ -1324,7 +1410,8 @@
     "originalTitle": "ジョゼと虎と魚たち",
     "airDate": "2020-12-25",
     "createdAt": "2026-09-26T15:53:02.016Z",
-    "marks": []
+    "marks": [],
+    "series": "乔西的虎与鱼"
   },
   {
     "id": "FGGAPsHrBg_D",
@@ -1357,7 +1444,8 @@
     "originalTitle": "弱キャラ友崎くん",
     "airDate": "2021-01-08",
     "createdAt": "2026-09-26T15:53:01.475Z",
-    "marks": []
+    "marks": [],
+    "series": "弱角友崎同学"
   },
   {
     "id": "g0gldeahv1ko",
@@ -1407,7 +1495,8 @@
     "originalTitle": "回復術士のやり直し",
     "airDate": "2021-01-13",
     "createdAt": "2026-09-26T15:53:00.837Z",
-    "marks": []
+    "marks": [],
+    "series": "回复术士的重来人生"
   },
   {
     "id": "2rp7Cr1w_V87",
@@ -1474,7 +1563,8 @@
     "originalTitle": "アクダマドライブ",
     "airDate": "2020-10-08",
     "createdAt": "2026-09-26T15:18:13.999Z",
-    "marks": []
+    "marks": [],
+    "series": "全员恶玉"
   },
   {
     "id": "UNqNzBCAql9x",
@@ -1490,7 +1580,8 @@
     "originalTitle": "神様になった日",
     "airDate": "2020-10-10",
     "createdAt": "2026-09-26T15:18:13.714Z",
-    "marks": []
+    "marks": [],
+    "series": "成神之日"
   },
   {
     "id": "Cfq9bGOxt-8x",
@@ -1574,7 +1665,8 @@
     "originalTitle": "魔女の旅々",
     "airDate": "2020-10-02",
     "createdAt": "2026-09-26T15:18:12.395Z",
-    "marks": []
+    "marks": [],
+    "series": "魔女之旅"
   },
   {
     "id": "W6DpCkOD2AHE",
@@ -1590,7 +1682,8 @@
     "originalTitle": "泣きたい私は猫をかぶる",
     "airDate": "2020-06-18",
     "createdAt": "2026-09-26T15:18:12.125Z",
-    "marks": []
+    "marks": [],
+    "series": "想哭的我戴上了猫的面具"
   },
   {
     "id": "eyy3RKP2593e",
@@ -1640,7 +1733,8 @@
     "originalTitle": "神之塔 -Tower of God-",
     "airDate": "2020-04-01",
     "createdAt": "2026-09-26T15:18:11.474Z",
-    "marks": []
+    "marks": [],
+    "series": "神之塔"
   },
   {
     "id": "BUZgRZLwLzfz",
@@ -1656,7 +1750,8 @@
     "originalTitle": "グレイプニル",
     "airDate": "2020-04-05",
     "createdAt": "2026-09-26T15:18:11.176Z",
-    "marks": []
+    "marks": [],
+    "series": "格莱普尼尔"
   },
   {
     "id": "8JzVWYmV9y_I",
@@ -1723,7 +1818,8 @@
     "originalTitle": "ID:INVADED イド：インヴェイデッド",
     "airDate": "2020-01-05",
     "createdAt": "2026-09-26T15:18:10.112Z",
-    "marks": []
+    "marks": [],
+    "series": "异度侵入"
   },
   {
     "id": "W9r6Mo1NfiA3",
@@ -1743,7 +1839,8 @@
     "originalTitle": "ヘルモード ～やり込み好きのゲーマーは廃設定の異世界で無双する～ 2nd Season",
     "airDate": "2026-07-03",
     "createdAt": "2026-09-26T04:47:22.664Z",
-    "marks": []
+    "marks": [],
+    "series": "地狱模式～喜欢挑战特殊成就的玩家在废设定的异世界成为无双～第二季"
   },
   {
     "id": "7BDrjxzJBDB0",
@@ -1764,7 +1861,8 @@
     "originalTitle": "透明な夜に駆ける君と、目に見えない恋をした。",
     "airDate": "2026-07-06",
     "createdAt": "2026-09-25T06:35:43.848Z",
-    "marks": []
+    "marks": [],
+    "series": "与奔驰于透明之夜的你，谈一场看不见的恋爱。"
   },
   {
     "id": "IEsvKf5LXLjw",
@@ -1785,7 +1883,8 @@
     "originalTitle": "ふつつかな悪女ではございますが ～雛宮蝶鼠とりかえ伝～",
     "airDate": "2026-07-12",
     "createdAt": "2026-09-25T05:37:13.933Z",
-    "marks": []
+    "marks": [],
+    "series": "恶女不才，请多关照 ～雏宫蝶鼠换身传～"
   },
   {
     "id": "a6zCQCrntgyU",
@@ -1801,7 +1900,8 @@
     "originalTitle": "俺を好きなのはお前だけかよ",
     "airDate": "2019-10-02",
     "createdAt": "2026-09-21T14:00:43.428Z",
-    "marks": []
+    "marks": [],
+    "series": "喜欢本大爷的竟然就你一个？"
   },
   {
     "id": "i8gC1GNiOniL",
@@ -1834,7 +1934,8 @@
     "originalTitle": "HELLO WORLD",
     "airDate": "2019-09-20",
     "createdAt": "2026-09-21T14:00:41.846Z",
-    "marks": []
+    "marks": [],
+    "series": "你好 世界"
   },
   {
     "id": "SUL6d56-8FaE",
@@ -1901,7 +2002,8 @@
     "originalTitle": "天気の子",
     "airDate": "2019-07-19",
     "createdAt": "2026-09-21T14:00:39.646Z",
-    "marks": []
+    "marks": [],
+    "series": "天气之子"
   },
   {
     "id": "LEvmyD0ZqMhK",
@@ -1968,7 +2070,8 @@
     "originalTitle": "キャロル＆チューズデイ",
     "airDate": "2019-04-10",
     "createdAt": "2026-09-21T14:00:38.596Z",
-    "marks": []
+    "marks": [],
+    "series": "CAROLE & TUESDAY"
   },
   {
     "id": "ffH9aW89CtRa",
@@ -2103,7 +2206,8 @@
     "originalTitle": "君の膵臓をたべたい",
     "airDate": "2018-09-01",
     "createdAt": "2026-09-21T13:27:32.546Z",
-    "marks": []
+    "marks": [],
+    "series": "我想吃掉你的胰脏"
   },
   {
     "id": "ygc0yL-ERoRt",
@@ -2136,7 +2240,8 @@
     "originalTitle": "ISLAND",
     "airDate": "2018-07-01",
     "createdAt": "2026-09-21T13:27:32.370Z",
-    "marks": []
+    "marks": [],
+    "series": "ISLAND"
   },
   {
     "id": "XKn0VCmycu7V",
@@ -2152,7 +2257,8 @@
     "originalTitle": "殺戮の天使",
     "airDate": "2018-07-06",
     "createdAt": "2026-09-21T13:27:32.066Z",
-    "marks": []
+    "marks": [],
+    "series": "杀戮天使"
   },
   {
     "id": "IObFGNSdXh3a",
@@ -2202,7 +2308,8 @@
     "originalTitle": "さよならの朝に約束の花をかざろう",
     "airDate": "2018-02-24",
     "createdAt": "2026-09-21T13:27:31.526Z",
-    "marks": []
+    "marks": [],
+    "series": "朝花夕誓——于离别之朝束起约定之花"
   },
   {
     "id": "dgn1oSt1k5T7",
@@ -2269,7 +2376,8 @@
     "originalTitle": "月がきれい",
     "airDate": "2017-04-06",
     "createdAt": "2026-09-20T08:40:12.116Z",
-    "marks": []
+    "marks": [],
+    "series": "月色真美"
   },
   {
     "id": "hE_pafbln400",
@@ -2387,7 +2495,8 @@
     "originalTitle": "クビキリサイクル 青色サヴァンと戯言遣い",
     "airDate": "2016-10-26",
     "createdAt": "2026-09-20T08:06:26.920Z",
-    "marks": []
+    "marks": [],
+    "series": "斩首循环 蓝色学者与戏言跟班"
   },
   {
     "id": "FCOKU8xfaehj",
@@ -2454,7 +2563,8 @@
     "originalTitle": "この美術部には問題がある！",
     "airDate": "2016-07-07",
     "createdAt": "2026-09-20T08:06:25.822Z",
-    "marks": []
+    "marks": [],
+    "series": "这个美术社大有问题！"
   },
   {
     "id": "mgrJU4ssVSi1",
@@ -2504,7 +2614,8 @@
     "originalTitle": "双星の陰陽師",
     "airDate": "2016-04-06",
     "createdAt": "2026-09-20T08:06:25.024Z",
-    "marks": []
+    "marks": [],
+    "series": "双星之阴阳师"
   },
   {
     "id": "pYCoXLoK6bnW",
@@ -2588,7 +2699,8 @@
     "originalTitle": "落第騎士の英雄譚",
     "airDate": "2015-10-03",
     "createdAt": "2026-09-20T06:34:29.449Z",
-    "marks": []
+    "marks": [],
+    "series": "落第骑士英雄谭"
   },
   {
     "id": "4lQnXJdLRnZv",
@@ -2638,7 +2750,8 @@
     "originalTitle": "六花の勇者",
     "airDate": "2015-07-04",
     "createdAt": "2026-09-20T06:34:28.598Z",
-    "marks": []
+    "marks": [],
+    "series": "六花的勇者"
   },
   {
     "id": "aBR4QfQST3rA",
@@ -2654,7 +2767,8 @@
     "originalTitle": "Charlotte",
     "airDate": "2015-07-04",
     "createdAt": "2026-09-20T06:34:28.326Z",
-    "marks": []
+    "marks": [],
+    "series": "夏洛特"
   },
   {
     "id": "pI_Jyz9wsnKf",
@@ -2755,7 +2869,8 @@
     "originalTitle": "プラスティック・メモリーズ",
     "airDate": "2015-04-04",
     "createdAt": "2026-09-20T06:34:26.676Z",
-    "marks": []
+    "marks": [],
+    "series": "可塑性记忆"
   },
   {
     "id": "quXJLXjKeA0O",
@@ -2788,7 +2903,8 @@
     "originalTitle": "聖剣使いの禁呪詠唱",
     "airDate": "2015-01-11",
     "createdAt": "2026-09-20T06:34:26.147Z",
-    "marks": []
+    "marks": [],
+    "series": "圣剑使的禁咒咏唱"
   },
   {
     "id": "g3uK7lYohq5v",
@@ -2804,7 +2920,8 @@
     "originalTitle": "アブソリュート・デュオ",
     "airDate": "2015-01-04",
     "createdAt": "2026-09-20T06:34:25.566Z",
-    "marks": []
+    "marks": [],
+    "series": "绝对双刃"
   },
   {
     "id": "p4_axvFA0zRA",
@@ -2837,7 +2954,8 @@
     "originalTitle": "新妹魔王の契約者",
     "airDate": "2015-01-07",
     "createdAt": "2026-09-20T06:34:25.018Z",
-    "marks": []
+    "marks": [],
+    "series": "新妹魔王的契约者"
   },
   {
     "id": "PDLv3l8Zw71U",
@@ -2904,7 +3022,8 @@
     "originalTitle": "七つの大罪",
     "airDate": "2014-10-05",
     "createdAt": "2026-09-20T05:11:53.413Z",
-    "marks": []
+    "marks": [],
+    "series": "七大罪"
   },
   {
     "id": "sIDKZ5O9y9aR",
@@ -2920,7 +3039,8 @@
     "originalTitle": "異能バトルは日常系のなかで",
     "airDate": "2014-10-06",
     "createdAt": "2026-09-20T05:11:53.133Z",
-    "marks": []
+    "marks": [],
+    "series": "日常系的异能战斗"
   },
   {
     "id": "jG16mZUbNHoe",
@@ -2970,7 +3090,8 @@
     "originalTitle": "精霊使いの剣舞",
     "airDate": "2014-07-14",
     "createdAt": "2026-09-20T05:11:52.343Z",
-    "marks": []
+    "marks": [],
+    "series": "精灵使的剑舞"
   },
   {
     "id": "MTUGMudXThCF",
@@ -2986,7 +3107,8 @@
     "originalTitle": "アカメが斬る!",
     "airDate": "2014-07-06",
     "createdAt": "2026-09-20T05:11:52.064Z",
-    "marks": []
+    "marks": [],
+    "series": "斩·赤红之瞳！"
   },
   {
     "id": "3XE0u9RmcpLf",
@@ -3019,7 +3141,8 @@
     "originalTitle": "星刻の竜騎士",
     "airDate": "2014-04-05",
     "createdAt": "2026-09-20T05:11:51.533Z",
-    "marks": []
+    "marks": [],
+    "series": "星刻的龙骑士"
   },
   {
     "id": "EXAINIxErm4_",
@@ -3035,7 +3158,8 @@
     "originalTitle": "僕らはみんな河合荘",
     "airDate": "2014-04-03",
     "createdAt": "2026-09-20T05:11:51.263Z",
-    "marks": []
+    "marks": [],
+    "series": "我们大家的河合庄"
   },
   {
     "id": "hCOxgfz3ZbXg",
@@ -3051,7 +3175,8 @@
     "originalTitle": "たまこラブストーリー",
     "airDate": "2014-04-26",
     "createdAt": "2026-09-20T05:11:50.993Z",
-    "marks": []
+    "marks": [],
+    "series": "玉子爱情故事"
   },
   {
     "id": "gdIxI3dh0oEZ",
@@ -3067,7 +3192,8 @@
     "originalTitle": "ノーゲーム・ノーライフ",
     "airDate": "2014-04-09",
     "createdAt": "2026-09-20T05:11:50.733Z",
-    "marks": []
+    "marks": [],
+    "series": "游戏人生"
   },
   {
     "id": "C3hX3uJon-Tk",
@@ -3236,7 +3362,8 @@
     "originalTitle": "はたらく魔王さま!",
     "airDate": "2013-04-04",
     "createdAt": "2026-09-19T17:35:51.406Z",
-    "marks": []
+    "marks": [],
+    "series": "打工吧！魔王大人"
   },
   {
     "id": "-KKKd7pJWggT",
@@ -3269,7 +3396,8 @@
     "originalTitle": "デート・ア・ライブ",
     "airDate": "2013-04-05",
     "createdAt": "2026-09-19T17:35:50.836Z",
-    "marks": []
+    "marks": [],
+    "series": "约会大作战"
   },
   {
     "id": "i5HRSsSeRmqh",
@@ -3319,7 +3447,8 @@
     "originalTitle": "たまこまーけっと",
     "airDate": "2013-01-09",
     "createdAt": "2026-09-19T17:35:50.024Z",
-    "marks": []
+    "marks": [],
+    "series": "玉子市场"
   },
   {
     "id": "dbq7WEgAjOmU",
@@ -3369,7 +3498,8 @@
     "originalTitle": "さんかれあ",
     "airDate": "2012-04-05",
     "createdAt": "2026-09-19T17:23:26.591Z",
-    "marks": []
+    "marks": [],
+    "series": "散华礼弥"
   },
   {
     "id": "YCVOKrrNs854",
@@ -3402,7 +3532,8 @@
     "originalTitle": "ギルティクラウン",
     "airDate": "2011-10-13",
     "createdAt": "2026-09-19T17:08:25.843Z",
-    "marks": []
+    "marks": [],
+    "series": "罪恶王冠"
   },
   {
     "id": "PLM26-5s5UyS",
@@ -3418,7 +3549,8 @@
     "originalTitle": "あの日見た花の名前を僕達はまだ知らない。",
     "airDate": "2011-04-14",
     "createdAt": "2026-09-19T17:08:25.313Z",
-    "marks": []
+    "marks": [],
+    "series": "我们仍未知道那天所看见的花的名字。"
   },
   {
     "id": "UvVa7Syb6LTF",
@@ -3434,7 +3566,8 @@
     "originalTitle": "STEINS;GATE",
     "airDate": "2011-04-06",
     "createdAt": "2026-09-19T17:08:25.049Z",
-    "marks": []
+    "marks": [],
+    "series": "命运石之门"
   },
   {
     "id": "jpVlfBE4-yD9",
@@ -3467,7 +3600,8 @@
     "originalTitle": "とある科学の超電磁砲",
     "airDate": "2009-10-02",
     "createdAt": "2026-09-19T16:53:04.599Z",
-    "marks": []
+    "marks": [],
+    "series": "某科学的超电磁炮"
   },
   {
     "id": "lSkjVkwZTNVI",
@@ -3483,7 +3617,8 @@
     "originalTitle": "けいおん！",
     "airDate": "2009-04-02",
     "createdAt": "2026-09-19T16:53:04.333Z",
-    "marks": []
+    "marks": [],
+    "series": "轻音少女"
   },
   {
     "id": "oOTgENVlnoJr",
@@ -3499,7 +3634,8 @@
     "originalTitle": "とらドラ！",
     "airDate": "2008-10-01",
     "createdAt": "2026-09-19T16:30:57.141Z",
-    "marks": []
+    "marks": [],
+    "series": "龙与虎"
   },
   {
     "id": "dRbO_nHfyjlR",
@@ -3549,7 +3685,8 @@
     "originalTitle": "秒速5センチメートル",
     "airDate": "2007-03-03",
     "createdAt": "2026-09-19T16:25:09.970Z",
-    "marks": []
+    "marks": [],
+    "series": "秒速5厘米"
   },
   {
     "id": "kpWCynHqnE9F",
@@ -3565,7 +3702,8 @@
     "originalTitle": "ゼロの使い魔",
     "airDate": "2006-07-02",
     "createdAt": "2026-09-19T16:11:31.531Z",
-    "marks": []
+    "marks": [],
+    "series": "零之使魔"
   },
   {
     "id": "oCQcyEyfjDtP",
@@ -3581,7 +3719,8 @@
     "originalTitle": "時をかける少女",
     "airDate": "2006-07-15",
     "createdAt": "2026-09-19T16:11:31.232Z",
-    "marks": []
+    "marks": [],
+    "series": "穿越时空的少女"
   },
   {
     "id": "or6hnYeIpTrA",
@@ -3597,7 +3736,8 @@
     "originalTitle": "Fate/stay night",
     "airDate": "2006-01-06",
     "createdAt": "2026-09-19T16:11:30.958Z",
-    "marks": []
+    "marks": [],
+    "series": "Fate/stay night"
   },
   {
     "id": "qgOAtjH6gC2d",
@@ -3613,7 +3753,8 @@
     "originalTitle": "千と千尋の神隠し",
     "airDate": "2001-07-20",
     "createdAt": "2026-09-19T15:24:44.132Z",
-    "marks": []
+    "marks": [],
+    "series": "千与千寻"
   },
   {
     "id": "7x_ixOgHNBlI",
@@ -3633,7 +3774,8 @@
     "originalTitle": "ここは俺に任せて先に行けと言ってから10年がたったら伝説になっていた。",
     "airDate": "2026-07-06",
     "createdAt": "2026-09-19T14:02:52.128Z",
-    "marks": []
+    "marks": [],
+    "series": "『你们先走我断后』，于是10年后我成为了传说"
   },
   {
     "id": "zN9d1X0LlYwi",
@@ -3654,7 +3796,8 @@
     "originalTitle": "乙女怪獣キャラメリゼ",
     "airDate": "2026-07-02",
     "createdAt": "2026-09-18T04:46:51.073Z",
-    "marks": []
+    "marks": [],
+    "series": "少女怪兽焦糖味"
   },
   {
     "id": "Fex9dIA9bb5Y",
@@ -3674,7 +3817,8 @@
     "originalTitle": "言の葉の庭",
     "airDate": "2013-05-31",
     "createdAt": "2026-08-04T08:54:09.561Z",
-    "marks": []
+    "marks": [],
+    "series": "言叶之庭"
   },
   {
     "id": "CrjdX9MZL2VP",
@@ -3695,7 +3839,8 @@
     "originalTitle": "聲の形",
     "airDate": "2016-09-17",
     "createdAt": "2026-08-04T08:52:45.417Z",
-    "marks": []
+    "marks": [],
+    "series": "声之形"
   },
   {
     "id": "-Uj3qNMIaEAz",
@@ -3715,7 +3860,8 @@
     "originalTitle": "君の名は。",
     "airDate": "2016-08-26",
     "createdAt": "2026-08-04T08:51:25.308Z",
-    "marks": []
+    "marks": [],
+    "series": "你的名字。"
   },
   {
     "id": "jWZZNGM0u6G2",
@@ -3777,7 +3923,8 @@
     "originalTitle": "BanG Dream! Ave Mujica",
     "airDate": "2025-01-02",
     "createdAt": "2026-07-31T14:51:37.794Z",
-    "marks": []
+    "marks": [],
+    "series": "BanG Dream! Ave Mujica"
   },
   {
     "id": "w2COoYhM2PKy",
@@ -3797,7 +3944,8 @@
     "originalTitle": "ガールズバンドクライ",
     "airDate": "2024-04-05",
     "createdAt": "2026-07-31T14:50:15.978Z",
-    "marks": []
+    "marks": [],
+    "series": "少女乐队的呐喊"
   },
   {
     "id": "L9QlWRnBjOHu",
@@ -3816,7 +3964,8 @@
     "originalTitle": "ぼっち・ざ・ろっく！",
     "airDate": "2022-10-08",
     "createdAt": "2026-07-31T14:48:21.570Z",
-    "marks": []
+    "marks": [],
+    "series": "孤独摇滚！"
   },
   {
     "id": "yHbM5VZuYHbm",
@@ -3917,7 +4066,8 @@
     "bangumiUrl": "https://bgm.tv/subject/535669",
     "originalTitle": "氷の城壁",
     "airDate": "2026-04-02",
-    "marks": []
+    "marks": [],
+    "series": "冰之城墙"
   },
   {
     "id": "RgrZbaA5x4H3",
@@ -3937,7 +4087,8 @@
     "bangumiUrl": "https://bgm.tv/subject/374648",
     "originalTitle": "ラグナクリムゾン",
     "airDate": "2023-09-30",
-    "marks": []
+    "marks": [],
+    "series": "狩龙人拉格纳"
   },
   {
     "id": "OI1ltaZGcEjl",
@@ -3978,7 +4129,8 @@
     "bangumiUrl": "https://bgm.tv/subject/252782",
     "originalTitle": "蜘蛛ですが、なにか?",
     "airDate": "2021-01-08",
-    "marks": []
+    "marks": [],
+    "series": "转生成蜘蛛又怎样！"
   },
   {
     "id": "sppALCptkfaR",
@@ -4123,7 +4275,8 @@
     "bangumiUrl": "https://bgm.tv/subject/526448",
     "originalTitle": "グノーシア",
     "airDate": "2025-10-11",
-    "marks": []
+    "marks": [],
+    "series": "古诺西亚"
   },
   {
     "id": "sp3v8YMK-OwX",
@@ -4143,7 +4296,8 @@
     "bangumiUrl": "https://bgm.tv/subject/571555",
     "originalTitle": "スノウボールアース",
     "airDate": "2026-04-03",
-    "marks": []
+    "marks": [],
+    "series": "冻结地球"
   },
   {
     "id": "uLRbpp27gQ1-",
@@ -4162,7 +4316,8 @@
     "bangumiUrl": "https://bgm.tv/subject/456079",
     "originalTitle": "クラスで2番目に可愛い女の子と友だちになった",
     "airDate": "2026-04-07",
-    "marks": []
+    "marks": [],
+    "series": "我和班上第二可爱的女孩成为朋友"
   },
   {
     "id": "vqDMppaV6PE7",
@@ -4181,7 +4336,8 @@
     "bangumiUrl": "https://bgm.tv/subject/623854",
     "originalTitle": "女神『異世界転生何になりたいですか』俺「勇者の肋骨で」",
     "airDate": "2026-04-07",
-    "marks": []
+    "marks": [],
+    "series": "女神“异世界转生想成为什么”我“勇者的肋骨”"
   },
   {
     "id": "93lPb4RdvTar",
@@ -4201,7 +4357,8 @@
     "bangumiUrl": "https://bgm.tv/subject/364450",
     "originalTitle": "リコリス・リコイル",
     "airDate": "2022-07-02",
-    "marks": []
+    "marks": [],
+    "series": "莉可丽丝"
   },
   {
     "id": "iKIz-h3lEna8",
@@ -4221,7 +4378,8 @@
     "bangumiUrl": "https://bgm.tv/subject/41488",
     "originalTitle": "さくら荘のペットな彼女",
     "airDate": "2012-10-08",
-    "marks": []
+    "marks": [],
+    "series": "樱花庄的宠物女孩"
   },
   {
     "id": "54H7gJF81EVL",
@@ -4283,7 +4441,8 @@
     "bangumiUrl": "https://bgm.tv/subject/551123",
     "originalTitle": "ポンコツ風紀委員とスカート丈が不適切なJKの話",
     "airDate": "2026-04-06",
-    "marks": []
+    "marks": [],
+    "series": "木头风纪委员和迷你裙JK的故事"
   },
   {
     "id": "_laOLxZnf3N7",
@@ -4303,7 +4462,8 @@
     "bangumiUrl": "https://bgm.tv/subject/558088",
     "originalTitle": "自称悪役令嬢な婚約者の観察記録。",
     "airDate": "2026-04-06",
-    "marks": []
+    "marks": [],
+    "series": "自称恶役大小姐的婚约者观察记录"
   },
   {
     "id": "02-TkZPTI0NV",
@@ -4323,7 +4483,8 @@
     "bangumiUrl": "https://bgm.tv/subject/309311",
     "originalTitle": "Cyberpunk: Edgerunners",
     "airDate": "2022-09-13",
-    "marks": []
+    "marks": [],
+    "series": "赛博朋克：边缘行者"
   },
   {
     "id": "cDcHtZKEE8K2",
@@ -4342,7 +4503,8 @@
     "bangumiUrl": "https://bgm.tv/subject/7157",
     "originalTitle": "ヨスガノソラ",
     "airDate": "2010-10-04",
-    "marks": []
+    "marks": [],
+    "series": "缘之空"
   },
   {
     "id": "9G4qXuuBmd__",
@@ -4362,7 +4524,8 @@
     "bangumiUrl": "https://bgm.tv/subject/1851",
     "originalTitle": "Angel Beats!",
     "airDate": "2010-04-02",
-    "marks": []
+    "marks": [],
+    "series": "Angel Beats!"
   },
   {
     "id": "UZRatQqPSqeR",
@@ -4382,7 +4545,8 @@
     "bangumiUrl": "https://bgm.tv/subject/9717",
     "originalTitle": "魔法少女まどか☆マギカ",
     "airDate": "2011-01-06",
-    "marks": []
+    "marks": [],
+    "series": "魔法少女小圆"
   },
   {
     "id": "IpyZTPX_UNQt",
@@ -4401,7 +4565,8 @@
     "bangumiUrl": "https://bgm.tv/subject/365437",
     "originalTitle": "君は放課後インソムニア",
     "airDate": "2023-04-10",
-    "marks": []
+    "marks": [],
+    "series": "放学后失眠的你"
   },
   {
     "id": "h_LLsbNwC7aw",
@@ -4420,7 +4585,8 @@
     "bangumiUrl": "https://bgm.tv/subject/27364",
     "originalTitle": "氷菓",
     "airDate": "2012-04-22",
-    "marks": []
+    "marks": [],
+    "series": "冰菓"
   },
   {
     "id": "DwdgV_EEOHDA",
@@ -4439,7 +4605,8 @@
     "bangumiUrl": "https://bgm.tv/subject/424883",
     "originalTitle": "時々ボソッとロシア語でデレる隣のアーリャさん",
     "airDate": "2024-07-03",
-    "marks": []
+    "marks": [],
+    "series": "不时轻声地以俄语遮羞的邻座艾莉同学 第一季"
   },
   {
     "id": "8g-VmTyHM7Kc",
@@ -4455,7 +4622,8 @@
     "bangumiUrl": "https://bgm.tv/subject/212278",
     "originalTitle": "Just Because!",
     "airDate": "2017-10-05",
-    "marks": []
+    "marks": [],
+    "series": "Just Because!"
   },
   {
     "id": "MDmLLM3--9g6",
@@ -4471,7 +4639,8 @@
     "bangumiUrl": "https://bgm.tv/subject/319739",
     "originalTitle": "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました",
     "airDate": "2021-10-06",
-    "marks": []
+    "marks": [],
+    "series": "因为不是真正的伙伴而被逐出勇者队伍 流落到边境展开慢活人生 第一季"
   },
   {
     "id": "y3c0Zhee1_9Y",
@@ -4521,7 +4690,9 @@
     "bangumiUrl": "https://bgm.tv/subject/325585",
     "originalTitle": "無職転生 ～異世界行ったら本気だす～ 第2クール",
     "airDate": "2021-10-03",
-    "marks": [],
+    "marks": [
+      "sequel"
+    ],
     "series": "无职转生～到了异世界就拿出真本事～"
   },
   {
@@ -4538,7 +4709,9 @@
     "bangumiUrl": "https://bgm.tv/subject/277554",
     "originalTitle": "無職転生 ～異世界行ったら本気だす～",
     "airDate": "2021-01-10",
-    "marks": [],
+    "marks": [
+      "sequel"
+    ],
     "series": "无职转生～到了异世界就拿出真本事～"
   },
   {
@@ -4640,7 +4813,8 @@
     "bangumiUrl": "https://bgm.tv/subject/502142",
     "originalTitle": "クレバテス-魔獣の王と赤子と屍の勇者-",
     "airDate": "2025-07-02",
-    "marks": []
+    "marks": [],
+    "series": "魔兽之王与婴儿与尸之勇者"
   },
   {
     "id": "CpQnJ1C-D91x",
@@ -4657,7 +4831,8 @@
     "bangumiUrl": "https://bgm.tv/subject/428735",
     "originalTitle": "BanG Dream! It's MyGO!!!!!",
     "airDate": "2023-06-29",
-    "marks": []
+    "marks": [],
+    "series": "BanG Dream! It's MyGO!!!!!"
   },
   {
     "id": "demo-3",
@@ -4674,7 +4849,8 @@
     "bangumiUrl": "https://bgm.tv/subject/467461",
     "originalTitle": "ダンダダン",
     "airDate": "2024-10-03",
-    "marks": []
+    "marks": [],
+    "series": "胆大党"
   },
   {
     "id": "demo-4",
@@ -4713,7 +4889,8 @@
     "bangumiUrl": "https://bgm.tv/subject/464376",
     "originalTitle": "負けヒロインが多すぎる！",
     "airDate": "2024-07-13",
-    "marks": []
+    "marks": [],
+    "series": "败犬女主太多了！"
   },
   {
     "id": "demo-2",
@@ -4730,7 +4907,8 @@
     "bangumiUrl": "https://bgm.tv/subject/395378",
     "originalTitle": "ダンジョン飯",
     "airDate": "2024-01-04",
-    "marks": []
+    "marks": [],
+    "series": "迷宫饭"
   },
   {
     "id": "demo-5",
@@ -4774,5 +4952,1532 @@
     "airDate": "2026-01-16",
     "marks": [],
     "series": "葬送的芙莉莲"
+  },
+  {
+    "id": "TKCz_VEgmNAX",
+    "title": "梦想成为魔法少女",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/96/d1/424663_mM5GN.jpg",
+    "rating": 8.5,
+    "comment": "枫糖主教我还记得你，魔法少女还能这样拍？",
+    "episodes": 13,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 424663,
+    "bangumiUrl": "https://bgm.tv/subject/424663",
+    "originalTitle": "魔法少女にあこがれて",
+    "airDate": "2024-01-03",
+    "createdAt": "2026-09-28T08:41:02.966Z",
+    "series": "梦想成为魔法少女"
+  },
+  {
+    "id": "HYfAn_mUJAKO",
+    "title": "欢迎来到实力至上主义的教室 第三季",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/50/4d/373266_BiqQm.jpg",
+    "rating": 8,
+    "comment": "一般般吧，要么一个女主都别有，专心搞你的中专大乱斗；要么专心行不行，拉扯这么多女的恶心",
+    "episodes": 13,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 373266,
+    "bangumiUrl": "https://bgm.tv/subject/373266",
+    "originalTitle": "ようこそ実力至上主義の教室へ 3rd Season",
+    "airDate": "2024-01-03",
+    "createdAt": "2026-09-28T08:41:03.088Z",
+    "series": "欢迎来到实力至上主义的教室"
+  },
+  {
+    "id": "KeALeUD-Vfit",
+    "title": "青春猪头少年不会梦到红书包女孩",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/37/af/426239_1D3s9.jpg",
+    "rating": 9,
+    "comment": "麻衣学姐可爱捏",
+    "episodes": 1,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 426239,
+    "bangumiUrl": "https://bgm.tv/subject/426239",
+    "originalTitle": "青春ブタ野郎はランドセルガールの夢を見ない",
+    "airDate": "2023-12-01",
+    "createdAt": "2026-09-28T08:41:03.166Z",
+    "series": "青春猪头少年不会梦到"
+  },
+  {
+    "id": "Nu-IdK7AIOjl",
+    "title": "剧场版 间谍过家家 代号：白",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ec/82/411428_xwKKP.jpg",
+    "rating": 8,
+    "comment": "这剧场版拉了，最差劲的喜剧就是屎尿屁",
+    "episodes": 1,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 411428,
+    "bangumiUrl": "https://bgm.tv/subject/411428",
+    "originalTitle": "劇場版 SPY×FAMILY CODE: White",
+    "airDate": "2023-12-22",
+    "createdAt": "2026-09-28T08:41:03.249Z",
+    "series": "间谍过家家"
+  },
+  {
+    "id": "OgVRbC-LXgug",
+    "title": "秒杀外挂太强了，异世界的家伙们根本就不是对手。",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ef/c7/409441_wrBwz.jpg",
+    "rating": 8.5,
+    "comment": "很有意思的番，期待第二季啊",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 409441,
+    "bangumiUrl": "https://bgm.tv/subject/409441",
+    "originalTitle": "即死チートが最強すぎて、異世界のやつらがまるで相手にならないんですが。",
+    "airDate": "2024-01-04",
+    "createdAt": "2026-09-28T08:41:03.376Z",
+    "series": "秒杀外挂太强了，异世界的家伙们根本就不是对手。"
+  },
+  {
+    "id": "-90HUhnOck0p",
+    "title": "事与愿违的不死冒险者",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/bc/bc/378298_zO8ek.jpg",
+    "rating": 8.5,
+    "comment": "也是不错的番，ed好听，女主大",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 378298,
+    "bangumiUrl": "https://bgm.tv/subject/378298",
+    "originalTitle": "望まぬ不死の冒険者",
+    "airDate": "2024-01-08",
+    "createdAt": "2026-09-28T08:41:03.459Z",
+    "series": "事与愿违的不死冒险者"
+  },
+  {
+    "id": "onojil21qSwr",
+    "title": "异修罗",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b5/a4/420084_zhWtk.jpg",
+    "rating": 8.5,
+    "comment": "打斗好，剧情越到后期不明所以了，电子斗蛐蛐还行",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 420084,
+    "bangumiUrl": "https://bgm.tv/subject/420084",
+    "originalTitle": "異修羅",
+    "airDate": "2024-01-03",
+    "createdAt": "2026-09-28T08:41:03.541Z",
+    "series": "异修罗"
+  },
+  {
+    "id": "eTOUjDsOZDcU",
+    "title": "愚蠢天使与恶魔共舞",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/11/bc/431839_s81KK.jpg",
+    "rating": 8.5,
+    "comment": "看了不亏，不看也无所谓",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 431839,
+    "bangumiUrl": "https://bgm.tv/subject/431839",
+    "originalTitle": "愚かな天使は悪魔と踊る",
+    "airDate": "2024-01-08",
+    "createdAt": "2026-09-28T08:41:03.622Z",
+    "series": "愚蠢天使与恶魔共舞"
+  },
+  {
+    "id": "ZSRdphmy7Fof",
+    "title": "弱角友崎同学 第二季",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ca/92/365572_g22Q4.jpg",
+    "rating": 8.5,
+    "comment": "一般般了，为什么不是女主啊",
+    "episodes": 13,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 365572,
+    "bangumiUrl": "https://bgm.tv/subject/365572",
+    "originalTitle": "弱キャラ友崎くん 2nd STAGE",
+    "airDate": "2024-01-03",
+    "createdAt": "2026-09-28T08:41:03.713Z",
+    "series": "弱角友崎同学"
+  },
+  {
+    "id": "ZrzOkR8uNut5",
+    "title": "我心里危险的东西 推危短篇",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/1b/fa/460305_7Lvd3.jpg",
+    "rating": 9,
+    "comment": "应该看过，我心危这个也是不错的",
+    "episodes": 1,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 460305,
+    "bangumiUrl": "https://bgm.tv/subject/460305",
+    "originalTitle": "僕の心のヤバイやつ ツイヤバ",
+    "airDate": "2023-12-10",
+    "createdAt": "2026-09-28T08:41:03.807Z",
+    "series": "我心里危险的东西"
+  },
+  {
+    "id": "8yTMCHEiBFrb",
+    "title": "北海道辣妹贼拉可爱",
+    "season": "2024春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/79/4c/406119_X9kRl.jpg",
+    "rating": 8.5,
+    "comment": "其实不错，但我好像没看完",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 406119,
+    "bangumiUrl": "https://bgm.tv/subject/406119",
+    "originalTitle": "道産子ギャルはなまらめんこい",
+    "airDate": "2024-01-08",
+    "createdAt": "2026-09-28T08:41:03.887Z",
+    "series": "北海道辣妹贼拉可爱"
+  },
+  {
+    "id": "RQPsNeZcDZI8",
+    "title": "无职转生 第二季 ～到了异世界就拿出真本事～ 第2部分",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ad/25/444557_e4hPO.jpg",
+    "rating": 10,
+    "comment": "无职依旧好看，要一直看下去啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "无职转生～到了异世界就拿出真本事～",
+    "marks": [],
+    "bangumiId": 444557,
+    "bangumiUrl": "https://bgm.tv/subject/444557",
+    "originalTitle": "無職転生Ⅱ ～異世界行ったら本気だす～ 第2クール",
+    "airDate": "2024-04-07",
+    "createdAt": "2026-09-29T02:22:22.901Z"
+  },
+  {
+    "id": "sabXFiYVyV76",
+    "title": "夜晚的水母不会游泳",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/f2/8f/425909_M7W7T.jpg",
+    "rating": 8,
+    "comment": "水母也是绝了，画面再好有啥用啊，美少女贴贴都写不好",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 425909,
+    "bangumiUrl": "https://bgm.tv/subject/425909",
+    "originalTitle": "夜のクラゲは泳げない",
+    "airDate": "2024-04-06",
+    "createdAt": "2026-09-29T02:22:22.994Z",
+    "series": "夜晚的水母不会游泳"
+  },
+  {
+    "id": "vSztejJyIT86",
+    "title": "鬼灭之刃 柱训练篇",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/0a/ee/441939_6l6VR.jpg",
+    "rating": 8.5,
+    "comment": "鬼灭这季度稍显平淡，战前准备，但是op很好听",
+    "episodes": 8,
+    "tags": [],
+    "series": "鬼灭之刃",
+    "marks": [],
+    "bangumiId": 441939,
+    "bangumiUrl": "https://bgm.tv/subject/441939",
+    "originalTitle": "鬼滅の刃 柱稽古編",
+    "airDate": "2024-05-12",
+    "createdAt": "2026-09-29T02:22:23.084Z"
+  },
+  {
+    "id": "p0TU-Zc0CxLP",
+    "title": "末日列车去哪里？",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/96/6c/404809_H2HnH.jpg",
+    "rating": 8,
+    "comment": "感觉是比较对电波的一部番，没太看下去",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 404809,
+    "bangumiUrl": "https://bgm.tv/subject/404809",
+    "originalTitle": "終末トレインどこへいく？",
+    "airDate": "2024-04-01",
+    "createdAt": "2026-09-29T02:22:23.178Z",
+    "series": "末日列车去哪里？"
+  },
+  {
+    "id": "oQWNnEjAqpOV",
+    "title": "身为魔王的我娶了奴隶精灵为妻，该如何表白我的爱？",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/d2/b8/406251_MjAw4.jpg",
+    "rating": 8,
+    "comment": "看了不亏吧，不看也无所谓，聊胜于无",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 406251,
+    "bangumiUrl": "https://bgm.tv/subject/406251",
+    "originalTitle": "魔王の俺が奴隷エルフを嫁にしたんだが、どう愛でればいい？",
+    "airDate": "2024-04-04",
+    "createdAt": "2026-09-29T02:22:23.269Z",
+    "series": "身为魔王的我娶了奴隶精灵为妻，该如何表白我的爱？"
+  },
+  {
+    "id": "1GruyTB0m2dP",
+    "title": "怪异与少女与神隐",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/46/d1/414987_Dcb0y.jpg",
+    "rating": 8.5,
+    "comment": "有趣的一部番，有续作会想追的",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 414987,
+    "bangumiUrl": "https://bgm.tv/subject/414987",
+    "originalTitle": "怪異と乙女と神隠し",
+    "airDate": "2024-04-10",
+    "createdAt": "2026-09-29T02:22:23.354Z",
+    "series": "怪异与少女与神隐"
+  },
+  {
+    "id": "X_Z4CzPf6fXS",
+    "title": "无名记忆",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/36/44/410939_nKQHe.jpg",
+    "rating": 9,
+    "comment": "虽然很穷，但是我很喜欢的一部番，不知道为什么就很爱看，原作都已经拜读了",
+    "episodes": 12,
+    "tags": [],
+    "marks": [
+      "source"
+    ],
+    "bangumiId": 410939,
+    "bangumiUrl": "https://bgm.tv/subject/410939",
+    "originalTitle": "Unnamed Memory",
+    "airDate": "2024-04-09",
+    "createdAt": "2026-09-29T02:22:23.446Z",
+    "series": "无名记忆"
+  },
+  {
+    "id": "6bMwImUsG08b",
+    "title": "神渴望着游戏。",
+    "season": "2024夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/2a/6d/365952_Sg7SY.jpg",
+    "rating": 8,
+    "comment": "一般般了，有些穷了",
+    "episodes": 13,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 365952,
+    "bangumiUrl": "https://bgm.tv/subject/365952",
+    "originalTitle": "神は遊戯に飢えている。",
+    "airDate": "2024-04-01",
+    "createdAt": "2026-09-29T02:22:23.542Z",
+    "series": "神渴望着游戏。"
+  },
+  {
+    "id": "JjTWPN8OFH1t",
+    "title": "义妹生活",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/40/01/393037_I7mvN.jpg",
+    "rating": 9,
+    "comment": "很好看，监督展示了怎么在经费受限的情况下做好演出",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 393037,
+    "bangumiUrl": "https://bgm.tv/subject/393037",
+    "originalTitle": "義妹生活",
+    "airDate": "2024-07-04",
+    "createdAt": "2026-09-29T02:56:37.724Z",
+    "series": "义妹生活"
+  },
+  {
+    "id": "m7DWXfK3HEfN",
+    "title": "鹿乃子乃子乃子虎视眈眈",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b1/7b/484761_r83E8.jpg",
+    "rating": 8,
+    "comment": "无厘头搞笑番，个人不是很对味口，拿来看几集还行",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 484761,
+    "bangumiUrl": "https://bgm.tv/subject/484761",
+    "originalTitle": "しかのこのこのここしたんたん",
+    "airDate": "2024-07-07",
+    "createdAt": "2026-09-29T02:56:37.816Z",
+    "series": "鹿乃子乃子乃子虎视眈眈"
+  },
+  {
+    "id": "9lmkgGlQyDSz",
+    "title": "亚托莉 -我挚爱的时光-",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/66/6d/397604_TgJ63.jpg",
+    "rating": 8,
+    "comment": "感觉动漫拍的不好，我是玩过游戏的，游戏其实也不是那么好",
+    "episodes": 13,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 397604,
+    "bangumiUrl": "https://bgm.tv/subject/397604",
+    "originalTitle": "ATRI -My Dear Moments-",
+    "airDate": "2024-07-13",
+    "createdAt": "2026-09-29T02:56:37.898Z",
+    "series": "亚托莉 -我挚爱的时光-"
+  },
+  {
+    "id": "Ftnv2b-qqpeP",
+    "title": "2.5次元的诱惑",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/53/13/410346_MmQCm.jpg",
+    "rating": 8.5,
+    "comment": "感觉是更衣人偶一类的番，不过算是党争而非纯爱吧",
+    "episodes": 24,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 410346,
+    "bangumiUrl": "https://bgm.tv/subject/410346",
+    "originalTitle": "2.5次元の誘惑",
+    "airDate": "2024-07-05",
+    "createdAt": "2026-09-29T02:56:37.983Z",
+    "series": "2.5次元的诱惑"
+  },
+  {
+    "id": "RX1gvG4D0nMP",
+    "title": "疑似后宫",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/0c/fd/428823_vuwNR.jpg",
+    "rating": 8,
+    "comment": "不是那么喜欢，偏向单元剧",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 428823,
+    "bangumiUrl": "https://bgm.tv/subject/428823",
+    "originalTitle": "疑似ハーレム",
+    "airDate": "2024-07-04",
+    "createdAt": "2026-09-29T02:56:38.069Z",
+    "series": "疑似后宫"
+  },
+  {
+    "id": "sjc7u8ATqCEl",
+    "title": "依靠被嫌弃的【状态异常技能】而成为最强的我最终蹂躏一切",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ac/c5/476418_50C5z.jpg",
+    "rating": 8.5,
+    "comment": "除了有点穷之外都不错，女主好看，剧情在线",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 476418,
+    "bangumiUrl": "https://bgm.tv/subject/476418",
+    "originalTitle": "ハズレ枠の【状態異常スキル】で最強になった俺がすべてを蹂躙するまで",
+    "airDate": "2024-07-04",
+    "createdAt": "2026-09-29T02:56:38.158Z",
+    "series": "依靠被嫌弃的【状态异常技能】而成为最强的我最终蹂躏一切"
+  },
+  {
+    "id": "1QPO7cy7_FPa",
+    "title": "我要招架一切 逆向误解的世界最强梦想成为冒险者",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/c7/57/463389_PGZ0p.jpg",
+    "rating": 8,
+    "comment": "一般般吧",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 463389,
+    "bangumiUrl": "https://bgm.tv/subject/463389",
+    "originalTitle": "俺は全てを【パリイ】する〜逆勘違いの世界最強は冒険者になりたい〜",
+    "airDate": "2024-07-04",
+    "createdAt": "2026-09-29T02:56:38.244Z",
+    "series": "我要招架一切 逆向误解的世界最强梦想成为冒险者"
+  },
+  {
+    "id": "7Y65YzwkYFT2",
+    "title": "魔王军最强的魔术师是人类",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/0b/e5/475933_Kf14e.jpg",
+    "rating": 8,
+    "comment": "也是一般般",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 475933,
+    "bangumiUrl": "https://bgm.tv/subject/475933",
+    "originalTitle": "魔王軍最強の魔術師は人間だった",
+    "airDate": "2024-07-03",
+    "createdAt": "2026-09-29T02:56:38.340Z",
+    "series": "魔王军最强的魔术师是人类"
+  },
+  {
+    "id": "Xm0-uAg5j6Zm",
+    "title": "为何我的世界被遗忘了？",
+    "season": "2024秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b4/f9/446615_qpXQH.jpg",
+    "rating": 8.5,
+    "comment": "这个倒是挺有意思的，能出第二季吗",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 446615,
+    "bangumiUrl": "https://bgm.tv/subject/446615",
+    "originalTitle": "なぜ僕の世界を誰も覚えていないのか？",
+    "airDate": "2024-07-13",
+    "createdAt": "2026-09-29T02:56:38.434Z",
+    "series": "为何我的世界被遗忘了？"
+  },
+  {
+    "id": "OyRJTtEDTr6w",
+    "title": "Re：从零开始的异世界生活 第三季 袭击篇",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/26/d6/425998_dnzr8.jpg",
+    "rating": 8.5,
+    "comment": "从零这一季不好看，没啥意思",
+    "episodes": 8,
+    "tags": [],
+    "series": "Re：从零开始的异世界生活",
+    "marks": [],
+    "bangumiId": 425998,
+    "bangumiUrl": "https://bgm.tv/subject/425998",
+    "originalTitle": "Re:ゼロから始める異世界生活 3rd season 襲擊編",
+    "airDate": "2024-10-02",
+    "createdAt": "2026-09-29T03:21:02.337Z"
+  },
+  {
+    "id": "LZc5FjAF4YHk",
+    "title": "地。 ―关于地球的运动―",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/5f/84/389156_J4gqQ.jpg",
+    "rating": 7.5,
+    "comment": "光，关于闪光弹的应用。绝了，谁想的标题太对了",
+    "episodes": 25,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 389156,
+    "bangumiUrl": "https://bgm.tv/subject/389156",
+    "originalTitle": "チ。 ―地球の運動について―",
+    "airDate": "2024-10-05",
+    "createdAt": "2026-09-29T03:21:02.431Z",
+    "series": "地。 ―关于地球的运动―"
+  },
+  {
+    "id": "B9kBOFaYCAr9",
+    "title": "魔王2099",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/31/d7/425991_JFQel.jpg",
+    "rating": 8.5,
+    "comment": "ed好听，挺好看的，女主漂亮，从此爱上伊藤美来",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 425991,
+    "bangumiUrl": "https://bgm.tv/subject/425991",
+    "originalTitle": "魔王2099",
+    "airDate": "2024-10-12",
+    "createdAt": "2026-09-29T03:21:02.630Z",
+    "series": "魔王2099"
+  },
+  {
+    "id": "6SYdLBS144Nl",
+    "title": "女仆冥土小姐。",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/a9/63/471839_RD8nA.jpg",
+    "rating": 8,
+    "comment": "一般般，有些无聊了",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 471839,
+    "bangumiUrl": "https://bgm.tv/subject/471839",
+    "originalTitle": "君は冥土様。",
+    "airDate": "2024-10-05",
+    "createdAt": "2026-09-29T03:21:02.730Z",
+    "series": "女仆冥土小姐。"
+  },
+  {
+    "id": "3hvvF9ep5hcL",
+    "title": "剧场版 进击的巨人 完结篇 THE LAST ATTACK",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/07/1e/508708_Z8Za5.jpg",
+    "rating": 9.5,
+    "comment": "巨人总终季在这里啊，给个9.5吧，什么样的结局其实都能接受",
+    "episodes": 1,
+    "tags": [],
+    "series": "进击的巨人",
+    "marks": [],
+    "bangumiId": 508708,
+    "bangumiUrl": "https://bgm.tv/subject/508708",
+    "originalTitle": "劇場版 進撃の巨人 完結編 THE LAST ATTACK",
+    "airDate": "2024-11-08",
+    "createdAt": "2026-09-29T03:21:02.841Z"
+  },
+  {
+    "id": "RLVj1qDZOztS",
+    "title": "漩涡",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/12/51/289854_x58Kd.jpg",
+    "rating": 8,
+    "comment": "有点独特的番，画风绝了，不想多看",
+    "episodes": 4,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 289854,
+    "bangumiUrl": "https://bgm.tv/subject/289854",
+    "originalTitle": "うずまき",
+    "airDate": "2024-09-28",
+    "createdAt": "2026-09-29T03:21:02.933Z",
+    "series": "漩涡"
+  },
+  {
+    "id": "yv_QG6kbU07y",
+    "title": "重启人生的千金小姐正在攻略龙帝陛下",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/da/22/432597_d3pD7.jpg",
+    "rating": 8,
+    "comment": "一般般吧",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 432597,
+    "bangumiUrl": "https://bgm.tv/subject/432597",
+    "originalTitle": "やり直し令嬢は竜帝陛下を攻略中",
+    "airDate": "2024-10-09",
+    "createdAt": "2026-09-29T03:21:03.021Z",
+    "series": "重启人生的千金小姐正在攻略龙帝陛下"
+  },
+  {
+    "id": "Kgwk8J9EYra8",
+    "title": "再见龙生，你好人生",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/5e/16/484981_7uC2z.jpg",
+    "rating": 8,
+    "comment": "也是一般般",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 484981,
+    "bangumiUrl": "https://bgm.tv/subject/484981",
+    "originalTitle": "さようなら竜生、こんにちは人生",
+    "airDate": "2024-10-10",
+    "createdAt": "2026-09-29T03:21:03.108Z",
+    "series": "再见龙生，你好人生"
+  },
+  {
+    "id": "spL7hxAZP_-t",
+    "title": "被队伍驱逐的治愈师，其实是最强的",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/44/56/472673_DW15U.jpg",
+    "rating": 8,
+    "comment": "更是一般般",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 472673,
+    "bangumiUrl": "https://bgm.tv/subject/472673",
+    "originalTitle": "パーティーから追放されたその治癒師、実は最強につき",
+    "airDate": "2024-10-05",
+    "createdAt": "2026-09-29T03:21:03.195Z",
+    "series": "被队伍驱逐的治愈师，其实是最强的"
+  },
+  {
+    "id": "owparsvqn9js",
+    "title": "神选 第二季",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ec/d5/467803_GrwR5.jpg",
+    "rating": 8.5,
+    "comment": "神选第二季有点拉了，不如第一季，但还是值得看的",
+    "episodes": 12,
+    "tags": [],
+    "series": "神选",
+    "marks": [],
+    "bangumiId": 467803,
+    "bangumiUrl": "https://bgm.tv/subject/467803",
+    "originalTitle": "カミエラビ シーズン2",
+    "airDate": "2024-10-02",
+    "createdAt": "2026-09-29T03:21:03.292Z"
+  },
+  {
+    "id": "vdRcKUEhLlFR",
+    "title": "辰星降临之国的妮娜",
+    "season": "2024冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/7b/f7/467616_FdqTp.jpg",
+    "rating": 8,
+    "comment": "不知道怎么就看了，其实还好",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 467616,
+    "bangumiUrl": "https://bgm.tv/subject/467616",
+    "originalTitle": "星降る王国のニナ",
+    "airDate": "2024-10-10",
+    "createdAt": "2026-09-29T03:21:03.381Z",
+    "series": "辰星降临之国的妮娜"
+  },
+  {
+    "id": "_Z499aKrgmTQ",
+    "title": "Re：从零开始的异世界生活 第三季 反击篇",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/2e/d7/510728_P22GO.jpg",
+    "rating": 8.5,
+    "comment": "不喜欢，水门篇不好看",
+    "episodes": 8,
+    "tags": [],
+    "series": "Re：从零开始的异世界生活",
+    "marks": [],
+    "bangumiId": 510728,
+    "bangumiUrl": "https://bgm.tv/subject/510728",
+    "originalTitle": "Re:ゼロから始める異世界生活 3rd season 反擊編",
+    "airDate": "2025-02-05",
+    "createdAt": "2026-09-29T06:15:47.194Z"
+  },
+  {
+    "id": "4Hxkl0VN5rPq",
+    "title": "全修。",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/40/cc/486039_0S1ar.jpg",
+    "rating": 9,
+    "comment": "可以，完全意料之外的展开，本季最佳原创",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 486039,
+    "bangumiUrl": "https://bgm.tv/subject/486039",
+    "originalTitle": "全修。",
+    "airDate": "2025-01-05",
+    "createdAt": "2026-09-29T06:15:47.283Z",
+    "series": "全修。"
+  },
+  {
+    "id": "zxDjMPFGZOm7",
+    "title": "虽然是公会柜台小姐，但是因为讨厌加班所以要去单挑BOSS",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/8f/8a/445827_L6Zh0.jpg",
+    "rating": 9,
+    "comment": "op好听，特别喜欢，追了原作",
+    "episodes": 12,
+    "tags": [],
+    "marks": [
+      "source"
+    ],
+    "bangumiId": 445827,
+    "bangumiUrl": "https://bgm.tv/subject/445827",
+    "originalTitle": "ギルドの受付嬢ですが、残業は嫌なのでボスをソロ討伐しようと思います",
+    "airDate": "2025-01-10",
+    "createdAt": "2026-09-29T06:15:47.367Z",
+    "series": "虽然是公会柜台小姐，但是因为讨厌加班所以要去单挑BOSS"
+  },
+  {
+    "id": "Ig6l579UT8vq",
+    "title": "战队红战士在异世界当冒险者",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/73/c6/507581_Z4sLp.jpg",
+    "rating": 8.5,
+    "comment": "还好，算不上特别好看，但是也算题材特殊有趣",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 507581,
+    "bangumiUrl": "https://bgm.tv/subject/507581",
+    "originalTitle": "戦隊レッド 異世界で冒険者になる",
+    "airDate": "2025-01-12",
+    "createdAt": "2026-09-29T06:15:47.462Z",
+    "series": "战队红战士在异世界当冒险者"
+  },
+  {
+    "id": "_BP_2uZkT9c3",
+    "title": "欢迎来到日本，精灵小姐。",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ca/22/472661_hjrMm.jpg",
+    "rating": 8,
+    "comment": "一般般",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 472661,
+    "bangumiUrl": "https://bgm.tv/subject/472661",
+    "originalTitle": "日本へようこそエルフさん。",
+    "airDate": "2025-01-10",
+    "createdAt": "2026-09-29T06:15:47.545Z",
+    "series": "欢迎来到日本，精灵小姐。"
+  },
+  {
+    "id": "I2fGdweg1QTu",
+    "title": "天久鹰央的推理病历表",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/f3/19/488177_9nFrY.jpg",
+    "rating": 8,
+    "comment": "一般般",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 488177,
+    "bangumiUrl": "https://bgm.tv/subject/488177",
+    "originalTitle": "天久鷹央の推理カルテ",
+    "airDate": "2025-01-01",
+    "createdAt": "2026-09-29T06:15:47.627Z",
+    "series": "天久鹰央的推理病历表"
+  },
+  {
+    "id": "14jd5aHpkSWT",
+    "title": "魔法制造者 ～异世界魔法的制作方法～",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/00/da/503268_SdLDD.jpg",
+    "rating": 8.5,
+    "comment": "嗯，也算有些意思，如果可以出第二季的话",
+    "episodes": 12,
+    "tags": [],
+    "marks": [
+      "sequel"
+    ],
+    "bangumiId": 503268,
+    "bangumiUrl": "https://bgm.tv/subject/503268",
+    "originalTitle": "マジック・メイカー ～異世界魔法の作り方～",
+    "airDate": "2025-01-08",
+    "createdAt": "2026-09-29T06:15:47.708Z",
+    "series": "魔法制造者 ～异世界魔法的制作方法～"
+  },
+  {
+    "id": "25X_uKIA-4Vj",
+    "title": "异修罗 第二季",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/85/36/485782_PHh6e.jpg",
+    "rating": 8,
+    "comment": "世界观人物出来太多了，战力感觉有些崩",
+    "episodes": 12,
+    "tags": [],
+    "series": "异修罗",
+    "marks": [],
+    "bangumiId": 485782,
+    "bangumiUrl": "https://bgm.tv/subject/485782",
+    "originalTitle": "異修羅 第2期",
+    "airDate": "2025-01-08",
+    "createdAt": "2026-09-29T06:15:47.805Z"
+  },
+  {
+    "id": "ONp6P4jKjwmd",
+    "title": "黄昏旅店",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/09/89/501033_2FzC2.jpg",
+    "rating": 8,
+    "comment": "放在这里吧，但是我真忘了自己到底追完没有",
+    "episodes": 12,
+    "tags": [],
+    "marks": [],
+    "bangumiId": 501033,
+    "bangumiUrl": "https://bgm.tv/subject/501033",
+    "originalTitle": "誰ソ彼ホテル",
+    "airDate": "2025-01-08",
+    "createdAt": "2026-09-29T06:15:47.886Z",
+    "series": "黄昏旅店"
+  },
+  {
+    "id": "hoHkQZwvi1Pp",
+    "title": "无名记忆 第二季",
+    "season": "2025春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/22/53/501205_883DI.jpg",
+    "rating": 9,
+    "comment": "爱看，第二季算是完结了吧，为什么画面这么穷啊，剧情很喜欢",
+    "episodes": 12,
+    "tags": [],
+    "series": "无名记忆",
+    "marks": [],
+    "bangumiId": 501205,
+    "bangumiUrl": "https://bgm.tv/subject/501205",
+    "originalTitle": "Unnamed Memory Act.2",
+    "airDate": "2025-01-07",
+    "createdAt": "2026-09-29T06:15:47.981Z"
+  },
+  {
+    "id": "mAboYUxc0tu4",
+    "title": "末日后酒店",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/6e/1a/509986_99qsc.jpg",
+    "rating": 9.5,
+    "comment": "本季甚至本年最佳原创，太好看了，女主太可爱了",
+    "episodes": 12,
+    "tags": [],
+    "series": "末日后酒店",
+    "marks": [],
+    "bangumiId": 509986,
+    "bangumiUrl": "https://bgm.tv/subject/509986",
+    "originalTitle": "アポカリプスホテル",
+    "airDate": "2025-04-08",
+    "createdAt": "2026-09-29T07:34:04.143Z"
+  },
+  {
+    "id": "kgivkbvE0zvt",
+    "title": "魔女与使魔",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/5e/4f/506672_K9EQT.jpg",
+    "rating": 8.5,
+    "comment": "前期还好，后面有些无聊了",
+    "episodes": 25,
+    "tags": [],
+    "series": "魔女与使魔",
+    "marks": [],
+    "bangumiId": 506672,
+    "bangumiUrl": "https://bgm.tv/subject/506672",
+    "originalTitle": "ウィッチウォッチ",
+    "airDate": "2025-04-06",
+    "createdAt": "2026-09-29T07:34:04.238Z"
+  },
+  {
+    "id": "4qviRZuX1mKE",
+    "title": "莉可丽丝：友谊是时间的窃贼",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/01/d5/504950_WmdZx.jpg",
+    "rating": 8.5,
+    "comment": "太短了，根本不够看啊",
+    "episodes": 6,
+    "tags": [],
+    "series": "莉可丽丝",
+    "marks": [],
+    "bangumiId": 504950,
+    "bangumiUrl": "https://bgm.tv/subject/504950",
+    "originalTitle": "リコリス・リコイル Friends are thieves of time.",
+    "airDate": "2025-04-16",
+    "createdAt": "2026-09-29T07:34:04.334Z"
+  },
+  {
+    "id": "5UeYTuPsMah4",
+    "title": "男女之间的友情存在吗？（不，不存在!!）",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/17/74/395493_FAWf3.jpg",
+    "rating": 8,
+    "comment": "一般般，之前看小说已经被毒走了",
+    "episodes": 12,
+    "tags": [],
+    "series": "男女之间的友情存在吗？（不，不存在!!）",
+    "marks": [
+      "source"
+    ],
+    "bangumiId": 395493,
+    "bangumiUrl": "https://bgm.tv/subject/395493",
+    "originalTitle": "男女の友情は成立する？（いや、しないっ!!）",
+    "airDate": "2025-04-04",
+    "createdAt": "2026-09-29T07:34:04.417Z"
+  },
+  {
+    "id": "Zq2bXvaLAr_j",
+    "title": "紫云寺家的兄弟姐妹",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/48/c8/480545_gGwa0.jpg",
+    "rating": 8.5,
+    "comment": "还行，党争番，最后一定要是粉毛胜出啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "紫云寺家的兄弟姐妹",
+    "marks": [],
+    "bangumiId": 480545,
+    "bangumiUrl": "https://bgm.tv/subject/480545",
+    "originalTitle": "紫雲寺家の子供たち",
+    "airDate": "2025-04-08",
+    "createdAt": "2026-09-29T07:34:04.509Z"
+  },
+  {
+    "id": "FXrwPBRIGI4d",
+    "title": "阳光马达棒球场！",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/a0/09/524123_5Pwit.jpg",
+    "rating": 8.5,
+    "comment": "挺不错的番，是原创的好像",
+    "episodes": 12,
+    "tags": [],
+    "series": "阳光马达棒球场！",
+    "marks": [],
+    "bangumiId": 524123,
+    "bangumiUrl": "https://bgm.tv/subject/524123",
+    "originalTitle": "ボールパークでつかまえて！",
+    "airDate": "2025-04-01",
+    "createdAt": "2026-09-29T07:34:04.596Z"
+  },
+  {
+    "id": "vJhzYfpgmX-f",
+    "title": "记忆缝线",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/14/39/445826_id8dk.jpg",
+    "rating": 8.5,
+    "comment": "很可以啊，世界观很独特，算是推理破案？",
+    "episodes": 13,
+    "tags": [],
+    "series": "记忆缝线",
+    "marks": [],
+    "bangumiId": 445826,
+    "bangumiUrl": "https://bgm.tv/subject/445826",
+    "originalTitle": "ユア・フォルマ",
+    "airDate": "2025-04-02",
+    "createdAt": "2026-09-29T07:34:04.679Z"
+  },
+  {
+    "id": "TaiMIg02w_AX",
+    "title": "推理要在晚餐后",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b0/e9/525642_9ub90.jpg",
+    "rating": 8,
+    "comment": "也是推理番，但是男主到底是谁啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "推理要在晚餐后",
+    "marks": [],
+    "bangumiId": 525642,
+    "bangumiUrl": "https://bgm.tv/subject/525642",
+    "originalTitle": "謎解きはディナーのあとで",
+    "airDate": "2025-04-04",
+    "createdAt": "2026-09-29T07:34:04.764Z"
+  },
+  {
+    "id": "rmxCiILPuzhH",
+    "title": "受到猩猩之神庇护的大小姐在皇家骑士团受到宠爱",
+    "season": "2025夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/3b/cb/514997_6RM6C.jpg",
+    "rating": 8,
+    "comment": "看了不亏吧只能说",
+    "episodes": 12,
+    "tags": [],
+    "series": "受到猩猩之神庇护的大小姐在皇家骑士团受到宠爱",
+    "marks": [],
+    "bangumiId": 514997,
+    "bangumiUrl": "https://bgm.tv/subject/514997",
+    "originalTitle": "ゴリラの神から加護された令嬢は王立騎士団で可愛がられる",
+    "airDate": "2025-04-06",
+    "createdAt": "2026-09-29T07:34:04.850Z"
+  },
+  {
+    "id": "wMaiDaji30lk",
+    "title": "更衣人偶坠入爱河 第二季",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/38/44/398951_M97dM.jpg",
+    "rating": 9,
+    "comment": "好看，制作更精良了，就是和上一季间隔时间太久了，人物都有些忘了",
+    "episodes": 12,
+    "tags": [],
+    "series": "更衣人偶坠入爱河",
+    "marks": [],
+    "bangumiId": 398951,
+    "bangumiUrl": "https://bgm.tv/subject/398951",
+    "originalTitle": "その着せ替え人形は恋をする Season 2",
+    "airDate": "2025-07-05",
+    "createdAt": "2026-09-29T08:06:36.452Z"
+  },
+  {
+    "id": "cDFiVcst1dRr",
+    "title": "胆大党 第二季",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/4a/2b/529431_a7joa.jpg",
+    "rating": 9,
+    "comment": "好看，下一季什么时候啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "胆大党",
+    "marks": [
+      "sequel"
+    ],
+    "bangumiId": 529431,
+    "bangumiUrl": "https://bgm.tv/subject/529431",
+    "originalTitle": "ダンダダン 第2期",
+    "airDate": "2025-07-03",
+    "createdAt": "2026-09-29T08:06:36.593Z"
+  },
+  {
+    "id": "zAtWYjEwIAkL",
+    "title": "薰香花朵凛然绽放",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b8/0d/513345_jv4wM.jpg",
+    "rating": 8.5,
+    "comment": "还算可以吧，纯爱且经典",
+    "episodes": 13,
+    "tags": [],
+    "series": "薰香花朵凛然绽放",
+    "marks": [],
+    "bangumiId": 513345,
+    "bangumiUrl": "https://bgm.tv/subject/513345",
+    "originalTitle": "薫る花は凛と咲く",
+    "airDate": "2025-07-05",
+    "createdAt": "2026-09-29T08:06:36.692Z"
+  },
+  {
+    "id": "ZAbp3QOPkQrn",
+    "title": "青春猪头少年不会梦到圣诞服女郎",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/d3/a3/467930_jH4s4.jpg",
+    "rating": 9,
+    "comment": "青猪还在出剧场版啊",
+    "episodes": 13,
+    "tags": [],
+    "series": "青春猪头少年不会梦到",
+    "marks": [],
+    "bangumiId": 467930,
+    "bangumiUrl": "https://bgm.tv/subject/467930",
+    "originalTitle": "青春ブタ野郎はサンタクロースの夢を見ない",
+    "airDate": "2025-07-05",
+    "createdAt": "2026-09-29T08:06:36.773Z"
+  },
+  {
+    "id": "l7yyUiRh0_RM",
+    "title": "彻夜之歌 第二季",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/15/5f/484623_6EWej.jpg",
+    "rating": 9,
+    "comment": "好看，制作更好了有没有？剧情也在展开",
+    "episodes": 12,
+    "tags": [],
+    "series": "彻夜之歌",
+    "marks": [],
+    "bangumiId": 484623,
+    "bangumiUrl": "https://bgm.tv/subject/484623",
+    "originalTitle": "よふかしのうた Season 2",
+    "airDate": "2025-07-04",
+    "createdAt": "2026-09-29T08:06:36.857Z"
+  },
+  {
+    "id": "lYC1lvwcGvhD",
+    "title": "剧场版 鬼灭之刃 无限城篇 第一章 猗窝座再袭",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/f6/0b/501958_VZs4W.jpg",
+    "rating": 9,
+    "comment": "独自去电影院看的，很不错，就是蝴蝶忍死太难受了",
+    "episodes": 1,
+    "tags": [],
+    "series": "鬼灭之刃",
+    "marks": [],
+    "bangumiId": 501958,
+    "bangumiUrl": "https://bgm.tv/subject/501958",
+    "originalTitle": "劇場版 鬼滅の刃 無限城編 第一章 猗窩座再来",
+    "airDate": "2025-07-18",
+    "createdAt": "2026-09-29T08:06:36.946Z"
+  },
+  {
+    "id": "p4bpbM7Y-sSK",
+    "title": "与游戏中心的少女异文化交流的故事",
+    "season": "2025秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/55/d5/510256_09w10.jpg",
+    "rating": 8,
+    "comment": "一般般，该电了",
+    "episodes": 12,
+    "tags": [],
+    "series": "与游戏中心的少女异文化交流的故事",
+    "marks": [],
+    "bangumiId": 510256,
+    "bangumiUrl": "https://bgm.tv/subject/510256",
+    "originalTitle": "ゲーセン少女と異文化交流",
+    "airDate": "2025-07-06",
+    "createdAt": "2026-09-29T08:06:37.029Z"
+  },
+  {
+    "id": "5U-zvVjU0_qY",
+    "title": "剧场版 链锯人 蕾塞篇",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/e0/d8/470660_uLY5M.jpg",
+    "rating": 9,
+    "comment": "电锯人剧场版还不错，制作精良啊，我之前还以为蕾塞真女主呢，可惜，应该说幸好，还不如玛琪玛呢",
+    "episodes": 1,
+    "tags": [],
+    "series": "链锯人",
+    "marks": [],
+    "bangumiId": 470660,
+    "bangumiUrl": "https://bgm.tv/subject/470660",
+    "originalTitle": "劇場版 チェンソーマン レゼ篇",
+    "airDate": "2025-09-19",
+    "createdAt": "2026-09-29T08:54:30.940Z"
+  },
+  {
+    "id": "sRqsRFQByBQZ",
+    "title": "间谍过家家 第三季",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/3d/79/498378_3ycrL.jpg",
+    "rating": 9,
+    "comment": "好看，间谍过家家是真不错",
+    "episodes": 13,
+    "tags": [],
+    "series": "间谍过家家",
+    "marks": [],
+    "bangumiId": 498378,
+    "bangumiUrl": "https://bgm.tv/subject/498378",
+    "originalTitle": "SPY×FAMILY Season 3",
+    "airDate": "2025-10-04",
+    "createdAt": "2026-09-29T08:54:31.033Z"
+  },
+  {
+    "id": "ya9yQFKhLSN5",
+    "title": "永远的黄昏",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/10/27/566600_cQ0oQ.jpg",
+    "rating": 7,
+    "comment": "屎，原创大舞台，有梦你就来，也是绝了，剧情发展到不知何方天地了",
+    "episodes": 13,
+    "tags": [],
+    "series": "永远的黄昏",
+    "marks": [],
+    "bangumiId": 566600,
+    "bangumiUrl": "https://bgm.tv/subject/566600",
+    "originalTitle": "永久のユウグレ",
+    "airDate": "2025-09-25",
+    "createdAt": "2026-09-29T08:54:31.125Z"
+  },
+  {
+    "id": "3j-q0f5L9aCW",
+    "title": "朋友的妹妹只喜欢烦我",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/82/62/326859_1pOHy.jpg",
+    "rating": 8.5,
+    "comment": "还不错，能看下去，后期别搞别的女的就行",
+    "episodes": 12,
+    "tags": [],
+    "series": "朋友的妹妹只喜欢烦我",
+    "marks": [],
+    "bangumiId": 326859,
+    "bangumiUrl": "https://bgm.tv/subject/326859",
+    "originalTitle": "友達の妹が俺にだけウザい",
+    "airDate": "2025-10-04",
+    "createdAt": "2026-09-29T08:54:31.217Z"
+  },
+  {
+    "id": "V-7rINycmV5V",
+    "title": "明明只是暗杀者，我的面板数值却比勇者还要强",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/4a/44/537904_2b515.jpg",
+    "rating": 8.5,
+    "comment": "意外的好看啊，女主漂亮就值得8.5了",
+    "episodes": 12,
+    "tags": [],
+    "series": "明明只是暗杀者，我的面板数值却比勇者还要强",
+    "marks": [],
+    "bangumiId": 537904,
+    "bangumiUrl": "https://bgm.tv/subject/537904",
+    "originalTitle": "暗殺者である俺のステータスが勇者よりも明らかに強いのだが",
+    "airDate": "2025-10-06",
+    "createdAt": "2026-09-29T08:54:31.308Z"
+  },
+  {
+    "id": "rKfMM9RUidZJ",
+    "title": "变身圣诞老人",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/50/5d/503303_ilQah.jpg",
+    "rating": 8,
+    "comment": "剧情节奏不对，画面好也没用啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "变身圣诞老人",
+    "marks": [],
+    "bangumiId": 503303,
+    "bangumiUrl": "https://bgm.tv/subject/503303",
+    "originalTitle": "SANDA",
+    "airDate": "2025-10-03",
+    "createdAt": "2026-09-29T08:54:31.397Z"
+  },
+  {
+    "id": "K65UbzvagWDJ",
+    "title": "绝妙舞步",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/d1/3c/508958_gMfH8.jpg",
+    "rating": 8.5,
+    "comment": "作画好并没有那么重要，即使这是一部舞蹈番，剧情仍是大头",
+    "episodes": 12,
+    "tags": [],
+    "series": "绝妙舞步",
+    "marks": [],
+    "bangumiId": 508958,
+    "bangumiUrl": "https://bgm.tv/subject/508958",
+    "originalTitle": "ワンダンス",
+    "airDate": "2025-10-08",
+    "createdAt": "2026-09-29T08:54:31.488Z"
+  },
+  {
+    "id": "wSOGPIBUNXH2",
+    "title": "队友太弱所以贯彻辅助的宫廷魔法师，惨遭流放目标却是最强",
+    "season": "2025冬",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ea/df/545842_AxVDu.jpg",
+    "rating": 8,
+    "comment": "还行吧，看了不亏，不看无所谓",
+    "episodes": 12,
+    "tags": [],
+    "series": "队友太弱所以贯彻辅助的宫廷魔法师，惨遭流放目标却是最强",
+    "marks": [],
+    "bangumiId": 545842,
+    "bangumiUrl": "https://bgm.tv/subject/545842",
+    "originalTitle": "味方が弱すぎて補助魔法に徹していた宮廷魔法師、追放されて最強を目指す",
+    "airDate": "2025-10-04",
+    "createdAt": "2026-09-29T08:54:31.575Z"
+  },
+  {
+    "id": "cHH5AV0czEyL",
+    "title": "超辉夜姬！",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/f6/0f/604826_2XWRN.jpg",
+    "rating": 9.5,
+    "comment": "真不错啊，有钱任性啊，netfilx 多来点儿啊",
+    "episodes": 1,
+    "tags": [],
+    "series": "超辉夜姬！",
+    "marks": [],
+    "bangumiId": 604826,
+    "bangumiUrl": "https://bgm.tv/subject/604826",
+    "originalTitle": "超かぐや姫！",
+    "airDate": "2026-01-22",
+    "createdAt": "2026-09-30T07:08:47.637Z"
+  },
+  {
+    "id": "mdxxExqJWoVz",
+    "title": "相反的你和我",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/71/50/525565_OxOv7.jpg",
+    "rating": 8.5,
+    "comment": "开局直接表白，后面感觉没意思啊，但为什么我看总之就是非常可爱就很喜欢，搞不明白",
+    "episodes": 12,
+    "tags": [],
+    "series": "相反的你和我",
+    "marks": [],
+    "bangumiId": 525565,
+    "bangumiUrl": "https://bgm.tv/subject/525565",
+    "originalTitle": "正反対な君と僕",
+    "airDate": "2026-01-11",
+    "createdAt": "2026-09-30T07:08:47.728Z"
+  },
+  {
+    "id": "pNzr_z1dQyMC",
+    "title": "辉夜大小姐想让我告白 通往大人的阶梯",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/9b/f5/565802_PRfRL.jpg",
+    "rating": 9.5,
+    "comment": "辉夜绝了啊，制作组满满的爱意，太喜欢了",
+    "episodes": 2,
+    "tags": [],
+    "series": "辉夜大小姐想让我告白",
+    "marks": [],
+    "bangumiId": 565802,
+    "bangumiUrl": "https://bgm.tv/subject/565802",
+    "originalTitle": "かぐや様は告らせたい 大人への階段",
+    "airDate": "2025-12-31",
+    "createdAt": "2026-09-30T07:08:47.811Z"
+  },
+  {
+    "id": "p-H-AtFfCcE_",
+    "title": "【我推的孩子】 第三季",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/92/95/517057_257ad.jpg",
+    "rating": 8.5,
+    "comment": "推子不太喜欢，从这里就感觉剧情节奏不太对了",
+    "episodes": 11,
+    "tags": [],
+    "series": "我推的孩子",
+    "marks": [],
+    "bangumiId": 517057,
+    "bangumiUrl": "https://bgm.tv/subject/517057",
+    "originalTitle": "【推しの子】 第3期",
+    "airDate": "2026-01-14",
+    "createdAt": "2026-09-30T07:08:47.900Z"
+  },
+  {
+    "id": "9jZMTFW0BlbK",
+    "title": "咒术回战 死灭回游 前篇",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/ab/77/472741_MqsB8.jpg",
+    "rating": 9,
+    "comment": "咒术依然好看，乙骨强啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "咒术回战",
+    "marks": [],
+    "bangumiId": 472741,
+    "bangumiUrl": "https://bgm.tv/subject/472741",
+    "originalTitle": "呪術廻戦 死滅回游 前編",
+    "airDate": "2026-01-08",
+    "createdAt": "2026-09-30T07:08:48.008Z"
+  },
+  {
+    "id": "KsQ9GBOFRC9_",
+    "title": "判处勇者刑 惩罚勇者9004队刑务纪录",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/7f/9b/445905_M0j2M.jpg",
+    "rating": 8,
+    "comment": "应该是没看完，画面好有个屁用啊",
+    "episodes": 12,
+    "tags": [],
+    "series": "判处勇者刑 惩罚勇者9004队刑务纪录",
+    "marks": [],
+    "bangumiId": 445905,
+    "bangumiUrl": "https://bgm.tv/subject/445905",
+    "originalTitle": "勇者刑に処す 懲罰勇者9004隊刑務記録",
+    "airDate": "2026-01-03",
+    "createdAt": "2026-09-30T07:08:48.100Z"
+  },
+  {
+    "id": "s8rtNYZ3fmvb",
+    "title": "午夜的倾心旋律",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/8d/2d/544109_U7B7C.jpg",
+    "rating": 8.5,
+    "comment": "嗯，还不错，都看下去的兴趣",
+    "episodes": 12,
+    "tags": [],
+    "series": "午夜的倾心旋律",
+    "marks": [],
+    "bangumiId": 544109,
+    "bangumiUrl": "https://bgm.tv/subject/544109",
+    "originalTitle": "真夜中ハートチューン",
+    "airDate": "2026-01-06",
+    "createdAt": "2026-09-30T07:08:48.200Z"
+  },
+  {
+    "id": "IHfp35-5oLjo",
+    "title": "地狱乐 第二季",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/f9/83/443446_S2n61.jpg",
+    "rating": 9,
+    "comment": "地狱乐这季也不错，ed依旧好听，希望快点下一季",
+    "episodes": 12,
+    "tags": [],
+    "series": "地狱乐",
+    "marks": [
+      "sequel"
+    ],
+    "bangumiId": 443446,
+    "bangumiUrl": "https://bgm.tv/subject/443446",
+    "originalTitle": "地獄楽 第二期",
+    "airDate": "2026-01-11",
+    "createdAt": "2026-09-30T07:08:48.288Z"
+  },
+  {
+    "id": "QCkPA9PkaB9K",
+    "title": "泛而不精的我被逐出了勇者队伍",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/0b/9d/541336_oG7SO.jpg",
+    "rating": 8.5,
+    "comment": "马马虎虎吧，经典退队流，不算讨厌",
+    "episodes": 12,
+    "tags": [],
+    "series": "泛而不精的我被逐出了勇者队伍",
+    "marks": [],
+    "bangumiId": 541336,
+    "bangumiUrl": "https://bgm.tv/subject/541336",
+    "originalTitle": "勇者パーティを追い出された器用貧乏",
+    "airDate": "2026-01-04",
+    "createdAt": "2026-09-30T07:08:48.386Z"
+  },
+  {
+    "id": "cEGqE1pxo6e_",
+    "title": "地狱模式～喜欢挑战特殊成就的玩家在废设定的异世界成为无双～",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b9/52/526979_R83u1.jpg",
+    "rating": 8.5,
+    "comment": "第二季还是不错的，就是别这么穷啊，啥时候下一季？",
+    "episodes": 12,
+    "tags": [],
+    "series": "地狱模式～喜欢挑战特殊成就的玩家在废设定的异世界成为无双～第二季",
+    "marks": [
+      "sequel"
+    ],
+    "bangumiId": 526979,
+    "bangumiUrl": "https://bgm.tv/subject/526979",
+    "originalTitle": "ヘルモード ～やり込み好きのゲーマーは廃設定の異世界で無双する～",
+    "airDate": "2026-01-09",
+    "createdAt": "2026-09-30T07:08:48.482Z"
+  },
+  {
+    "id": "AbeJz5Aua7Qy",
+    "title": "贵族转生 ～得天眷顾一出生就获得最强力量～",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/08/c8/531724_U8Ti8.jpg",
+    "rating": 8.5,
+    "comment": "异界十三阿哥说是，还真有那味，ed很好听",
+    "episodes": 12,
+    "tags": [],
+    "series": "贵族转生 ～得天眷顾一出生就获得最强力量～",
+    "marks": [],
+    "bangumiId": 531724,
+    "bangumiUrl": "https://bgm.tv/subject/531724",
+    "originalTitle": "貴族転生 ～恵まれた生まれから最強の力を得る～",
+    "airDate": "2026-01-07",
+    "createdAt": "2026-09-30T07:08:48.568Z"
+  },
+  {
+    "id": "aCg4KCWHnqAZ",
+    "title": "剧场版 我心里危险的东西",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/e5/b8/515869_H3Z1N.jpg",
+    "rating": 9,
+    "comment": "不确定看过没有，给个9.0吧",
+    "episodes": 1,
+    "tags": [],
+    "series": "我心里危险的东西",
+    "marks": [],
+    "bangumiId": 515869,
+    "bangumiUrl": "https://bgm.tv/subject/515869",
+    "originalTitle": "劇場版 僕の心のヤバイやつ",
+    "airDate": "2026-02-13",
+    "createdAt": "2026-09-30T07:08:48.655Z"
+  },
+  {
+    "id": "r9p70r51Qzuh",
+    "title": "剧场版 关于我转生变成史莱姆这档事 苍海之泪篇",
+    "season": "2026春",
+    "cover": "https://lain.bgm.tv/pic/cover/l/cc/84/515595_xP1P5.jpg",
+    "rating": 9,
+    "comment": "这个没看过，还是要找机会看的，暂定9.0，怕忘了",
+    "episodes": 1,
+    "tags": [],
+    "series": "关于我转生变成史莱姆这档事",
+    "marks": [],
+    "bangumiId": 515595,
+    "bangumiUrl": "https://bgm.tv/subject/515595",
+    "originalTitle": "劇場版 転生したらスライムだった件 蒼海の涙編",
+    "airDate": "2026-02-27",
+    "createdAt": "2026-09-30T07:08:48.738Z"
+  },
+  {
+    "id": "WA57Ng28ZBEr",
+    "title": "Re：从零开始的异世界生活 第四季 丧失篇",
+    "season": "2026夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/8e/70/547888_46dnk.jpg",
+    "rating": 8.5,
+    "comment": "太穷了，话说还是白狐社在做吗？剧情只能说尚可，我看了前几季486大呼小叫真的忍受不了了，要不是蕾姆苏醒，我连8.5都懒得给你打",
+    "episodes": 11,
+    "tags": [],
+    "series": "Re：从零开始的异世界生活",
+    "marks": [],
+    "bangumiId": 547888,
+    "bangumiUrl": "https://bgm.tv/subject/547888",
+    "originalTitle": "Re:ゼロから始める異世界生活 4th season 喪失編",
+    "airDate": "2026-04-08",
+    "createdAt": "2026-09-30T07:37:15.453Z"
+  },
+  {
+    "id": "aWDrNZeGRlJi",
+    "title": "公鸡斗士",
+    "season": "2026夏",
+    "cover": "https://lain.bgm.tv/pic/cover/l/b5/7a/505258_73XO8.jpg",
+    "rating": 9,
+    "comment": "鸡哥无敌啊，着实不错，比很多战斗番都好看",
+    "episodes": 12,
+    "tags": [],
+    "series": "公鸡斗士",
+    "marks": [],
+    "bangumiId": 505258,
+    "bangumiUrl": "https://bgm.tv/subject/505258",
+    "originalTitle": "ニワトリ・ファイター",
+    "airDate": "2026-04-05",
+    "createdAt": "2026-09-30T07:37:15.715Z"
+  },
+  {
+    "id": "klrr6JaZChfB",
+    "title": "Re：从零开始的异世界生活 第四季 夺还篇",
+    "season": "2026秋",
+    "cover": "https://lain.bgm.tv/pic/cover/l/43/ca/633836_ql0f3.jpg",
+    "rating": 8.5,
+    "comment": "这季续借上篇，感觉还是节奏不好",
+    "episodes": 8,
+    "tags": [],
+    "series": "Re：从零开始的异世界生活",
+    "marks": [],
+    "bangumiId": 633836,
+    "bangumiUrl": "https://bgm.tv/subject/633836",
+    "originalTitle": "Re:ゼロから始める異世界生活 4th season 奪還編",
+    "airDate": "2026-08-12",
+    "createdAt": "2026-09-30T08:01:42.525Z"
   }
 ]
